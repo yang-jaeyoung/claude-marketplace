@@ -1,0 +1,17 @@
+{
+  "name": "jyyang-claude-marketplace",
+  "description": "Personal Claude Code plugins marketplace by jyyang",
+  "author": {
+    "name": "jyyang",
+    "email": "jyyang@eye.co.kr"
+  },
+  "plugins": [
+    {
+      "name": "codex-cli",
+      "version": "1.0.0",
+      "description": "Codex CLI integration for Claude Code - Execute Codex commands directly",
+      "path": "plugins/codex-cli",
+      "keywords": ["codex", "cli", "gpt", "openai"]
+    }
+  ]
+}
