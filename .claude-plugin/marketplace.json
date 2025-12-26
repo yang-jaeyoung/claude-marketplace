@@ -10,7 +10,7 @@
       "name": "codex-cli",
       "version": "1.0.0",
       "description": "Codex CLI integration for Claude Code - Execute Codex commands directly",
-      "path": "plugins/codex-cli",
+      "path": "../plugins/codex-cli",
       "keywords": ["codex", "cli", "gpt", "openai"]
     }
   ]
