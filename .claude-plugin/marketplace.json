@@ -9,6 +9,11 @@
       "name": "codex-cli",
       "description": "Codex CLI integration for Claude Code - Execute Codex commands directly",
       "source": "./plugins/codex-cli"
+    },
+    {
+      "name": "mssql",
+      "description": "MS SQL Server integration for Claude Code - Execute queries, explore schemas, and manage databases with Windows Authentication",
+      "source": "./plugins/mssql"
     }
   ]
 }

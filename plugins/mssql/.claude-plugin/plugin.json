@@ -1,0 +1,22 @@
+{
+  "name": "mssql",
+  "version": "1.0.0",
+  "description": "MS SQL Server integration for Claude Code - Execute queries, explore schemas, and manage databases with Windows Authentication",
+  "author": {
+    "name": "jyyang",
+    "email": "jyyang@eye.co.kr"
+  },
+  "mcpServers": {
+    "mssql": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp-server/dist/index.js"],
+      "env": {
+        "MSSQL_SERVER": "${MSSQL_SERVER}",
+        "MSSQL_DATABASE": "${MSSQL_DATABASE}",
+        "MSSQL_TRUST_CERT": "${MSSQL_TRUST_CERT}",
+        "MSSQL_QUERY_TIMEOUT": "${MSSQL_QUERY_TIMEOUT}"
+      }
+    }
+  }
+}
