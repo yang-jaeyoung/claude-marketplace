@@ -8,7 +8,7 @@
     {
       "name": "codex-cli",
       "description": "Codex CLI integration for Claude Code - Execute Codex commands directly",
-      "source": "../plugins/codex-cli"
+      "source": "./plugins/codex-cli"
     }
   ]
 }
