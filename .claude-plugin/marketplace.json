@@ -14,6 +14,25 @@
       "name": "mssql",
       "description": "MS SQL Server integration for Claude Code - Execute queries, explore schemas, and manage databases with Windows Authentication",
       "source": "./plugins/mssql"
+    },
+    {
+      "name": "magic-note",
+      "description": "AI coding workflow note management - automatically save prompts, plans, and decisions during coding sessions",
+      "source": "./plugins/magic-note",
+      "version": "1.0.0",
+      "author": {
+        "name": "Magic Note Team"
+      },
+      "keywords": [
+        "notes",
+        "prompts",
+        "plans",
+        "workflow",
+        "ai-coding",
+        "knowledge-management",
+        "mcp"
+      ],
+      "category": "productivity"
     }
   ]
 }

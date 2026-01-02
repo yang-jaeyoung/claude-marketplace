@@ -1,0 +1,12 @@
+{
+  "name": "magic-note-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.1",
+    "gray-matter": "^4.0.3",
+    "nanoid": "^5.1.6",
+    "yaml": "^2.8.2",
+    "zod": "^4.3.4"
+  }
+}

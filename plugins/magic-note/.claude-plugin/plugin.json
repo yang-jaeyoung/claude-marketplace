@@ -1,0 +1,19 @@
+{
+  "name": "magic-note",
+  "description": "AI coding workflow note management - automatically save prompts, plans, and decisions during coding sessions",
+  "version": "1.0.0",
+  "author": {
+    "name": "Magic Note Team"
+  },
+  "homepage": "https://github.com/magic-note/magic-note",
+  "repository": "https://github.com/magic-note/magic-note",
+  "license": "MIT",
+  "keywords": [
+    "notes",
+    "prompts",
+    "plans",
+    "workflow",
+    "ai-coding",
+    "knowledge-management"
+  ]
+}
