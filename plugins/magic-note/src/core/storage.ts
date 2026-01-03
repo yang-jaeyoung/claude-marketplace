@@ -1,6 +1,6 @@
 /**
  * Storage layer for file I/O operations
- * Uses Bun's native file APIs for better performance
+ * Uses runtime abstraction for Bun/Node.js compatibility
  */
 
 import { mkdir, readdir, unlink } from 'node:fs/promises';
@@ -8,6 +8,18 @@ import { join } from 'node:path';
 import { homedir } from 'node:os';
 import type { StoragePaths, NoteIndex, AppConfig } from './types';
 import { VERSION } from './version';
+import {
+  fileExists as checkFileExists,
+  readText,
+  readTextSafe,
+  writeText,
+} from './runtime';
+
+// Re-export fileExists from runtime for external use
+export { fileExists } from './runtime';
+
+// Internal alias for cleaner code
+const fileExists = checkFileExists;
 
 // Default storage root
 const STORAGE_ROOT = join(homedir(), '.magic-note');
@@ -26,7 +38,7 @@ export function getStoragePaths(): StoragePaths {
 // Check if storage is initialized
 export async function isInitialized(): Promise<boolean> {
   const paths = getStoragePaths();
-  return await Bun.file(paths.root).exists();
+  return await fileExists(paths.root);
 }
 
 // Initialize storage directories
@@ -38,12 +50,12 @@ export async function initStorage(): Promise<void> {
   await mkdir(paths.templates, { recursive: true });
 
   // Create default config if not exists
-  if (!(await Bun.file(paths.config).exists())) {
+  if (!(await fileExists(paths.config))) {
     await writeDefaultConfig();
   }
 
   // Create empty index if not exists
-  if (!(await Bun.file(paths.index).exists())) {
+  if (!(await fileExists(paths.index))) {
     await writeIndex(createEmptyIndex());
   }
 }
@@ -64,7 +76,7 @@ async function writeDefaultConfig(): Promise<void> {
   const paths = getStoragePaths();
   const { stringify } = await import('yaml');
   const config = getDefaultConfig();
-  await Bun.write(paths.config, stringify(config));
+  await writeText(paths.config, stringify(config));
 }
 
 // Create empty index
@@ -79,14 +91,13 @@ function createEmptyIndex(): NoteIndex {
 // Read index with error recovery
 export async function readIndex(): Promise<NoteIndex> {
   const paths = getStoragePaths();
-  const file = Bun.file(paths.index);
 
-  if (!(await file.exists())) {
+  if (!(await fileExists(paths.index))) {
     return createEmptyIndex();
   }
 
   try {
-    const content = await file.text();
+    const content = await readText(paths.index);
     const parsed = JSON.parse(content);
 
     // Validate basic structure
@@ -106,7 +117,7 @@ export async function readIndex(): Promise<NoteIndex> {
 export async function writeIndex(index: NoteIndex): Promise<void> {
   const paths = getStoragePaths();
   index.lastUpdated = new Date().toISOString();
-  await Bun.write(paths.index, JSON.stringify(index, null, 2));
+  await writeText(paths.index, JSON.stringify(index, null, 2));
 }
 
 // Get project directory path
@@ -136,7 +147,7 @@ export async function ensureProjectDir(projectName: string): Promise<void> {
 export async function listProjectDirs(): Promise<string[]> {
   const paths = getStoragePaths();
 
-  if (!(await Bun.file(paths.projects).exists())) {
+  if (!(await fileExists(paths.projects))) {
     return [];
   }
 
@@ -150,7 +161,7 @@ export async function listProjectDirs(): Promise<string[]> {
 export async function listNoteFiles(projectName: string): Promise<string[]> {
   const projectPath = getProjectPath(projectName);
 
-  if (!(await Bun.file(projectPath).exists())) {
+  if (!(await fileExists(projectPath))) {
     return [];
   }
 
@@ -164,7 +175,7 @@ export async function listNoteFiles(projectName: string): Promise<string[]> {
 export async function listTemplateFiles(): Promise<string[]> {
   const paths = getStoragePaths();
 
-  if (!(await Bun.file(paths.templates).exists())) {
+  if (!(await fileExists(paths.templates))) {
     return [];
   }
 
@@ -174,31 +185,21 @@ export async function listTemplateFiles(): Promise<string[]> {
     .map(entry => entry.name.replace('.md', ''));
 }
 
-// Read file content using Bun.file
+// Read file content (returns null if not exists)
 export async function readFileContent(filePath: string): Promise<string | null> {
-  const file = Bun.file(filePath);
-  if (!(await file.exists())) {
-    return null;
-  }
-  return await file.text();
+  return await readTextSafe(filePath);
 }
 
-// Write file content using Bun.write
+// Write file content
 export async function writeFileContent(filePath: string, content: string): Promise<void> {
-  await Bun.write(filePath, content);
+  await writeText(filePath, content);
 }
 
 // Delete file
 export async function deleteFile(filePath: string): Promise<boolean> {
-  const file = Bun.file(filePath);
-  if (!(await file.exists())) {
+  if (!(await fileExists(filePath))) {
     return false;
   }
   await unlink(filePath);
   return true;
-}
-
-// Check if file exists using Bun.file
-export async function fileExists(filePath: string): Promise<boolean> {
-  return await Bun.file(filePath).exists();
 }

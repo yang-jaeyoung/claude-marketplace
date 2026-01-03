@@ -1,7 +1,12 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 /**
  * Magic Note MCP Server
  * Provides tools for Claude Code to manage notes
+ *
+ * Runtime Support:
+ * - Bun: Primary runtime (fastest)
+ * - Node.js 22.18+/23.6+: Native TypeScript support
+ * - Node.js + tsx: Fallback for older Node.js versions
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -16,11 +21,12 @@ import {
   deleteNote,
   getAllTags,
   getAllProjects,
-} from '../core/note';
-import { listTemplates, getTemplate } from '../core/template';
-import { isInitialized, initStorage } from '../core/storage';
-import { VERSION, NAME } from '../core/version';
-import type { NoteType, NoteFilter, CreateNoteInput } from '../core/types';
+} from '../core/note.js';
+import { listTemplates, getTemplate } from '../core/template.js';
+import { isInitialized, initStorage } from '../core/storage.js';
+import { VERSION, NAME } from '../core/version.js';
+import { logRuntimeInfo } from '../core/runtime.js';
+import type { NoteType, NoteFilter, CreateNoteInput } from '../core/types.js';
 
 // Create MCP server
 const server = new McpServer({
@@ -303,9 +309,10 @@ server.registerTool(
 
 // Start server
 async function main() {
+  logRuntimeInfo();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('Magic Note MCP server running');
+  console.error('[magic-note] MCP server running');
 }
 
 main().catch(console.error);

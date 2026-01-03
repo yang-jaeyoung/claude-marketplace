@@ -124,11 +124,14 @@ Quick save: `/magic-note:save the auth plan`
 ### 요구사항
 
 - Claude Code v1.0.33 이상
-- [Bun](https://bun.sh/) 런타임 (필수)
+- 다음 런타임 중 하나 (우선순위 순):
+  1. **[Bun](https://bun.sh/)** - 권장 (가장 빠름)
+  2. **Node.js 22.18+ / 23.6+** - 네이티브 TypeScript 지원
+  3. **Node.js + tsx** - 이전 Node.js 버전용 폴백
 
-### Bun 설치
+### 런타임 설치 (택 1)
 
-MCP 서버 실행을 위해 Bun이 필요합니다.
+#### 옵션 1: Bun (권장)
 
 ```bash
 # macOS / Linux
@@ -144,7 +147,30 @@ brew install oven-sh/bun/bun
 bun --version
 ```
 
-> ⚠️ **중요**: Bun이 설치되어 있지 않으면 MCP 서버가 실행되지 않아 Magic Note 기능을 사용할 수 없습니다.
+#### 옵션 2: Node.js 22.18+ (네이티브 TypeScript)
+
+```bash
+# nvm 사용
+nvm install 22
+nvm use 22
+
+# 또는 공식 사이트에서 설치
+# https://nodejs.org/
+
+# 버전 확인 (22.18+ 또는 23.6+ 필요)
+node --version
+```
+
+#### 옵션 3: Node.js + tsx (폴백)
+
+```bash
+# 기존 Node.js가 있다면 tsx만 설치
+npm install -g tsx
+
+# 또는 npx로 자동 실행 (별도 설치 불필요)
+```
+
+> ℹ️ **자동 감지**: Magic Note는 설치된 런타임을 자동으로 감지하여 최적의 옵션을 선택합니다.
 
 ### 방법 1: GitHub 마켓플레이스 (권장)
 
@@ -282,14 +308,30 @@ plugin/
 ```bash
 # 의존성 설치
 cd /path/to/magic-note
-bun install
+npm install  # 또는 bun install
 
-# MCP 서버 초기화
-mn init
+# MCP 서버 테스트 (런타임 자동 감지)
+node bin/launcher.mjs
+
+# 또는 특정 런타임으로 직접 실행
+bun run src/mcp/server.ts           # Bun
+node src/mcp/server.ts              # Node.js 22.18+
+npx tsx src/mcp/server.ts           # Node.js + tsx
 
 # 플러그인 테스트
-claude --plugin-dir ./plugin
+claude --plugin-dir .
 ```
+
+### 지원 플랫폼
+
+| 플랫폼 | Bun | Node.js |
+|--------|:---:|:-------:|
+| macOS (Intel) | ✅ | ✅ |
+| macOS (Apple Silicon) | ✅ | ✅ |
+| Windows x64 | ✅ | ✅ |
+| Windows ARM | ❌ | ✅ |
+| Linux x64 | ✅ | ✅ |
+| Linux ARM | ✅ | ✅ |
 
 ## 라이센스
 

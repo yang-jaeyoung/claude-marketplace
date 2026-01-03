@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "magic-note": {
-      "command": "bun",
-      "args": ["run", "${CLAUDE_PLUGIN_ROOT}/src/mcp/server.ts"],
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/bin/launcher.mjs"],
       "env": {
         "MAGIC_NOTE_HOME": "${HOME}/.magic-note"
       }
