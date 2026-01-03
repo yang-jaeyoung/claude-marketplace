@@ -1,5 +1,6 @@
 ---
 description: Load a note's content into the current conversation context
+allowed-tools: ["mcp__magic-note__get_note", "mcp__magic-note__list_notes"]
 ---
 
 # Load Note Command

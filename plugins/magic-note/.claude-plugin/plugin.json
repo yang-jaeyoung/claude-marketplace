@@ -15,5 +15,15 @@
     "workflow",
     "ai-coding",
     "knowledge-management"
-  ]
+  ],
+  "mcpServers": {
+    "magic-note": {
+      "type": "stdio",
+      "command": "bun",
+      "args": ["run", "${CLAUDE_PLUGIN_ROOT}/src/mcp/server.ts"],
+      "env": {
+        "MAGIC_NOTE_HOME": "${HOME}/.magic-note"
+      }
+    }
+  }
 }

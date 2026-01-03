@@ -1,5 +1,6 @@
 ---
 description: Delete a note from Magic Note
+allowed-tools: ["mcp__magic-note__get_note", "mcp__magic-note__delete_note"]
 ---
 
 # Delete Note Command

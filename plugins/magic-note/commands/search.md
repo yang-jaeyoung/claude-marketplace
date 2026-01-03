@@ -1,5 +1,6 @@
 ---
 description: Search notes in Magic Note by content, tags, or metadata
+allowed-tools: ["mcp__magic-note__list_notes", "mcp__magic-note__list_tags"]
 ---
 
 # Search Notes Command

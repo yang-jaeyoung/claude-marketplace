@@ -4,7 +4,7 @@
       "command": "bun",
       "args": ["run", "${CLAUDE_PLUGIN_ROOT}/src/mcp/server.ts"],
       "env": {
-        "MAGIC_NOTE_HOME": "~/.magic-note"
+        "MAGIC_NOTE_HOME": "${HOME}/.magic-note"
       }
     }
   }

@@ -7,6 +7,8 @@ Personal Claude Code plugins marketplace by jyyang.
 | Plugin | Version | Description |
 |--------|---------|-------------|
 | [codex-cli](./plugins/codex-cli) | 1.0.0 | Codex CLI integration for Claude Code |
+| [mssql](./plugins/mssql) | 1.0.0 | MS SQL Server integration with Windows Authentication |
+| [magic-note](./plugins/magic-note) | 1.0.0 | AI coding workflow note management - save prompts, plans, and decisions |
 
 ## Installation
 

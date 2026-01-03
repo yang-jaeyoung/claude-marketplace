@@ -1,5 +1,6 @@
 ---
 description: Save current conversation context as a note
+allowed-tools: ["mcp__magic-note__add_note", "mcp__magic-note__list_notes"]
 ---
 
 # Save Context Command

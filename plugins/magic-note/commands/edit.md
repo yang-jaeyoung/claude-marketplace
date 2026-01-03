@@ -1,5 +1,6 @@
 ---
 description: Edit an existing note's content or metadata
+allowed-tools: ["mcp__magic-note__get_note", "mcp__magic-note__update_note"]
 ---
 
 # Edit Note Command

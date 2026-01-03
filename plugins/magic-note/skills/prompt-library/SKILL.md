@@ -1,6 +1,11 @@
 ---
 name: prompt-library
-description: Suggests relevant saved prompts from Magic Note when users request common coding tasks. Use when users ask for code reviews, refactoring, documentation, testing, or other repeatable coding tasks that might have saved prompts.
+description: >-
+  Suggests relevant saved prompts from Magic Note when users request common
+  coding tasks. Use when users ask for code reviews, refactoring, documentation,
+  testing, or other repeatable coding tasks that might have saved prompts.
+  Triggers on: "review this code", "refactor this", "add documentation",
+  "write tests", "code review", "리뷰해줘", "리팩토링", "테스트 작성"
 ---
 
 # Prompt Library Skill

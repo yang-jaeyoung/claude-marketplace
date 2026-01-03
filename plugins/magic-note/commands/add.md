@@ -1,5 +1,6 @@
 ---
 description: Add a new note to Magic Note
+allowed-tools: ["mcp__magic-note__add_note", "mcp__magic-note__list_templates", "mcp__magic-note__use_template"]
 ---
 
 # Add Note Command

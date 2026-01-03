@@ -1,6 +1,12 @@
 ---
 name: auto-save-plan
-description: Automatically saves coding plans and implementation strategies to Magic Note. Use when generating implementation plans, architecture designs, step-by-step coding strategies, refactoring plans, or any structured development roadmap.
+description: >-
+  Automatically saves coding plans and implementation strategies to Magic Note.
+  Use when generating implementation plans, architecture designs, step-by-step
+  coding strategies, refactoring plans, or any structured development roadmap.
+  Triggers on: "create a plan", "implementation plan", "let me plan",
+  "step-by-step", "roadmap for", "architecture design", "how to implement",
+  "구현 계획", "단계별로", "로드맵"
 ---
 
 # Auto Save Plan Skill

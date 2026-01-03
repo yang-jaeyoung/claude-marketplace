@@ -1,6 +1,8 @@
 ---
 description: Organizes and optimizes Magic Note library - cleans up tags, detects duplicates, archives outdated notes, and generates usage reports
 capabilities: ["tag optimization", "duplicate detection", "note consolidation", "usage analytics", "archive management"]
+model: haiku
+color: blue
 ---
 
 # Note Organizer Agent
@@ -16,6 +18,35 @@ Claude should invoke this agent when:
 - User wants tag suggestions or optimization
 - User asks for note usage statistics
 - Note library grows beyond manageable size
+
+## Examples
+
+<example>
+Context: User has been using Magic Note for a while and accumulated many notes.
+user: "My notes are getting messy, can you help organize them?"
+assistant: "I'll use the note-organizer agent to analyze your Magic Note library and suggest improvements."
+<commentary>
+Keywords like "messy", "organize", "clean up", "tidy" trigger the note-organizer agent for library maintenance.
+</commentary>
+</example>
+
+<example>
+Context: User suspects they have saved similar content multiple times.
+user: "I think I have some duplicate notes, can you find them?"
+assistant: "I'll launch the note-organizer agent to scan for duplicate or similar notes in your library."
+<commentary>
+Duplicate detection is a core capability. Keywords: "duplicate", "redundant", "similar notes".
+</commentary>
+</example>
+
+<example>
+Context: User wants insights about their note usage patterns.
+user: "Show me statistics about my notes"
+assistant: "I'll use the note-organizer agent to generate a usage analytics report for your Magic Note library."
+<commentary>
+Usage statistics and analytics requests trigger this agent. Keywords: "statistics", "analytics", "usage report".
+</commentary>
+</example>
 
 ## Capabilities
 

@@ -1,5 +1,6 @@
 ---
 description: Copy note content to clipboard or output
+allowed-tools: ["mcp__magic-note__get_note"]
 ---
 
 # Copy Note Command

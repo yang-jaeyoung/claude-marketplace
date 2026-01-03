@@ -1,5 +1,6 @@
 ---
 description: List notes from Magic Note with optional filtering
+allowed-tools: ["mcp__magic-note__list_notes", "mcp__magic-note__list_tags", "mcp__magic-note__list_projects"]
 ---
 
 # List Notes Command

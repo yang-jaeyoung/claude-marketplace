@@ -124,7 +124,27 @@ Quick save: `/magic-note:save the auth plan`
 ### 요구사항
 
 - Claude Code v1.0.33 이상
-- [Bun](https://bun.sh/) 런타임
+- [Bun](https://bun.sh/) 런타임 (필수)
+
+### Bun 설치
+
+MCP 서버 실행을 위해 Bun이 필요합니다.
+
+```bash
+# macOS / Linux
+curl -fsSL https://bun.sh/install | bash
+
+# Windows (PowerShell)
+powershell -c "irm bun.sh/install.ps1 | iex"
+
+# Homebrew (macOS)
+brew install oven-sh/bun/bun
+
+# 설치 확인
+bun --version
+```
+
+> ⚠️ **중요**: Bun이 설치되어 있지 않으면 MCP 서버가 실행되지 않아 Magic Note 기능을 사용할 수 없습니다.
 
 ### 방법 1: GitHub 마켓플레이스 (권장)
 

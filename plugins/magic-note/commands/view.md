@@ -1,5 +1,6 @@
 ---
 description: View full details of a specific note
+allowed-tools: ["mcp__magic-note__get_note"]
 ---
 
 # View Note Command

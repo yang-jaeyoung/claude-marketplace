@@ -1,6 +1,11 @@
 ---
 name: decision-logger
-description: Records technical decisions and their rationale to Magic Note. Use when users make technology choices, architectural decisions, library selections, or any significant technical trade-off decisions during development.
+description: >-
+  Records technical decisions and their rationale to Magic Note. Use when users
+  make technology choices, architectural decisions, library selections, or any
+  significant technical trade-off decisions during development.
+  Triggers on: "I'll go with", "let's use", "we decided", "choose between",
+  "vs", "or which", "뭘 쓸까", "선택", "결정"
 ---
 
 # Decision Logger Skill

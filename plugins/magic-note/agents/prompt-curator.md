@@ -1,6 +1,8 @@
 ---
 description: Curates and improves prompt notes - enhances prompt quality, suggests templates, analyzes effectiveness, and manages prompt library
 capabilities: ["prompt improvement", "template creation", "effectiveness analysis", "prompt versioning", "best practices"]
+model: sonnet
+color: purple
 ---
 
 # Prompt Curator Agent
@@ -16,6 +18,35 @@ Claude should invoke this agent when:
 - User mentions prompt organization or management
 - User wants best practices for their prompts
 - User has many similar prompts that could be standardized
+
+## Examples
+
+<example>
+Context: User has a prompt that isn't producing good results.
+user: "Can you improve my code review prompt? It's not working well."
+assistant: "I'll use the prompt-curator agent to analyze and enhance your code review prompt."
+<commentary>
+Prompt improvement requests trigger this agent. Keywords: "improve prompt", "enhance prompt", "prompt not working".
+</commentary>
+</example>
+
+<example>
+Context: User notices they have many similar prompts.
+user: "I have several similar prompts for code review, can you make a template?"
+assistant: "I'll launch the prompt-curator agent to analyze your prompts and create a reusable template."
+<commentary>
+Template creation from similar prompts. Keywords: "template", "standardize", "similar prompts", "reusable".
+</commentary>
+</example>
+
+<example>
+Context: User wants to evaluate their prompt library quality.
+user: "Which of my prompts are most effective?"
+assistant: "I'll use the prompt-curator agent to analyze your prompt library and generate an effectiveness report."
+<commentary>
+Prompt effectiveness analysis requests. Keywords: "effective", "best prompts", "prompt quality", "analyze prompts".
+</commentary>
+</example>
 
 ## Capabilities
 
