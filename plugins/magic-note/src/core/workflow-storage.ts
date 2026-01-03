@@ -35,6 +35,7 @@ import type {
   TaskFilter,
   WorkflowStatusSummary,
   BatchExecution,
+  ReadEventsResult,
 } from './types';
 import {
   getStoragePaths,
@@ -348,6 +349,7 @@ export async function updateWorkflow(
   if (input.status !== undefined) workflow.status = input.status;
   if (input.tags !== undefined) workflow.tags = input.tags;
   if (input.executionConfig !== undefined) workflow.executionConfig = input.executionConfig;
+  if (input.relatedNoteIds !== undefined) workflow.relatedNoteIds = input.relatedNoteIds;
 
   workflow.updatedAt = new Date().toISOString();
 
@@ -564,6 +566,7 @@ export async function updateTask(
   if (input.order !== undefined) task.order = input.order;
   if (input.dependsOn !== undefined) task.dependsOn = input.dependsOn;
   if (input.tags !== undefined) task.tags = input.tags;
+  if (input.noteIds !== undefined) task.noteIds = input.noteIds;
 
   // Track status changes
   if (input.status && input.status !== previousStatus) {
@@ -632,6 +635,50 @@ export async function removeTask(workflowId: string, taskId: string): Promise<bo
     index.entries[entryIndex] = workflowToIndexEntry(workflow);
     await writeWorkflowIndex(index);
   }
+
+  return true;
+}
+
+/**
+ * Reorder tasks in a workflow (batch operation)
+ * More efficient than calling updateTask for each task
+ */
+export async function reorderTasks(
+  workflowId: string,
+  taskIds: string[]
+): Promise<boolean> {
+  const workflow = await readWorkflow(workflowId);
+
+  if (!workflow) {
+    return false;
+  }
+
+  // Build task ID to index map
+  const taskIdToIndex = new Map(taskIds.map((id, index) => [id, index]));
+
+  // Update order for each task
+  let changed = false;
+  for (const task of workflow.tasks) {
+    const newOrder = taskIdToIndex.get(task.id);
+    if (newOrder !== undefined && task.order !== newOrder) {
+      task.order = newOrder;
+      changed = true;
+    }
+  }
+
+  if (!changed) {
+    return true; // No changes needed
+  }
+
+  workflow.updatedAt = new Date().toISOString();
+
+  // Write updated workflow (single write instead of N writes)
+  await writeText(getWorkflowPath(workflowId), JSON.stringify(workflow, null, 2));
+
+  await appendEvent(workflowId, {
+    type: 'workflow_updated',
+    payload: { action: 'tasks_reordered', taskIds },
+  });
 
   return true;
 }
@@ -752,6 +799,14 @@ export async function completeStep(
 
   await writeText(getWorkflowPath(workflowId), JSON.stringify(workflow, null, 2));
 
+  // Update index to reflect workflow updatedAt change
+  const index = await readWorkflowIndex();
+  const entryIndex = index.entries.findIndex(e => e.id === workflowId);
+  if (entryIndex >= 0) {
+    index.entries[entryIndex] = workflowToIndexEntry(workflow);
+    await writeWorkflowIndex(index);
+  }
+
   await appendEvent(workflowId, {
     type: 'step_completed',
     taskId,
@@ -796,28 +851,62 @@ export async function appendEvent(workflowId: string, input: EventInput): Promis
 }
 
 /**
- * Read all events for a workflow
+ * Read all events for a workflow with detailed error information
+ * Returns events along with metadata about any parse failures
  */
-export async function readEvents(workflowId: string): Promise<WorkflowEvent[]> {
+export async function readEventsWithMetadata(workflowId: string): Promise<ReadEventsResult> {
   const eventsPath = getEventsPath(workflowId);
 
   if (!(await fileExists(eventsPath))) {
-    return [];
+    return {
+      events: [],
+      parseErrors: [],
+      totalLines: 0,
+      successCount: 0,
+      errorCount: 0,
+    };
   }
 
   const content = await readText(eventsPath);
   const lines = content.trim().split('\n').filter(line => line.length > 0);
 
   const events: WorkflowEvent[] = [];
-  for (const line of lines) {
+  const parseErrors: ReadEventsResult['parseErrors'] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     try {
       events.push(JSON.parse(line) as WorkflowEvent);
     } catch (error) {
-      console.error('Failed to parse event:', error);
+      parseErrors.push({
+        lineNumber: i + 1,
+        content: line.length > 100 ? line.substring(0, 100) + '...' : line,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 
-  return events;
+  // Log warning if there were parse errors
+  if (parseErrors.length > 0) {
+    console.error(`[magic-note] Warning: ${parseErrors.length} event(s) failed to parse in workflow ${workflowId}`);
+  }
+
+  return {
+    events,
+    parseErrors,
+    totalLines: lines.length,
+    successCount: events.length,
+    errorCount: parseErrors.length,
+  };
+}
+
+/**
+ * Read all events for a workflow (simple interface, backward compatible)
+ * Use readEventsWithMetadata() if you need parse error details
+ */
+export async function readEvents(workflowId: string): Promise<WorkflowEvent[]> {
+  const result = await readEventsWithMetadata(workflowId);
+  return result.events;
 }
 
 /**
@@ -1064,6 +1153,7 @@ export async function getWorkflowStatus(workflowId: string): Promise<WorkflowSta
 
 /**
  * Get the next batch of tasks to execute
+ * Optimized with O(1) task lookups using a task ID map
  */
 export async function getNextBatch(
   workflowId: string,
@@ -1075,15 +1165,20 @@ export async function getNextBatch(
     return [];
   }
 
+  // Build task ID map for O(1) lookups (optimization from O(n²) to O(n))
+  const taskMap = new Map<string, Task>(
+    workflow.tasks.map(t => [t.id, t])
+  );
+
   // Get pending tasks that have no blockers
   const eligibleTasks = workflow.tasks
     .filter(task => {
       if (task.status !== 'pending') return false;
 
-      // Check if all dependencies are completed
+      // Check if all dependencies are completed using O(1) map lookup
       if (task.dependsOn && task.dependsOn.length > 0) {
         const allDepsCompleted = task.dependsOn.every(depId => {
-          const dep = workflow.tasks.find(t => t.id === depId);
+          const dep = taskMap.get(depId);
           return dep?.status === 'completed';
         });
         if (!allDepsCompleted) return false;

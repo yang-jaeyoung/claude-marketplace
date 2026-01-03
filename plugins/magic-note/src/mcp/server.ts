@@ -33,6 +33,7 @@ import {
   addTask,
   updateTask,
   removeTask,
+  reorderTasks,
   getTasks,
   createCheckpoint,
   listCheckpoints,
@@ -56,6 +57,27 @@ import type {
   Workflow,
   Task,
 } from '../core/types.js';
+import {
+  isWorkflowStatus,
+  isTaskStatus,
+  isTaskPriority,
+} from '../core/types.js';
+
+// Safe type conversion helpers (validates and returns undefined if invalid/missing)
+function toWorkflowStatus(value: string | undefined): WorkflowStatus | undefined {
+  if (!value) return undefined;
+  return isWorkflowStatus(value) ? value : undefined;
+}
+
+function toTaskStatus(value: string | undefined): TaskStatus | undefined {
+  if (!value) return undefined;
+  return isTaskStatus(value) ? value : undefined;
+}
+
+function toTaskPriority(value: string | undefined): TaskPriority | undefined {
+  if (!value) return undefined;
+  return isTaskPriority(value) ? value : undefined;
+}
 
 // Create MCP server
 const server = new McpServer({
@@ -522,7 +544,7 @@ server.registerTool(
       tasks: tasks?.map((t, i) => ({
         title: t.title,
         description: t.description || '',
-        priority: (t.priority as TaskPriority) || 'medium',
+        priority: toTaskPriority(t.priority) || 'medium',
         order: i,
       })),
     });
@@ -570,6 +592,7 @@ server.registerTool(
       createdAt: workflow.createdAt,
       updatedAt: workflow.updatedAt,
       tags: workflow.tags,
+      relatedNoteIds: workflow.relatedNoteIds,
     };
 
     if (includeTasks) {
@@ -605,7 +628,7 @@ server.registerTool(
 
     const workflows = await listWorkflows({
       project,
-      status: activeOnly ? 'active' : status as WorkflowStatus,
+      status: activeOnly ? 'active' : toWorkflowStatus(status),
       search,
     });
 
@@ -646,7 +669,7 @@ server.registerTool(
     const workflow = await updateWorkflowStorage(id, {
       title,
       description,
-      status: status as WorkflowStatus,
+      status: toWorkflowStatus(status),
       tags,
     });
 
@@ -747,7 +770,7 @@ server.registerTool(
     const task = await addTask(workflowId, {
       title,
       description: description || '',
-      priority: priority as TaskPriority,
+      priority: toTaskPriority(priority),
       dependsOn,
       noteIds,
     });
@@ -789,7 +812,7 @@ server.registerTool(
     const task = await updateTask(workflowId, taskId, {
       title,
       description,
-      priority: priority as TaskPriority,
+      priority: toTaskPriority(priority),
       tags,
     });
 
@@ -849,9 +872,14 @@ server.registerTool(
   async ({ workflowId, taskIds }) => {
     await ensureInit();
 
-    // Update each task's order
-    for (let i = 0; i < taskIds.length; i++) {
-      await updateTask(workflowId, taskIds[i], { order: i });
+    // Use optimized batch reorder (single write instead of N writes)
+    const success = await reorderTasks(workflowId, taskIds);
+
+    if (!success) {
+      return {
+        content: [{ type: 'text', text: `Workflow not found: ${workflowId}` }],
+        isError: true,
+      };
     }
 
     return {
@@ -879,8 +907,16 @@ server.registerTool(
   async ({ workflowId, taskId, status, note }) => {
     await ensureInit();
 
+    const validStatus = toTaskStatus(status);
+    if (!validStatus) {
+      return {
+        content: [{ type: 'text', text: `Invalid status: ${status}` }],
+        isError: true,
+      };
+    }
+
     const task = await updateTask(workflowId, taskId, {
-      status: status as TaskStatus,
+      status: validStatus,
     });
 
     if (!task) {
@@ -890,7 +926,7 @@ server.registerTool(
       };
     }
 
-    const emoji = getStatusEmoji(status as TaskStatus);
+    const emoji = getStatusEmoji(validStatus);
     let message = `${emoji} Task status updated: ${task.title} → ${status}`;
     if (note) {
       message += `\nNote: ${note}`;
@@ -1092,14 +1128,14 @@ server.registerTool(
       if (!task.noteIds) task.noteIds = [];
       if (!task.noteIds.includes(noteId)) {
         task.noteIds.push(noteId);
-        await updateTask(workflowId, taskId, {});
+        await updateTask(workflowId, taskId, { noteIds: task.noteIds });
       }
     } else {
       // Link to workflow
       if (!workflow.relatedNoteIds) workflow.relatedNoteIds = [];
       if (!workflow.relatedNoteIds.includes(noteId)) {
         workflow.relatedNoteIds.push(noteId);
-        await updateWorkflowStorage(workflowId, {});
+        await updateWorkflowStorage(workflowId, { relatedNoteIds: workflow.relatedNoteIds });
       }
     }
 
@@ -1138,13 +1174,13 @@ server.registerTool(
     if (taskId) {
       const task = workflow.tasks.find(t => t.id === taskId);
       if (task?.noteIds) {
-        task.noteIds = task.noteIds.filter(id => id !== noteId);
-        await updateTask(workflowId, taskId, {});
+        const updatedNoteIds = task.noteIds.filter(id => id !== noteId);
+        await updateTask(workflowId, taskId, { noteIds: updatedNoteIds });
       }
     } else {
       if (workflow.relatedNoteIds) {
-        workflow.relatedNoteIds = workflow.relatedNoteIds.filter(id => id !== noteId);
-        await updateWorkflowStorage(workflowId, {});
+        const updatedNoteIds = workflow.relatedNoteIds.filter(id => id !== noteId);
+        await updateWorkflowStorage(workflowId, { relatedNoteIds: updatedNoteIds });
       }
     }
 

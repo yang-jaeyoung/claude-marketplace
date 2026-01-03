@@ -188,6 +188,53 @@ export type TaskStatus =
 export type TaskPriority = 'critical' | 'high' | 'medium' | 'low';
 
 // ============================================================================
+// TYPE GUARDS FOR ENUM VALIDATION
+// ============================================================================
+
+const WORKFLOW_STATUSES = ['draft', 'ready', 'active', 'paused', 'blocked', 'completed', 'failed', 'cancelled'] as const;
+const TASK_STATUSES = ['pending', 'in_progress', 'verifying', 'review', 'completed', 'failed', 'skipped', 'blocked'] as const;
+const TASK_PRIORITIES = ['critical', 'high', 'medium', 'low'] as const;
+
+/** Type guard to validate WorkflowStatus */
+export function isWorkflowStatus(value: unknown): value is WorkflowStatus {
+  return typeof value === 'string' && WORKFLOW_STATUSES.includes(value as WorkflowStatus);
+}
+
+/** Type guard to validate TaskStatus */
+export function isTaskStatus(value: unknown): value is TaskStatus {
+  return typeof value === 'string' && TASK_STATUSES.includes(value as TaskStatus);
+}
+
+/** Type guard to validate TaskPriority */
+export function isTaskPriority(value: unknown): value is TaskPriority {
+  return typeof value === 'string' && TASK_PRIORITIES.includes(value as TaskPriority);
+}
+
+/** Safe cast with validation - throws if invalid */
+export function assertWorkflowStatus(value: unknown): WorkflowStatus {
+  if (!isWorkflowStatus(value)) {
+    throw new Error(`Invalid WorkflowStatus: ${value}. Must be one of: ${WORKFLOW_STATUSES.join(', ')}`);
+  }
+  return value;
+}
+
+/** Safe cast with validation - throws if invalid */
+export function assertTaskStatus(value: unknown): TaskStatus {
+  if (!isTaskStatus(value)) {
+    throw new Error(`Invalid TaskStatus: ${value}. Must be one of: ${TASK_STATUSES.join(', ')}`);
+  }
+  return value;
+}
+
+/** Safe cast with validation - throws if invalid */
+export function assertTaskPriority(value: unknown): TaskPriority {
+  if (!isTaskPriority(value)) {
+    throw new Error(`Invalid TaskPriority: ${value}. Must be one of: ${TASK_PRIORITIES.join(', ')}`);
+  }
+  return value;
+}
+
+// ============================================================================
 // CONFIDENCE CHECKER PATTERN (from SuperClaude_Framework)
 // ============================================================================
 
@@ -540,6 +587,22 @@ export interface WorkflowEvent {
   actor?: string;                     // Who/what triggered the event
 }
 
+/**
+ * Result of reading events with error metadata
+ * Includes both successfully parsed events and information about parse failures
+ */
+export interface ReadEventsResult {
+  events: WorkflowEvent[];
+  parseErrors: {
+    lineNumber: number;
+    content: string;
+    error: string;
+  }[];
+  totalLines: number;
+  successCount: number;
+  errorCount: number;
+}
+
 // ============================================================================
 // WORKFLOW CREATION/UPDATE INPUTS
 // ============================================================================
@@ -560,6 +623,7 @@ export interface UpdateWorkflowInput {
   status?: WorkflowStatus;
   tags?: string[];
   executionConfig?: BatchExecutionConfig;
+  relatedNoteIds?: string[];  // For artifact linking
 }
 
 export interface CreateTaskInput {
@@ -585,6 +649,7 @@ export interface UpdateTaskInput {
   order?: number;
   dependsOn?: string[];
   tags?: string[];
+  noteIds?: string[];  // For artifact linking
 }
 
 // ============================================================================

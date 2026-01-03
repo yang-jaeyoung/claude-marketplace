@@ -95,19 +95,14 @@ export async function writeText(path: string, content: string): Promise<void> {
 
 /**
  * Append text content to file (UTF-8)
- * - Bun: Uses Bun.write() with append flag
- * - Node.js: Uses fs.appendFile() with utf-8 encoding
+ * Uses fs.appendFile() for both runtimes to ensure atomic append operations.
+ * This prevents race conditions when multiple processes append concurrently.
  *
  * Creates the file if it doesn't exist.
  */
 export async function appendText(path: string, content: string): Promise<void> {
-  if (isBun) {
-    // Bun doesn't have a native append, so we read + write
-    const existing = await fileExists(path) ? await Bun.file(path).text() : '';
-    await Bun.write(path, existing + content);
-    return;
-  }
-
+  // Use Node.js appendFile for both runtimes - it's atomic and prevents race conditions
+  // The previous Bun implementation (read + write) was not safe for concurrent appends
   await appendFile(path, content, 'utf-8');
 }
 
