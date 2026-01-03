@@ -6,7 +6,7 @@
  * Fallback: Node.js fs/promises APIs when Bun is not available
  */
 
-import { readFile, writeFile, access, constants } from 'node:fs/promises';
+import { readFile, writeFile, appendFile, access, stat, constants } from 'node:fs/promises';
 
 // Runtime detection
 export const isBun = typeof globalThis.Bun !== 'undefined';
@@ -25,6 +25,31 @@ export async function fileExists(path: string): Promise<boolean> {
   try {
     await access(path, constants.F_OK);
     return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check if a path exists (file or directory)
+ * Uses fs.access which works for both files and directories
+ */
+export async function pathExists(path: string): Promise<boolean> {
+  try {
+    await access(path, constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check if a directory exists at the given path
+ */
+export async function dirExists(path: string): Promise<boolean> {
+  try {
+    const stats = await stat(path);
+    return stats.isDirectory();
   } catch {
     return false;
   }
@@ -66,6 +91,24 @@ export async function writeText(path: string, content: string): Promise<void> {
   }
 
   await writeFile(path, content, 'utf-8');
+}
+
+/**
+ * Append text content to file (UTF-8)
+ * - Bun: Uses Bun.write() with append flag
+ * - Node.js: Uses fs.appendFile() with utf-8 encoding
+ *
+ * Creates the file if it doesn't exist.
+ */
+export async function appendText(path: string, content: string): Promise<void> {
+  if (isBun) {
+    // Bun doesn't have a native append, so we read + write
+    const existing = await fileExists(path) ? await Bun.file(path).text() : '';
+    await Bun.write(path, existing + content);
+    return;
+  }
+
+  await appendFile(path, content, 'utf-8');
 }
 
 /**

@@ -21,17 +21,22 @@ export { fileExists } from './runtime';
 // Internal alias for cleaner code
 const fileExists = checkFileExists;
 
-// Default storage root
-const STORAGE_ROOT = join(homedir(), '.magic-note');
+// Default storage root (can be overridden via MAGIC_NOTE_STORAGE env var)
+function getStorageRoot(): string {
+  return process.env.MAGIC_NOTE_STORAGE || join(homedir(), '.magic-note');
+}
 
 // Get all storage paths
 export function getStoragePaths(): StoragePaths {
+  const root = getStorageRoot();
   return {
-    root: STORAGE_ROOT,
-    projects: join(STORAGE_ROOT, 'projects'),
-    templates: join(STORAGE_ROOT, 'templates'),
-    config: join(STORAGE_ROOT, 'config.yaml'),
-    index: join(STORAGE_ROOT, 'index.json'),
+    root,
+    projects: join(root, 'projects'),
+    templates: join(root, 'templates'),
+    config: join(root, 'config.yaml'),
+    index: join(root, 'index.json'),
+    workflows: join(root, 'workflows'),
+    workspaces: join(root, 'workspaces'),
   };
 }
 
@@ -48,6 +53,8 @@ export async function initStorage(): Promise<void> {
   await mkdir(paths.root, { recursive: true });
   await mkdir(paths.projects, { recursive: true });
   await mkdir(paths.templates, { recursive: true });
+  await mkdir(paths.workflows, { recursive: true });
+  await mkdir(paths.workspaces, { recursive: true });
 
   // Create default config if not exists
   if (!(await fileExists(paths.config))) {
