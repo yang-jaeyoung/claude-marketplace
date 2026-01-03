@@ -50,7 +50,7 @@ server.registerTool(
     title: 'List Notes',
     description: 'List all notes with optional filtering by type, project, or tags',
     inputSchema: {
-      type: z.enum(['prompt', 'plan', 'choice']).optional().describe('Filter by note type'),
+      type: z.enum(['prompt', 'plan', 'choice', 'insight']).optional().describe('Filter by note type'),
       project: z.string().optional().describe('Filter by project name'),
       tags: z.array(z.string()).optional().describe('Filter by tags'),
       search: z.string().optional().describe('Search in title and tags'),
@@ -105,7 +105,7 @@ server.registerTool(
     title: 'Add Note',
     description: 'Create a new note',
     inputSchema: {
-      type: z.enum(['prompt', 'plan', 'choice']).describe('Note type'),
+      type: z.enum(['prompt', 'plan', 'choice', 'insight']).describe('Note type'),
       title: z.string().describe('Note title'),
       content: z.string().describe('Note content'),
       tags: z.array(z.string()).optional().describe('Tags for the note'),
@@ -190,6 +190,86 @@ server.registerTool(
         },
       ],
       isError: !success,
+    };
+  }
+);
+
+// upsert_insight - Add insight to project's insight note (create or update)
+server.registerTool(
+  'upsert_insight',
+  {
+    title: 'Upsert Insight',
+    description: 'Add an insight to the project insight note. Creates new note if none exists, or appends to existing one.',
+    inputSchema: {
+      project: z.string().describe('Project name (usually from current working directory)'),
+      insight: z.string().describe('The insight content to add'),
+      context: z.string().optional().describe('Optional context about when/why this insight was generated'),
+      tags: z.array(z.string()).optional().describe('Additional tags for the insight'),
+    },
+  },
+  async ({ project, insight, context, tags }) => {
+    await ensureInit();
+
+    // Search for existing insight note for this project
+    const existingNotes = await listNotes({
+      type: 'insight' as NoteType,
+      project
+    });
+
+    const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const timeStr = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+
+    // Format new insight entry
+    const newInsightEntry = context
+      ? `### ${timestamp} ${timeStr}\n**Context**: ${context}\n\n${insight}\n\n---\n`
+      : `### ${timestamp} ${timeStr}\n\n${insight}\n\n---\n`;
+
+    if (existingNotes.length > 0) {
+      // Update existing insight note
+      const existingNote = await getNote(existingNotes[0].id);
+      if (existingNote) {
+        const updatedContent = existingNote.content + '\n' + newInsightEntry;
+        const existingTags = existingNote.tags || [];
+        const newTags = tags || [];
+        const mergedTags = [...new Set([...existingTags, ...newTags])];
+
+        await updateNote(existingNote.id, {
+          content: updatedContent,
+          tags: mergedTags
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `💡 Insight added to existing note!\nProject: ${project}\nNote ID: ${existingNote.id}\nTotal insights: ${(updatedContent.match(/^### \d{4}-\d{2}-\d{2}/gm) || []).length}`,
+            },
+          ],
+        };
+      }
+    }
+
+    // Create new insight note for this project
+    const initialContent = `# ${project} - Insights Collection\n\n` +
+      `> 이 프로젝트에서 학습한 인사이트 모음\n\n` +
+      `---\n\n` +
+      newInsightEntry;
+
+    const note = await createNote({
+      type: 'insight' as NoteType,
+      title: `${project} Insights`,
+      content: initialContent,
+      tags: ['insight', 'auto-captured', ...(tags || [])],
+      project,
+    });
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `💡 New insight note created!\nProject: ${project}\nNote ID: ${note.id}`,
+        },
+      ],
     };
   }
 );

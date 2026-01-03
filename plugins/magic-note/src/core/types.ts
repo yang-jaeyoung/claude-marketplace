@@ -3,7 +3,7 @@
  */
 
 // Note types
-export type NoteType = 'prompt' | 'plan' | 'choice';
+export type NoteType = 'prompt' | 'plan' | 'choice' | 'insight';
 
 // Supported content formats
 export type ContentFormat = 'markdown' | 'text' | 'xml' | 'yaml';
