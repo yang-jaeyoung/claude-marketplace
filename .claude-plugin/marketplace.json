@@ -16,21 +16,19 @@
       "source": "./plugins/mssql"
     },
     {
-      "name": "magic-note",
-      "description": "AI coding workflow note management - automatically save prompts, plans, and decisions during coding sessions",
-      "source": "./plugins/magic-note",
+      "name": "context-aware-workflow",
+      "description": "Context-aware workflow orchestration plugin with Plan Mode integration, intelligent context management, and structured task planning",
+      "source": "./plugins/context-aware-workflow",
       "version": "1.0.0",
       "author": {
-        "name": "Magic Note Team"
+        "name": "urd"
       },
       "keywords": [
-        "notes",
-        "prompts",
-        "plans",
         "workflow",
-        "ai-coding",
-        "knowledge-management",
-        "mcp"
+        "context",
+        "planning",
+        "orchestration",
+        "task-management"
       ],
       "category": "productivity"
     }
