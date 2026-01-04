@@ -11,6 +11,27 @@ description: >-
 
 This skill helps create and manage multi-step coding workflows with task tracking, checkpoints, and progress monitoring.
 
+## Plan Mode Handling
+
+**IMPORTANT**: If Claude Code is currently in **plan mode** (EnterPlanMode was used), MCP tools cannot be called directly. In this case:
+
+1. **During Plan Mode**: Generate the workflow structure in your plan, but DO NOT attempt to call `create_workflow` MCP tool.
+
+2. **After Plan Approval**: When the user approves the plan and exits plan mode (ExitPlanMode), THEN call `create_workflow` to create the actual workflow.
+
+3. **Workflow Offer Format in Plan Mode**:
+   ```
+   📋 이 계획을 워크플로우로 변환할 수 있습니다.
+
+   Plan 승인 후 자동으로 워크플로우가 생성됩니다:
+   - [N]개 태스크
+   - 체크포인트로 진행 상황 추적 가능
+
+   또는 나중에 `/magic-note:workflow` 명령으로 수동 생성 가능합니다.
+   ```
+
+4. **Post-Plan Workflow Creation**: After ExitPlanMode, immediately create the workflow using the plan content as the source.
+
 ## When to Activate
 
 Activate this skill when:
@@ -19,6 +40,7 @@ Activate this skill when:
 - Beginning a multi-step refactoring task
 - Planning a complex debugging session
 - Managing a project with multiple phases
+- **After plan approval** when a structured plan was generated in plan mode
 
 ## How to Create a Workflow
 

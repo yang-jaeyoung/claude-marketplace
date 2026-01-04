@@ -288,6 +288,21 @@ Use `/magic-note:load [id]` to load any note.
 Quick save: `/magic-note:save`
 ```
 
+#### Plan Mode 종료 시 (ExitPlanMode)
+
+Claude Code의 plan mode에서 계획 승인 후 자동 처리:
+
+```
+[Plan 승인 후]
+📋 Plan approved! Taking Magic Note actions:
+- Saving plan to notes...
+- Creating workflow with 5 tasks...
+```
+
+**중요**: Plan mode 중에는 MCP 도구를 호출할 수 없습니다. 따라서:
+- Plan mode 중: 워크플로우 구조만 표시, 실제 생성은 보류
+- Plan 승인 후: 자동으로 노트 저장 및 워크플로우 생성
+
 ### 인사이트 자동 캡처
 
 Learning/Explanatory 모드에서 생성된 인사이트가 자동 저장됩니다:
@@ -412,6 +427,24 @@ cp -r ~/.magic-note /path/to/project/.magic-note
 
 # 또는 직접 확인
 ls .magic-note/workflows/*/checkpoints/
+```
+
+#### Q: Plan mode에서 워크플로우 변환이 안 돼요
+
+Claude Code의 plan mode에서는 MCP 도구 호출이 제한됩니다. 이는 정상 동작입니다.
+
+**해결 방법**:
+1. Plan 승인 후 자동 변환: Plan을 승인하면 (`ExitPlanMode`) 자동으로 워크플로우가 생성됩니다
+2. 수동 생성: Plan 승인 후 `/magic-note:workflow [제목]` 명령 사용
+
+```
+[Plan mode 중]
+📋 이 계획을 워크플로우로 변환할 수 있습니다.
+Plan 승인 후 자동으로 워크플로우가 생성됩니다.
+
+[Plan 승인 후]
+📋 Plan approved! Creating workflow...
+✅ Workflow created: wf_xxx (5 tasks)
 ```
 
 ### 데이터 백업

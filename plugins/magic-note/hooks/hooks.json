@@ -29,6 +29,15 @@
             "prompt": "A file was just written or edited: ${FILE}\n\nThis is a passive check - DO NOT interrupt the user's workflow.\n\nONLY if the edit was part of implementing a significant plan that was discussed but NOT saved to Magic Note, make a brief note internally to potentially suggest saving at session end.\n\nDo NOT:\n- Interrupt with save suggestions after every edit\n- Mention Magic Note for routine code changes\n- Slow down the coding workflow\n\nStay completely silent unless there's a compelling reason to remind about saving a comprehensive implementation plan."
           }
         ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Plan mode just ended. The user approved a plan.\n\nCheck if the approved plan should be:\n1. **Saved to Magic Note**: If the plan has structured implementation steps, save it using add_note MCP tool with type 'plan'\n2. **Converted to Workflow**: If the plan has 3+ distinct tasks/phases, offer to create a workflow\n\nIf the plan is substantial, take action:\n\n📋 Plan approved! Taking Magic Note actions:\n- Saving plan to notes...\n- [If applicable] Creating workflow with [N] tasks...\n\nUse the add_note and create_workflow MCP tools as appropriate.\n\nIf the plan is trivial (1-2 simple steps), stay silent and let the user proceed with implementation."
+          }
+        ]
       }
     ],
     "SubagentStop": [

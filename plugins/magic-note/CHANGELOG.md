@@ -13,6 +13,14 @@ All notable changes to the Magic Note plugin will be documented in this file.
   - Project context travels with the codebase
   - Environment variable `MAGIC_NOTE_STORAGE` still available for overrides
 
+### Fixed
+
+- **Plan Mode Workflow Conversion**: Fixed workflow creation not working in Claude Code plan mode
+  - Plan mode restricts MCP tool calls, so workflow creation is now deferred
+  - Added `ExitPlanMode` hook to automatically create workflows after plan approval
+  - Updated `workflow` and `auto-save-plan` skills with plan mode handling instructions
+  - Added FAQ entry in user guide explaining the behavior
+
 ### Migration
 If you have existing data in `~/.magic-note`, you can migrate it to your project:
 ```bash

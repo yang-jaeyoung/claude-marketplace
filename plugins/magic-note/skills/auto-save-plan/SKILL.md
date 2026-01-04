@@ -13,6 +13,27 @@ description: >-
 
 This skill automatically detects and saves coding plans to Magic Note for future reference.
 
+## Plan Mode Handling
+
+**IMPORTANT**: If Claude Code is currently in **plan mode** (EnterPlanMode was used), MCP tools cannot be called directly.
+
+1. **During Plan Mode**: DO NOT attempt to call `add_note` or `create_workflow` MCP tools. The plan will be saved to a plan file that Claude Code manages.
+
+2. **After Plan Approval**: When the user approves the plan and exits plan mode (ExitPlanMode):
+   - Save the plan to Magic Note using `add_note` MCP tool
+   - Offer to convert to workflow using `create_workflow` MCP tool
+
+3. **Detection**: Check if you're in plan mode by:
+   - The system prompt mentions "plan mode"
+   - You're writing to a plan file
+   - ExitPlanMode tool is expected to be used
+
+4. **Deferred Save Message**:
+   ```
+   📝 이 계획은 Plan 승인 후 Magic Note에 저장됩니다.
+   워크플로우 변환도 그때 진행할 수 있습니다.
+   ```
+
 ## When to Activate
 
 Activate this skill when you:
@@ -22,6 +43,7 @@ Activate this skill when you:
 - Outline a migration or upgrade path
 - Create a debugging investigation plan
 - Design API endpoints or data models
+- **Exit plan mode** with a structured plan to save
 
 ## How to Save Plans
 
