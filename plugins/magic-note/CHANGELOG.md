@@ -2,6 +2,23 @@
 
 All notable changes to the Magic Note plugin will be documented in this file.
 
+## [1.1.0] - 2026-01-04
+
+### Changed
+
+#### Breaking Change
+- **Project-Local Storage**: Changed storage location from global `~/.magic-note` to project-local `.magic-note`
+  - Each project now has its own isolated storage directory
+  - Enables version control of notes/workflows (add to git or .gitignore)
+  - Project context travels with the codebase
+  - Environment variable `MAGIC_NOTE_STORAGE` still available for overrides
+
+### Migration
+If you have existing data in `~/.magic-note`, you can migrate it to your project:
+```bash
+cp -r ~/.magic-note /path/to/your/project/.magic-note
+```
+
 ## [1.0.1] - 2026-01-03
 
 ### Fixed

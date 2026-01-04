@@ -5,7 +5,6 @@
 
 import { mkdir, readdir, unlink } from 'node:fs/promises';
 import { join } from 'node:path';
-import { homedir } from 'node:os';
 import type { StoragePaths, NoteIndex, AppConfig } from './types';
 import { VERSION } from './version';
 import {
@@ -21,9 +20,19 @@ export { fileExists } from './runtime';
 // Internal alias for cleaner code
 const fileExists = checkFileExists;
 
-// Default storage root (can be overridden via MAGIC_NOTE_STORAGE env var)
+/**
+ * Get the storage root directory
+ *
+ * Storage is project-local: each project has its own .magic-note directory
+ * in the current working directory. This enables:
+ * - Project isolation (notes/workflows don't mix between projects)
+ * - Version control (can commit .magic-note or add to .gitignore)
+ * - Portability (project context travels with the codebase)
+ *
+ * Can be overridden via MAGIC_NOTE_STORAGE env var for testing or custom setups.
+ */
 function getStorageRoot(): string {
-  return process.env.MAGIC_NOTE_STORAGE || join(homedir(), '.magic-note');
+  return process.env.MAGIC_NOTE_STORAGE || join(process.cwd(), '.magic-note');
 }
 
 // Get all storage paths

@@ -4,8 +4,8 @@
  * Provides CRUD operations for Workflows, Tasks, Checkpoints, and Events.
  * Implements Event Sourcing pattern with JSONL append-only log.
  *
- * Storage Structure:
- *   ~/.magic-note/workflows/
+ * Storage Structure (project-local):
+ *   .magic-note/workflows/
  *     ├── index.json           # Workflow index for fast lookup
  *     ├── {workflowId}/
  *     │   ├── workflow.json    # Workflow state
