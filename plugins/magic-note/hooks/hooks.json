@@ -2,27 +2,43 @@
   "hooks": {
     "SessionStart": [
       {
-        "type": "prompt",
-        "prompt": "Check if Magic Note has any saved notes related to the current project.\n\nCurrent working directory: ${CWD}\n\nUsing the list_notes MCP tool, search for notes that might be relevant to this project:\n1. Search by project name (extract project name from the directory path)\n2. Search for recent plans or prompts that might be useful\n\nIf relevant notes are found (1-5 notes), briefly inform the user:\n\"📚 Magic Note: Found [N] related notes for this project:\n- [note_title] (type) - [brief description]\n\nUse `/magic-note:load [id]` to load any note.\"\n\nIf no relevant notes found or Magic Note is not initialized, stay silent - don't mention Magic Note at all.\n\nKeep this check quick and non-intrusive. Only mention if genuinely relevant notes exist."
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check if Magic Note has any saved notes related to the current project.\n\nCurrent working directory: ${CWD}\n\nUsing the list_notes MCP tool, search for notes that might be relevant to this project:\n1. Search by project name (extract project name from the directory path)\n2. Search for recent plans or prompts that might be useful\n\nIf relevant notes are found (1-5 notes), briefly inform the user:\n\"📚 Magic Note: Found [N] related notes for this project:\n- [note_title] (type) - [brief description]\n\nUse `/magic-note:load [id]` to load any note.\"\n\nIf no relevant notes found or Magic Note is not initialized, stay silent - don't mention Magic Note at all.\n\nKeep this check quick and non-intrusive. Only mention if genuinely relevant notes exist."
+          }
+        ]
       }
     ],
     "SessionEnd": [
       {
-        "type": "prompt",
-        "prompt": "Before this session ends, check if there was significant content worth saving to Magic Note.\n\nLook for content in this session that would be valuable to save:\n1. Implementation plans with multiple steps\n2. Technical decisions or comparisons made\n3. Useful prompts or checklists created\n4. Architecture designs or strategies discussed\n\nIf saveable content exists that wasn't already saved, offer ONCE:\n\"💾 Would you like to save any of this session's content to Magic Note?\n- [Brief description of saveable content]\n\nQuick save: `/magic-note:save [description]`\"\n\nIf nothing significant to save, or content was already saved during the session, stay silent.\n\nDo NOT be pushy. One brief offer maximum."
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before this session ends, check if there was significant content worth saving to Magic Note.\n\nLook for content in this session that would be valuable to save:\n1. Implementation plans with multiple steps\n2. Technical decisions or comparisons made\n3. Useful prompts or checklists created\n4. Architecture designs or strategies discussed\n\nIf saveable content exists that wasn't already saved, offer ONCE:\n\"💾 Would you like to save any of this session's content to Magic Note?\n- [Brief description of saveable content]\n\nQuick save: `/magic-note:save [description]`\"\n\nIf nothing significant to save, or content was already saved during the session, stay silent.\n\nDo NOT be pushy. One brief offer maximum."
+          }
+        ]
       }
     ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",
-        "type": "prompt",
-        "prompt": "A file was just written or edited: ${FILE}\n\nThis is a passive check - DO NOT interrupt the user's workflow.\n\nONLY if the edit was part of implementing a significant plan that was discussed but NOT saved to Magic Note, make a brief note internally to potentially suggest saving at session end.\n\nDo NOT:\n- Interrupt with save suggestions after every edit\n- Mention Magic Note for routine code changes\n- Slow down the coding workflow\n\nStay completely silent unless there's a compelling reason to remind about saving a comprehensive implementation plan."
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A file was just written or edited: ${FILE}\n\nThis is a passive check - DO NOT interrupt the user's workflow.\n\nONLY if the edit was part of implementing a significant plan that was discussed but NOT saved to Magic Note, make a brief note internally to potentially suggest saving at session end.\n\nDo NOT:\n- Interrupt with save suggestions after every edit\n- Mention Magic Note for routine code changes\n- Slow down the coding workflow\n\nStay completely silent unless there's a compelling reason to remind about saving a comprehensive implementation plan."
+          }
+        ]
       }
     ],
     "SubagentStop": [
       {
-        "type": "prompt",
-        "prompt": "A subagent task just completed.\n\nIf the subagent generated a significant deliverable (plan, analysis, review) that would be useful to save for future reference, briefly note:\n\"📋 This [analysis/plan/review] could be saved to Magic Note for future reference.\n   Quick save: `/magic-note:save`\"\n\nOnly suggest for substantial, reusable content. Stay silent for routine subagent operations."
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A subagent task just completed.\n\nIf the subagent generated a significant deliverable (plan, analysis, review) that would be useful to save for future reference, briefly note:\n\"📋 This [analysis/plan/review] could be saved to Magic Note for future reference.\n   Quick save: `/magic-note:save`\"\n\nOnly suggest for substantial, reusable content. Stay silent for routine subagent operations."
+          }
+        ]
       }
     ]
   }
