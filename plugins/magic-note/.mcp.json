@@ -2,10 +2,7 @@
   "mcpServers": {
     "magic-note": {
       "command": "node",
-      "args": ["${CLAUDE_PLUGIN_ROOT}/bin/launcher.mjs"],
-      "env": {
-        "MAGIC_NOTE_HOME": "${HOME}/.magic-note"
-      }
+      "args": ["${CLAUDE_PLUGIN_ROOT}/bin/launcher.mjs"]
     }
   }
 }

@@ -1449,9 +1449,11 @@ server.registerTool(
 // Start server
 async function main() {
   logRuntimeInfo();
+  console.error(`[magic-note] Storage: ${process.cwd()}/.magic-note`);
+  console.error(`[magic-note] Version: ${VERSION}`);
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('[magic-note] MCP server running');
+  console.error('[magic-note] MCP server running (30 tools registered)');
 }
 
 main().catch(console.error);
