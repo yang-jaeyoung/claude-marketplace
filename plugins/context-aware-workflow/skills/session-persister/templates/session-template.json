@@ -1,0 +1,35 @@
+{
+  "$schema": "Session state template for CAW workflow persistence",
+  "session_id": "sess_{YYYYMMDD}_{HHMMSS}",
+  "created": "{ISO_TIMESTAMP}",
+  "last_updated": "{ISO_TIMESTAMP}",
+  "workflow": {
+    "task_plan": ".caw/task_plan.md",
+    "task_title": "{TASK_TITLE}",
+    "status": "in_progress | completed | paused"
+  },
+  "progress": {
+    "current_phase": "phase_{N}",
+    "current_step": "{PHASE}.{STEP}",
+    "progress_percentage": 0,
+    "completed_steps": [],
+    "pending_steps": []
+  },
+  "context": {
+    "active_files": [],
+    "recent_edits": [
+      {
+        "file": "{FILE_PATH}",
+        "timestamp": "{ISO_TIMESTAMP}",
+        "summary": "{EDIT_SUMMARY}"
+      }
+    ],
+    "open_questions": []
+  },
+  "metrics": {
+    "insights_captured": 0,
+    "decisions_made": 0,
+    "quality_gates_passed": 0
+  },
+  "notes": ""
+}

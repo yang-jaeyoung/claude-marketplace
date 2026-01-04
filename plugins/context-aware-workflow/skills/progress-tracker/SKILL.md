@@ -1,0 +1,337 @@
+---
+name: progress-tracker
+description: Tracks workflow progress metrics including completion percentage, time spent, and step status. Use to maintain .caw/metrics.json and provide progress visualization.
+allowed-tools: Read, Write, Bash
+---
+
+# Progress Tracker
+
+Track and visualize workflow progress with detailed metrics.
+
+## Triggers
+
+This skill activates when:
+1. Step status changes (pending → in_progress → completed)
+2. Phase transitions
+3. `/caw:status` command runs
+4. Periodic updates (every 10 minutes)
+
+## Metrics Data
+
+### `.caw/metrics.json` Structure
+
+```json
+{
+  "task_id": "auth-jwt-implementation",
+  "task_title": "JWT Authentication Implementation",
+  "started": "2026-01-04T10:00:00Z",
+  "estimated_completion": "2026-01-04T14:00:00Z",
+  "phases": {
+    "phase_1": {
+      "name": "Setup",
+      "status": "completed",
+      "started": "2026-01-04T10:00:00Z",
+      "completed": "2026-01-04T10:30:00Z",
+      "duration_minutes": 30,
+      "steps": {
+        "total": 3,
+        "completed": 3,
+        "in_progress": 0,
+        "pending": 0
+      }
+    },
+    "phase_2": {
+      "name": "Core Implementation",
+      "status": "in_progress",
+      "started": "2026-01-04T10:30:00Z",
+      "completed": null,
+      "duration_minutes": null,
+      "steps": {
+        "total": 5,
+        "completed": 2,
+        "in_progress": 1,
+        "pending": 2
+      }
+    },
+    "phase_3": {
+      "name": "Testing",
+      "status": "pending",
+      "started": null,
+      "completed": null,
+      "duration_minutes": null,
+      "steps": {
+        "total": 3,
+        "completed": 0,
+        "in_progress": 0,
+        "pending": 3
+      }
+    }
+  },
+  "totals": {
+    "phases_total": 3,
+    "phases_completed": 1,
+    "steps_total": 11,
+    "steps_completed": 5,
+    "progress_percentage": 45.5
+  },
+  "timeline": [
+    {
+      "timestamp": "2026-01-04T10:00:00Z",
+      "event": "workflow_started",
+      "details": "Task plan created"
+    },
+    {
+      "timestamp": "2026-01-04T10:30:00Z",
+      "event": "phase_completed",
+      "details": "Phase 1: Setup completed"
+    },
+    {
+      "timestamp": "2026-01-04T11:15:00Z",
+      "event": "step_completed",
+      "details": "Step 2.2: Auth middleware"
+    }
+  ],
+  "performance": {
+    "avg_step_duration_minutes": 15,
+    "fastest_step": { "id": "1.1", "minutes": 5 },
+    "slowest_step": { "id": "2.1", "minutes": 35 },
+    "quality_gate_pass_rate": 0.85
+  },
+  "insights_captured": 3,
+  "decisions_logged": 2
+}
+```
+
+## Behavior
+
+### On Step Start
+
+```yaml
+action: step_started
+updates:
+  - Set step status to "in_progress"
+  - Record start timestamp
+  - Add timeline event
+```
+
+### On Step Complete
+
+```yaml
+action: step_completed
+updates:
+  - Set step status to "completed"
+  - Record completion timestamp
+  - Calculate duration
+  - Update totals
+  - Check for phase completion
+  - Add timeline event
+  - Recalculate progress percentage
+```
+
+### On Phase Complete
+
+```yaml
+action: phase_completed
+updates:
+  - Set phase status to "completed"
+  - Record phase duration
+  - Start next phase if exists
+  - Update estimated completion
+  - Add timeline event
+```
+
+## Progress Calculation
+
+### Overall Progress
+
+```python
+def calculate_progress(metrics):
+    total_steps = metrics['totals']['steps_total']
+    completed_steps = metrics['totals']['steps_completed']
+
+    # Weight in-progress as 50% complete
+    in_progress = sum(
+        phase['steps']['in_progress']
+        for phase in metrics['phases'].values()
+    )
+
+    effective_completed = completed_steps + (in_progress * 0.5)
+    return (effective_completed / total_steps) * 100
+```
+
+### Estimated Completion
+
+```python
+def estimate_completion(metrics):
+    avg_duration = metrics['performance']['avg_step_duration_minutes']
+    remaining_steps = (
+        metrics['totals']['steps_total'] -
+        metrics['totals']['steps_completed']
+    )
+
+    remaining_minutes = avg_duration * remaining_steps
+    return now() + timedelta(minutes=remaining_minutes)
+```
+
+## Visualization
+
+### Progress Bar (for /caw:status)
+
+```
+📊 Workflow Progress
+
+JWT Authentication Implementation
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░ 45%
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Phases:
+  ✅ Phase 1: Setup (3/3 steps)         30m
+  🔄 Phase 2: Implementation (2/5)      45m+
+  ⏳ Phase 3: Testing (0/3)             --
+
+Current: Step 2.3 - Auth middleware validation
+Estimated completion: 14:00 (2시간 남음)
+```
+
+### Timeline View
+
+```
+📅 Activity Timeline
+
+10:00  ▶️  Workflow started
+10:05  ✅  Step 1.1: Project setup
+10:15  ✅  Step 1.2: Dependencies
+10:30  ✅  Step 1.3: Config files
+10:30  🎉  Phase 1 completed (30m)
+10:35  ✅  Step 2.1: JWT utilities
+11:15  ✅  Step 2.2: Auth middleware
+11:20  🔄  Step 2.3: Started...
+
+💡 3 insights captured
+📋 2 decisions logged
+```
+
+### Compact View
+
+```
+[45%] Phase 2/3 | Step 5/11 | ETA: 14:00
+```
+
+## Performance Analytics
+
+### Step Duration Analysis
+
+```yaml
+analytics:
+  average_step_time: 15 minutes
+  variance: low  # consistent pace
+
+  by_phase:
+    phase_1: 10 min/step (setup - fast)
+    phase_2: 20 min/step (implementation - normal)
+
+  outliers:
+    - step_2.1: 35 min (complex, expected)
+
+  trend: stable  # no slowdown detected
+```
+
+### Quality Metrics
+
+```yaml
+quality:
+  gate_pass_rate: 85%
+  first_try_pass: 70%
+  avg_retries: 0.3
+
+  common_issues:
+    - test_failures: 40%
+    - lint_warnings: 35%
+    - type_errors: 25%
+```
+
+## Integration
+
+### With /caw:status
+
+Progress tracker provides data for status command:
+
+```markdown
+## Status Output Components
+
+1. Progress bar visualization
+2. Phase/step breakdown
+3. Time metrics
+4. Current step indicator
+5. Estimated completion
+```
+
+### With Session Persister
+
+```yaml
+session_data:
+  includes:
+    - current_progress_percentage
+    - current_phase
+    - current_step
+    - elapsed_time
+```
+
+### With Quality Gate
+
+```yaml
+on_quality_gate_result:
+  passed:
+    - Record step completion
+    - Update pass rate
+  failed:
+    - Record retry attempt
+    - Update failure stats
+```
+
+## Notifications
+
+### Milestone Notifications
+
+```yaml
+notifications:
+  - trigger: phase_completed
+    message: "🎉 Phase {n} completed in {duration}!"
+
+  - trigger: progress_50
+    message: "📊 Halfway there! 50% complete"
+
+  - trigger: progress_90
+    message: "🏁 Almost done! 90% complete"
+
+  - trigger: workflow_completed
+    message: "✅ Workflow completed in {total_duration}!"
+```
+
+### Warning Notifications
+
+```yaml
+warnings:
+  - trigger: step_taking_long
+    threshold: 2x average
+    message: "⏰ Step taking longer than usual"
+
+  - trigger: no_progress
+    threshold: 30 minutes
+    message: "📌 No progress in 30 minutes"
+```
+
+## Boundaries
+
+**Will:**
+- Track all step/phase transitions
+- Calculate accurate progress metrics
+- Provide time estimates
+- Store historical performance data
+
+**Will Not:**
+- Modify task_plan.md (read-only)
+- Make decisions based on metrics
+- Alert external systems
+- Store indefinitely (follows session retention)

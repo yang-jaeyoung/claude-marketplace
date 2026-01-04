@@ -1,0 +1,63 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "## Session Start - CAW Workflow Detection\n\n### Step 1: Restore Previous Session (session-persister skill)\n\nCheck for existing CAW session:\n\n1. Check if `.caw/sessions/current.json` exists\n2. If exists and recent (< 24 hours):\n   ```\n   🔄 이전 세션 발견\n   \n   Session: [session_id]\n   Task: [task_title]\n   Progress: [phase]/[total_phases], Step [step] ([progress]%)\n   Last Activity: [time_ago]\n   \n   [1] 이전 세션 이어서 진행\n   [2] 세션 상태 확인만 (/caw:status)\n   [3] 새로 시작 (이전 세션 아카이브)\n   ```\n3. If no session, continue silently.\n\n### Step 2: Detect Plan Mode Output (plan-detector skill)\n\nCheck for Plan Mode plans:\n\n1. Check `.claude/plans/` for recent plan files\n2. If found (modified < 1 hour ago) and no active CAW workflow:\n   ```\n   🎯 Plan Mode 계획 감지\n   \n   파일: [plan_path]\n   요약: [plan_title]\n   \n   CAW 워크플로우로 시작하시겠습니까?\n   [1] /caw:start --from-plan 실행\n   [2] 계획 미리보기\n   [3] 나중에 결정\n   ```\n\nIMPORTANT: This is informational only. Do not block the session."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "matcher": "Edit|Write",
+            "type": "prompt",
+            "prompt": "## Pre-File Modification Check\n\nBefore this file modification:\n\n1. Check if `.caw/task_plan.md` exists\n2. If it does NOT exist AND this is a code file:\n   - Display brief warning (not blocking):\n     ```\n     ⚠️ task_plan.md 없음. 구조화된 워크플로우: /caw:start\n     ```\n   - Continue with operation\n3. If task_plan.md exists: Continue silently\n\nSkip check for:\n- .caw/ directory files\n- Config files (package.json, tsconfig.json, etc.)\n- Documentation files (*.md in root)\n- Git/env files\n\nIMPORTANT: WARNING only. Never block the operation."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "## Plan Mode Completed (plan-detector skill)\n\nPlan Mode가 완료되었습니다. CAW 워크플로우 시작을 제안합니다:\n\n1. 최근 Plan 파일 확인 (`.claude/plans/`)\n2. Plan 내용 분석:\n   - 구현 단계 수 파악\n   - 예상 파일 변경 사항 확인\n3. 사용자에게 옵션 제시:\n   ```\n   🎯 Plan Mode 완료\n   \n   계획 파일: [plan_path]\n   분석 결과:\n     ✅ 구현 단계: [N] Phases, [M] Steps\n     ✅ 예상 파일: [X]개 변경\n   \n   CAW 워크플로우 옵션:\n   [1] 자동 시작 - /caw:start --from-plan\n   [2] 설계 먼저 - /caw:design\n   [3] 수동 진행 - 나중에 직접 시작\n   ```"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|Read",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "## Context & Progress Tracking (Silent)\n\n### Context Manager\nIf `.caw/context_manifest.json` exists:\n- For Read: Update last_accessed timestamp\n- For Edit/Write: Move file to 'active' tier\n- Update stats.total_tokens estimate\n\n### Progress Tracker (progress-tracker skill)\nIf `.caw/task_plan.md` exists and step is in_progress:\n- Update `.caw/metrics.json` with activity\n- Track file modifications for current step\n\nSkip for:\n- .caw/ directory files\n- node_modules/, .git/\n- Temporary files\n\nIMPORTANT: Runs silently. No user output."
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "## Insight Protocol Reminder (insight-collector skill)\n\nWhen generating `★ Insight` blocks:\n\n1. Display the insight to the user\n2. **Immediately save** using Write tool:\n   - Path: `.caw/insights/{YYYYMMDD}-{slug}.md`\n   - Use template from `skills/insight-collector/templates/`\n3. Confirm: `💡 Insight saved: [title]`\n\nInsight 생성 = 즉시 저장. Do not defer saving to later."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "## Session End - State Persistence (session-persister skill)\n\nBefore session ends, save workflow state:\n\n1. Check if CAW workflow is active (`.caw/task_plan.md` exists)\n2. If active:\n   - Parse current progress from task_plan.md\n   - Gather active context files\n   - Save to `.caw/sessions/current.json`:\n     ```json\n     {\n       \"session_id\": \"sess_[timestamp]\",\n       \"task_title\": \"[from task_plan]\",\n       \"current_phase\": \"[phase_n]\",\n       \"current_step\": \"[step_id]\",\n       \"progress_percentage\": [percent],\n       \"last_updated\": \"[iso_timestamp]\"\n     }\n     ```\n   - Brief confirmation: `💾 세션 저장됨: [progress]%`\n\n3. If no active workflow: Continue silently\n\nIMPORTANT: Quick save only. Do not delay session end."
+          }
+        ]
+      }
+    ]
+  }
+}

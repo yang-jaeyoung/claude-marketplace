@@ -1,0 +1,8 @@
+{
+  "name": "caw",
+  "version": "1.0.0",
+  "description": "Context-aware workflow orchestration plugin with Plan Mode integration, intelligent context management, and structured task planning",
+  "author": {
+    "name": "urd"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "version": "1.0",
+  "updated": "2024-01-15T14:30:00Z",
+  "active_task": "task_plan.md",
+  "files": {
+    "active": [
+      {
+        "path": "src/auth/jwt.ts",
+        "reason": "Main JWT implementation",
+        "added": "2024-01-15T14:00:00Z",
+        "last_accessed": "2024-01-15T14:25:00Z"
+      },
+      {
+        "path": "src/middleware/auth.ts",
+        "reason": "Authentication middleware",
+        "added": "2024-01-15T14:10:00Z",
+        "last_accessed": "2024-01-15T14:20:00Z"
+      }
+    ],
+    "project": [
+      {
+        "path": "package.json",
+        "reason": "Project dependencies"
+      },
+      {
+        "path": "tsconfig.json",
+        "reason": "TypeScript configuration"
+      },
+      {
+        "path": "CLAUDE.md",
+        "reason": "Project conventions"
+      }
+    ],
+    "packed": [
+      {
+        "path": "src/utils/helpers.ts",
+        "summary": "12 exports: formatDate, parseJSON, Logger, debounce, throttle...",
+        "interfaces": [
+          "function formatDate(date: Date, format?: string): string",
+          "function parseJSON<T>(json: string): T | null",
+          "class Logger { info(), error(), debug() }",
+          "function debounce<T>(fn: T, wait: number): T",
+          "function throttle<T>(fn: T, limit: number): T"
+        ]
+      },
+      {
+        "path": "src/types/index.ts",
+        "summary": "8 types: User, Token, AuthConfig, JWTPayload...",
+        "interfaces": [
+          "interface User { id: string; email: string; name: string; }",
+          "interface Token { access: string; refresh: string; }",
+          "interface AuthConfig { secret: string; expiresIn: number; }",
+          "type JWTPayload = { sub: string; iat: number; exp: number; }"
+        ]
+      }
+    ],
+    "archived": [
+      {
+        "path": "src/old/deprecated-auth.ts",
+        "reason": "Old auth implementation - archived for reference",
+        "archived_at": "2024-01-14T10:00:00Z"
+      }
+    ]
+  },
+  "stats": {
+    "total_tokens": 2025,
+    "active_tokens": 900,
+    "project_tokens": 1000,
+    "packed_tokens": 125
+  },
+  "settings": {
+    "prune_threshold_turns": 5,
+    "auto_pack_size_kb": 5,
+    "token_budget": 5000
+  }
+}
