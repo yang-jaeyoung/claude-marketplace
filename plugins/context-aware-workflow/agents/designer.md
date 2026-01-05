@@ -8,6 +8,7 @@ tools:
   - Glob
   - Grep
   - AskUserQuestion
+skills: pattern-learner, decision-logger
 ---
 
 # Designer Agent

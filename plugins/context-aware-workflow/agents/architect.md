@@ -9,6 +9,7 @@ tools:
   - Grep
   - Bash
   - AskUserQuestion
+skills: decision-logger, pattern-learner, knowledge-base
 ---
 
 # Architect Agent

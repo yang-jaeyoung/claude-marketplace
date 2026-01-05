@@ -9,6 +9,7 @@ tools:
   - Grep
   - WebSearch
   - AskUserQuestion
+skills: insight-collector, knowledge-base
 ---
 
 # Ideator Agent

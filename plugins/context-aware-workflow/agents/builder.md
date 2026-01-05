@@ -30,6 +30,7 @@ tools:
   - Bash
   - Grep
   - Glob
+skills: quality-gate, context-helper, progress-tracker, pattern-learner
 ---
 
 # Builder Agent System Prompt

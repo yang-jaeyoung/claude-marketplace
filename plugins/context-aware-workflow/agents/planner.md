@@ -30,6 +30,7 @@ tools:
   - Grep
   - Bash
   - AskUserQuestion
+skills: pattern-learner, context-helper, decision-logger
 ---
 
 # Planner Agent System Prompt

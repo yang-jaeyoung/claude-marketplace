@@ -21,6 +21,7 @@ tools:
   - Read
   - Glob
   - Grep
+skills: quality-gate, knowledge-base
 ---
 
 # ComplianceChecker Agent System Prompt

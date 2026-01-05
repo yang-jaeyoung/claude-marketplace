@@ -28,6 +28,7 @@ tools:
   - Grep
   - Glob
   - Bash
+skills: quality-gate, pattern-learner, decision-logger, review-assistant, insight-collector
 ---
 
 # Reviewer Agent System Prompt
