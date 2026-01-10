@@ -2,6 +2,17 @@
 name: context-helper
 description: Helps agents understand and manage context efficiently. Provides relevant files, previous phase outputs, and related insights based on current workflow step.
 allowed-tools: Read, Glob, Grep
+forked-context: true
+forked-context-returns: |
+  files: 우선순위 파일 목록 (최대 10개)
+  step_outputs: 이전 단계 요약
+  insights: 관련 인사이트 (압축)
+  dependencies: 의존성 파일 목록
+hooks:
+  AgentStartStep:
+    action: provide_context
+    priority: 2
+    condition: "requires .caw/ directory"
 ---
 
 # Context Helper
@@ -331,3 +342,63 @@ loading_strategy:
 - Include entire file contents (use sections)
 - Override agent's file reading decisions
 - Store context permanently (transient)
+
+## Forked Context Behavior
+
+이 스킬은 **분리된 컨텍스트(Forked Context)**에서 실행됩니다.
+
+### 분리되는 내용 (메인 컨텍스트에 노출되지 않음)
+
+```yaml
+isolated_operations:
+  - 다중 파일 스캔 (task_plan.md, context_manifest.json 등)
+  - 관련성 점수 계산 (1.0, 0.8, 0.6, 0.4, 0.3 가중치)
+  - 컨텍스트 우선순위 정렬 알고리즘
+  - insights/ 및 decisions/ 폴더 검색
+  - 컨텍스트 예산 계산
+  - 프로그레시브 로딩 결정 로직
+```
+
+### 메인 컨텍스트로 반환되는 내용
+
+```yaml
+returned_result:
+  files:
+    critical:
+      - "src/auth/jwt.ts"     # Step 2.1 output
+      - "src/auth/types.ts"   # Type definitions
+    important:
+      - "src/middleware/index.ts"
+    reference:
+      - "tests/auth/jwt.test.ts"
+  step_outputs:
+    "2.1": "JWT utilities: generateToken(), verifyToken()"
+    "2.2": "Token validation middleware added"
+  insights:
+    - "JWT Token Refresh Pattern (2026-01-04)"
+  dependencies:
+    - "Step 2.1", "Step 2.2"
+```
+
+### 반환 형식 예시
+
+**컨텍스트 요청 시:**
+```
+📋 Context for Step 2.3: Auth Middleware
+
+Required Files:
+  1. src/auth/jwt.ts (dependency)
+  2. src/auth/types.ts (types)
+  3. src/middleware/index.ts (target)
+
+Previous Steps:
+  • 2.1: JWT utilities implemented
+  • 2.2: Token validation added
+
+💡 Related: JWT Token Refresh Pattern
+```
+
+**최소 컨텍스트 모드:**
+```
+📋 [Step 2.3] Files: 3 critical, 2 reference | Deps: 2.1, 2.2
+```

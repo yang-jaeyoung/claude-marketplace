@@ -220,7 +220,7 @@ The `/caw:next` command delegates implementation to the Builder agent:
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   /caw:next     │────▶│  Builder Agent  │────▶│.caw/task_plan.md│
-│  (Orchestrator) │     │  (Implementer)  │     │  (State Store)   │
+│   (Command)     │     │  (Implementer)  │     │  (State Store)   │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         │                       │                       │
         │  1. Parse plan        │  2. TDD implement    │

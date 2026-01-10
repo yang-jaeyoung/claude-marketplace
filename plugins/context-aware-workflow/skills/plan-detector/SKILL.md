@@ -2,6 +2,11 @@
 name: plan-detector
 description: Detects Plan Mode completion and suggests starting CAW workflow. Use when ExitPlanMode is called or when a plan file is created/updated in .claude/plans/ directory.
 allowed-tools: Read, Glob, AskUserQuestion
+hooks:
+  ExitPlanMode:
+    action: suggest_caw_workflow
+    priority: 1
+    condition: "requires .caw/ directory"
 ---
 
 # Plan Detector

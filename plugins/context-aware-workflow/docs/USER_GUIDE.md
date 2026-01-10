@@ -1,7 +1,8 @@
 # Context-Aware Workflow (CAW) 사용자 가이드
 
-> **버전**: 1.0.0
+> **버전**: 1.2.1
 > **목적**: 구조화된 작업 계획과 컨텍스트 관리를 통한 효율적인 개발 워크플로우
+> **업데이트**: Quick Fix 스킬 추가, Reviewer JSON 출력 지원 (Fixer 연동 강화)
 
 ---
 
@@ -34,19 +35,22 @@ claude plugin add /path/to/context-aware-workflow
 ### 첫 사용 (2분 완성)
 
 ```bash
-# 1. 새 작업 시작
+# 1. 환경 초기화 (선택 - /caw:start에서 자동 실행됨)
+/context-aware-workflow:init
+
+# 2. 새 작업 시작
 /context-aware-workflow:start "JWT 인증 시스템 구현"
 
-# 2. 현재 상태 확인
+# 3. 현재 상태 확인
 /context-aware-workflow:status
 
-# 3. 다음 단계 자동 실행
+# 4. 다음 단계 자동 실행
 /context-aware-workflow:next
 
-# 4. 코드 리뷰
+# 5. 코드 리뷰
 /context-aware-workflow:review
 
-# 5. 규칙 준수 검증
+# 6. 규칙 준수 검증
 /context-aware-workflow:check
 ```
 
@@ -54,12 +58,14 @@ claude plugin add /path/to/context-aware-workflow
 
 | 명령어 | 단축형 | 설명 |
 |--------|--------|------|
+| `/context-aware-workflow:init` | `/caw:init` | 환경 초기화 (자동 실행) |
 | `/context-aware-workflow:brainstorm` | `/caw:brainstorm` | 요구사항 발굴 (선택) |
 | `/context-aware-workflow:design` | `/caw:design` | UX/UI, 아키텍처 설계 (선택) |
 | `/context-aware-workflow:start` | `/caw:start` | 워크플로우 시작 |
 | `/context-aware-workflow:status` | `/caw:status` | 진행 상태 표시 |
 | `/context-aware-workflow:next` | `/caw:next` | 다음 단계 실행 |
 | `/context-aware-workflow:review` | `/caw:review` | 코드 리뷰 |
+| `/context-aware-workflow:fix` | `/caw:fix` | 리뷰 결과 수정 (NEW) |
 | `/context-aware-workflow:check` | `/caw:check` | 규칙 준수 검증 |
 | `/context-aware-workflow:context` | `/caw:context` | 컨텍스트 관리 |
 
@@ -114,7 +120,12 @@ claude plugin add /path/to/context-aware-workflow
 
 ### 3. 에이전트 시스템
 
-CAW는 7개의 전문 에이전트를 사용합니다:
+CAW는 9개의 전문 에이전트를 사용합니다:
+
+**초기화 에이전트**:
+| 에이전트 | 역할 | 출력물 |
+|----------|------|--------|
+| **Bootstrapper** | 환경 초기화, 프로젝트 탐지 | `.caw/context_manifest.json` |
 
 **선택적 설계 에이전트** (사전 설계 단계):
 | 에이전트 | 역할 | 출력물 |
@@ -129,18 +140,156 @@ CAW는 7개의 전문 에이전트를 사용합니다:
 | **Planner** | 실행 계획 생성 | `.caw/task_plan.md` |
 | **Builder** | TDD 구현 및 테스트 | 코드 파일 |
 | **Reviewer** | 코드 품질 리뷰 | 리뷰 리포트 |
+| **Fixer** | 리뷰 결과 수정/리팩토링 | 수정된 코드 |
 | **ComplianceChecker** | 규칙 준수 검증 | 검증 리포트 |
 
-**워크플로우**:
+**전체 워크플로우 다이어그램**:
 ```
-[선택적] /caw:brainstorm → /caw:design → [필수] /caw:start → /caw:next → /caw:review
-              ↓                ↓                   ↓            ↓            ↓
-         brainstorm.md    design/*.md        task_plan.md   구현 코드    리뷰 리포트
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     CAW (Context-Aware Workflow) Pipeline                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+ User Request
+      │
+      ▼
+┌─────────────┐
+│ BOOTSTRAPPER│  ◄── /caw:init (자동 또는 수동)
+│   (haiku)   │
+├─────────────┤
+│ • 환경 체크  │
+│ • .caw/ 생성│
+│ • 프로젝트   │
+│   분석      │
+└──────┬──────┘
+       │
+       ▼ .caw/context_manifest.json
+       │
+┌──────┴──────────────────────────────────────────────────────────────────────┐
+│                        [선택적 Discovery/Design Phase]                       │
+│  ┌───────────────┐    ┌───────────────┐    ┌───────────────┐               │
+│  │   IDEATOR     │    │   DESIGNER    │    │   ARCHITECT   │               │
+│  │   (sonnet)    │    │   (sonnet)    │    │   (sonnet)    │               │
+│  ├───────────────┤    ├───────────────┤    ├───────────────┤               │
+│  │/caw:brainstorm│    │/caw:design    │    │/caw:design    │               │
+│  │               │    │  --ui         │    │  --arch       │               │
+│  └───────┬───────┘    └───────┬───────┘    └───────┬───────┘               │
+│          │                    │                    │                        │
+│          ▼                    ▼                    ▼                        │
+│   brainstorm.md        ux-ui.md            architecture.md                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+       │
+       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         [핵심 Implementation Phase]                          │
+│                                                                              │
+│  ┌───────────────┐                                                           │
+│  │    PLANNER    │  ◄── /caw:start "작업 설명"                               │
+│  │   (sonnet)    │                                                           │
+│  ├───────────────┤                                                           │
+│  │ • 요구사항    │                                                           │
+│  │   분석       │                                                           │
+│  │ • Phase/Step │                                                           │
+│  │   계획 생성  │                                                            │
+│  └───────┬───────┘                                                           │
+│          │                                                                   │
+│          ▼ task_plan.md                                                      │
+│          │                                                                   │
+│  ┌───────────────┐                                                           │
+│  │    BUILDER    │  ◄── /caw:next                                           │
+│  │   (sonnet)    │                                                           │
+│  ├───────────────┤                                                           │
+│  │ • TDD 구현    │  ───┐                                                     │
+│  │ • 테스트 실행 │     │ 반복                                                │
+│  │ • 상태 갱신   │  ◄──┘                                                     │
+│  └───────┬───────┘                                                           │
+│          │                                                                   │
+│          ▼ 구현 코드 + 테스트                                                 │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+       │
+       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            [Quality Gate Phase]                              │
+│                                                                              │
+│  ┌───────────────┐         ┌───────────────┐         ┌───────────────┐      │
+│  │   REVIEWER    │         │    FIXER      │         │  COMPLIANCE   │      │
+│  │   (sonnet)    │         │   (sonnet)    │         │   CHECKER     │      │
+│  ├───────────────┤         ├───────────────┤         │   (haiku)     │      │
+│  │/caw:review    │         │/caw:fix       │         ├───────────────┤      │
+│  │               │   ────▶ │  --deep       │         │/caw:check     │      │
+│  └───────┬───────┘         └───────┬───────┘         └───────┬───────┘      │
+│          │                         │                         │              │
+│          ▼                         ▼                         ▼              │
+│   리뷰 리포트              수정된 코드               컴플라이언스 리포트       │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+       │
+       ▼
+   ✅ 작업 완료
+```
+
+**간단 워크플로우**:
+```
+/caw:init → /caw:brainstorm → /caw:design → /caw:start → /caw:next → /caw:review → /caw:fix → /caw:check
+    ↓            ↓                ↓             ↓            ↓            ↓           ↓          ↓
+  환경설정   brainstorm.md   design/*.md  task_plan.md   구현 코드    리뷰 리포트  수정코드    검증 리포트
+  (자동)       (선택)          (선택)        (필수)        (반복)       (권장)      (선택)      (권장)
 ```
 
 ---
 
 ## 📌 명령어 상세
+
+### `/caw:init` - 환경 초기화
+
+CAW 환경을 초기화합니다. `/caw:start` 실행 시 자동으로 호출되지만, 수동으로도 실행 가능합니다.
+
+#### 사용법
+
+```bash
+# 환경 초기화 (자동 탐지)
+/caw:init
+
+# 환경 리셋 (기존 환경 삭제 후 재생성)
+/caw:init --reset
+
+# 특정 프로젝트 타입 지정
+/caw:init --type typescript
+```
+
+#### Bootstrapper 에이전트 동작
+
+1. **환경 확인**: `.caw/` 디렉토리 존재 여부 확인
+2. **프로젝트 분석**: 파일 구조, 기술 스택, 패키지 매니저 탐지
+3. **디렉토리 생성**: `.caw/`, `.caw/design/`, `.caw/sessions/`, `.caw/archives/`
+4. **매니페스트 생성**: `context_manifest.json` 초기화
+
+#### 출력 예시
+
+```
+🚀 CAW Environment Initialized
+
+📁 Created:
+  ✅ .caw/
+  ✅ .caw/design/
+  ✅ .caw/sessions/
+  ✅ .caw/archives/
+
+📋 Project Analysis:
+  • Type: TypeScript (Node.js)
+  • Package Manager: npm
+  • Test Framework: Jest
+  • Entry Point: src/index.ts
+
+📄 Generated: .caw/context_manifest.json
+
+💡 Next Steps:
+   • /caw:brainstorm - 요구사항 발굴
+   • /caw:design - UX/UI 또는 아키텍처 설계
+   • /caw:start "작업 설명" - 바로 구현 시작
+```
+
+---
 
 ### `/caw:brainstorm` - 요구사항 발굴 (선택)
 
@@ -382,6 +531,127 @@ Reviewer 에이전트를 호출하여 코드 품질을 분석합니다.
 
 ---
 
+### `/caw:fix` - 리뷰 결과 수정 (NEW)
+
+Reviewer 결과를 기반으로 코드를 자동 또는 대화형으로 수정합니다.
+
+#### 사용법
+
+```bash
+# 간단한 이슈 자동 수정 (기본)
+/caw:fix
+
+# 대화형 모드 (수정 전 확인)
+/caw:fix --interactive
+
+# 특정 카테고리만 수정
+/caw:fix --category docs       # 문서 (JSDoc 등)
+/caw:fix --category style      # 스타일/린트
+/caw:fix --category constants  # 매직 넘버 상수화
+
+# 복잡한 리팩토링 (Fixer 에이전트 사용)
+/caw:fix --deep
+
+# 미리보기 (실제 수정 안 함)
+/caw:fix --dry-run
+```
+
+#### 수정 가능 유형
+
+| 카테고리 | 자동화 | 예시 |
+|----------|--------|------|
+| `constants` | ✅ 가능 | `3600` → `TOKEN_EXPIRY_SECONDS` |
+| `docs` | ✅ 가능 | 누락된 JSDoc 템플릿 생성 |
+| `style` | ✅ 가능 | ESLint/Prettier 자동 수정 |
+| `imports` | ✅ 가능 | Import 정렬, 미사용 제거 |
+| `naming` | ⚠️ 반자동 | 변수명 변경 (확인 필요) |
+| `logic` | ❌ 수동 | Fixer 에이전트 필요 (`--deep`) |
+| `performance` | ❌ 수동 | Fixer 에이전트 필요 (`--deep`) |
+
+#### 모드 선택
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   /caw:fix                           │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  Simple Issues           Complex Issues             │
+│  (auto-fixable)          (needs analysis)           │
+│       │                        │                    │
+│       ▼                        ▼                    │
+│  ┌─────────┐            ┌─────────────┐             │
+│  │  Quick  │            │   Fixer     │             │
+│  │   Fix   │            │   Agent     │             │
+│  └─────────┘            │  (--deep)   │             │
+│       │                 └─────────────┘             │
+│       ▼                        │                    │
+│  • 상수 추출                • 로직 개선              │
+│  • JSDoc 생성              • 다중 파일 리팩토링       │
+│  • 린트 수정               • 패턴 추출               │
+│                           • 아키텍처 변경            │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+#### 출력 예시
+
+**Quick Fix 결과**:
+```
+🔧 Quick Fix Mode
+
+스캔 중: review 결과 분석...
+
+자동 수정 가능:
+  ✓ 3 매직 넘버 → 상수화
+  ✓ 2 누락된 JSDoc → 템플릿 생성
+  ✓ 5 린트 위반 → 자동 수정
+
+자동 수정 불가 (--deep 필요):
+  ⚠ 2 성능 개선 제안
+  ⚠ 1 아키텍처 권장사항
+
+수정 적용 중...
+
+✅ 수정 완료: src/auth/jwt.ts
+   • Line 45: 3600 → TOKEN_EXPIRY_SECONDS
+   • Line 67: generateToken() JSDoc 추가
+
+📊 요약:
+   적용됨: 10개 수정
+   건너뜀: 3개 (--deep 필요)
+
+💡 복잡한 수정은:
+   /caw:fix --deep
+```
+
+**Deep Fix 결과** (Fixer 에이전트):
+```
+🔧 Deep Fix Mode - Fixer Agent 호출
+
+분석 중: 리뷰 결과...
+
+복잡한 이슈 발견:
+  1. Performance: DB 쿼리 배치 처리
+  2. Architecture: 검증 모듈 분리
+
+📋 리팩토링 계획:
+┌────────────────────────────────────────────────────┐
+│ 1. DB 쿼리 배치 처리                                │
+│    파일: src/auth/jwt.ts, src/services/user.ts     │
+│    영향: DB 호출 ~30% 감소                          │
+│    위험도: 낮음                                     │
+├────────────────────────────────────────────────────┤
+│ 2. 검증 모듈 분리                                   │
+│    파일: 신규 src/validation/auth.ts               │
+│    영향: 관심사 분리 개선                           │
+│    위험도: 중간                                     │
+└────────────────────────────────────────────────────┘
+
+진행하시겠습니까? [Y/n/선택]
+```
+
+---
+
 ### `/caw:check` - 규칙 준수 검증
 
 ComplianceChecker 에이전트를 호출하여 프로젝트 규칙 준수를 검증합니다.
@@ -485,6 +755,36 @@ ComplianceChecker 에이전트를 호출하여 프로젝트 규칙 준수를 검
 ---
 
 ## 🤖 에이전트
+
+### 초기화 에이전트
+
+#### Bootstrapper 에이전트
+
+**역할**: 환경 초기화 및 프로젝트 컨텍스트 탐지
+
+| 속성 | 값 |
+|------|-----|
+| 모델 | haiku (빠른 초기화) |
+| 도구 | Read, Write, Glob, Bash, AskUserQuestion |
+| 트리거 | `/caw:init`, `/caw:start` (자동) |
+| 출력 | `.caw/context_manifest.json` |
+
+**특징**:
+- `.caw/` 디렉토리 존재 여부 확인 및 생성
+- 프로젝트 타입 자동 탐지 (package.json, pyproject.toml 등)
+- 컨텍스트 매니페스트 초기화
+- 기존 환경 재사용 또는 리셋 지원
+
+**동작 흐름**:
+```
+1. 환경 확인: .caw/ 디렉토리 존재 여부
+2. 프로젝트 분석: 파일 구조, 기술 스택 탐지
+3. 디렉토리 생성: .caw/, .caw/design/, .caw/sessions/, .caw/archives/
+4. 매니페스트 생성: context_manifest.json 초기화
+5. 완료 보고: 환경 상태 요약 제공
+```
+
+---
 
 ### 설계 에이전트 (선택적)
 
@@ -604,6 +904,51 @@ ComplianceChecker 에이전트를 호출하여 프로젝트 규칙 준수를 검
 | 🟡 Warning | 수정 권장 |
 | 🟢 Suggestion | 개선 제안 |
 | 💡 Note | 참고 사항 |
+
+---
+
+### Fixer 에이전트
+
+**역할**: 리뷰 결과 기반 지능형 코드 수정 및 리팩토링
+
+| 속성 | 값 |
+|------|-----|
+| 모델 | sonnet |
+| 도구 | Read, Write, Edit, Bash, Grep, Glob |
+| 트리거 | `/caw:fix --deep` |
+| 출력 | 수정된 소스 코드, `.caw/fix_history.json` |
+
+**특징**:
+- 리뷰 피드백 심층 분석
+- 멀티파일 리팩토링 지원
+- 안전한 실행 (백업 → 적용 → 검증 → 롤백)
+- 의존성 분석 및 영향 범위 파악
+
+**수정 전략 (카테고리별)**:
+
+| 카테고리 | 복잡도 | 접근법 |
+|----------|--------|--------|
+| 🔴 Security | 높음 | 취약점 즉시 수정 |
+| 🔴 Logic | 높음 | 버그 근본 원인 해결 |
+| 🟡 Performance | 중간 | DB 배치, 캐싱, 알고리즘 최적화 |
+| 🟡 Architecture | 중간 | 모듈 추출, 패턴 리팩토링 |
+| 🟢 Quality | 낮음 | 코드 품질 개선 |
+
+**실행 흐름**:
+```
+1. 리뷰 결과 로드 (.caw/last_review.json)
+2. 이슈 분류 및 우선순위 정렬
+3. 의존성 분석 (영향 범위 파악)
+4. 리팩토링 계획 생성
+5. 안전 실행 (백업 → 수정 → 테스트)
+6. 결과 리포트 생성
+```
+
+**안전 메커니즘**:
+- 변경 전 git 상태 확인
+- 각 수정 후 타입 체크 실행
+- 테스트 실패 시 자동 롤백
+- 고위험 변경은 사용자 확인 요청
 
 ---
 
@@ -849,16 +1194,30 @@ claude plugin list
 
 ## 🗺️ 향후 로드맵
 
+### 에이전트
+- [x] Bootstrapper 에이전트 - 환경 초기화 (v1.1.0)
+- [x] Fixer 에이전트 - 코드 수정/리팩토링 (v1.2.0)
+- [x] Ideator 에이전트 - 요구사항 발굴
+- [x] Designer 에이전트 - UX/UI 설계
+- [x] Architect 에이전트 - 아키텍처 설계
 - [x] Planner 에이전트 - 계획 생성
 - [x] Builder 에이전트 - TDD 구현
 - [x] Reviewer 에이전트 - 코드 리뷰
 - [x] ComplianceChecker 에이전트 - 규칙 검증
+
+### 명령어
+- [x] `/caw:init` - 환경 초기화 (v1.1.0)
+- [x] `/caw:fix` - 리뷰 결과 수정 (v1.2.0)
+- [x] `/caw:brainstorm` - 요구사항 발굴
+- [x] `/caw:design` - UX/UI, 아키텍처 설계
 - [x] `/caw:start` - 워크플로우 시작
 - [x] `/caw:status` - 진행 상태 표시
 - [x] `/caw:next` - 다음 단계 실행
 - [x] `/caw:review` - 코드 리뷰
 - [x] `/caw:check` - 규칙 준수 검증
 - [x] `/caw:context` - 컨텍스트 관리
+
+### 기타
 - [x] PostToolUse 훅 - 자동 컨텍스트 추적
 - [ ] VS Code 확장 통합
 - [ ] GitHub Actions 통합

@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caw.dev/schemas/last_review.schema.json",
+  "title": "CAW Review Results",
+  "description": "Structured output from Reviewer agent for consumption by Quick Fix skill and Fixer agent",
+  "type": "object",
+  "required": ["version", "timestamp", "scope", "summary", "issues"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version",
+      "const": "1.0"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of review completion"
+    },
+    "scope": {
+      "type": "object",
+      "description": "Review scope information",
+      "required": ["files"],
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of reviewed file paths"
+        },
+        "phase": {
+          "type": "integer",
+          "description": "Phase number from task_plan.md"
+        },
+        "step": {
+          "type": "string",
+          "description": "Step identifier (e.g., '2.3')"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Review summary and statistics",
+      "required": ["overall_status", "scores", "total_issues", "auto_fixable", "agent_required"],
+      "properties": {
+        "overall_status": {
+          "type": "string",
+          "enum": ["APPROVED", "APPROVED_WITH_SUGGESTIONS", "NEEDS_WORK", "REJECTED"],
+          "description": "Overall review status"
+        },
+        "scores": {
+          "type": "object",
+          "description": "Scores by category",
+          "properties": {
+            "correctness": { "$ref": "#/$defs/categoryScore" },
+            "code_quality": { "$ref": "#/$defs/categoryScore" },
+            "best_practices": { "$ref": "#/$defs/categoryScore" },
+            "security": { "$ref": "#/$defs/categoryScore" },
+            "performance": { "$ref": "#/$defs/categoryScore" }
+          }
+        },
+        "total_issues": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of issues found"
+        },
+        "auto_fixable": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of issues that can be auto-fixed by Quick Fix skill"
+        },
+        "agent_required": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of issues requiring Fixer agent analysis"
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "description": "List of all identified issues",
+      "items": { "$ref": "#/$defs/issue" }
+    },
+    "action_items": {
+      "type": "array",
+      "description": "Prioritized list of action items",
+      "items": { "$ref": "#/$defs/actionItem" }
+    },
+    "test_coverage": {
+      "type": "object",
+      "description": "Test coverage analysis results",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file": { "type": "string" },
+              "coverage": { "type": "number", "minimum": 0, "maximum": 100 },
+              "status": { "type": "string", "enum": ["excellent", "good", "fair", "poor"] }
+            }
+          }
+        },
+        "missing_tests": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of suggested test cases"
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "General recommendations for improvement"
+    }
+  },
+  "$defs": {
+    "categoryScore": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "string",
+          "enum": ["excellent", "good", "fair", "poor", "critical"]
+        },
+        "issues": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "required": ["id", "file", "line", "category", "severity", "auto_fixable", "title", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^issue_\\d{3}$",
+          "description": "Unique issue identifier"
+        },
+        "file": {
+          "type": "string",
+          "description": "File path where issue was found"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Line number of issue"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["constants", "docs", "style", "imports", "naming", "logic", "performance", "security", "architecture"],
+          "description": "Issue category"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "major", "minor", "suggestion"],
+          "description": "Issue severity level"
+        },
+        "auto_fixable": {
+          "type": "boolean",
+          "description": "Whether Quick Fix skill can automatically resolve this"
+        },
+        "title": {
+          "type": "string",
+          "description": "Short issue title"
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed issue description"
+        },
+        "current_code": {
+          "type": "string",
+          "description": "The problematic code snippet"
+        },
+        "suggested_fix": {
+          "type": "object",
+          "description": "Suggested fix information",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["extract_constant", "add_jsdoc", "add_docstring", "lint_fix", "reorder_imports", "rename", "refactor"],
+              "description": "Type of fix to apply"
+            },
+            "constant_name": { "type": "string" },
+            "constant_value": {},
+            "template": { "type": "string" },
+            "approach": { "type": "string" },
+            "impact": { "type": "string" }
+          }
+        }
+      }
+    },
+    "actionItem": {
+      "type": "object",
+      "required": ["priority", "category", "item", "file", "auto_fixable"],
+      "properties": {
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Action item priority"
+        },
+        "category": {
+          "type": "string",
+          "description": "Issue category"
+        },
+        "item": {
+          "type": "string",
+          "description": "Action item description"
+        },
+        "file": {
+          "type": "string",
+          "description": "Target file"
+        },
+        "line": {
+          "type": "integer",
+          "description": "Target line number"
+        },
+        "auto_fixable": {
+          "type": "boolean",
+          "description": "Whether auto-fixable"
+        }
+      }
+    }
+  }
+}
