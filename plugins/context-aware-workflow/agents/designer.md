@@ -8,6 +8,9 @@ tools:
   - Glob
   - Grep
   - AskUserQuestion
+mcp_servers:
+  - context7     # UI 컴포넌트 패턴, 접근성 가이드라인 참조
+  - perplexity   # UX 트렌드, 접근성 표준 심층 연구
 skills: pattern-learner, decision-logger
 ---
 
