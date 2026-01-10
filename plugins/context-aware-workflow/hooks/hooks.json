@@ -1,3 +1,50 @@
 {
-  "hooks": {}
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check for existing session context in .caw/ directory. If found, load the session state and resume from last checkpoint."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": {
+          "tool_name": "Write"
+        },
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before writing files, verify this aligns with the current task plan and quality gates."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": {
+          "tool_name": "Bash"
+        },
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "After command execution, update progress tracking if task-related."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before ending session, save current context state to .caw/ for session persistence."
+          }
+        ]
+      }
+    ]
+  }
 }
