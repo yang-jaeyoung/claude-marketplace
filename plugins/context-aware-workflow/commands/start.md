@@ -12,10 +12,35 @@ Initialize a context-aware workflow session for structured task execution.
 
 ```
 Check: Does .caw/context_manifest.json exist?
-├─ NO  → Invoke Bootstrapper Agent first (subagent_type="caw:bootstrapper")
+├─ NO  → MUST invoke Bootstrapper Agent using Task tool:
+│        Task(subagent_type="caw:bootstrapper", prompt="Initialize CAW environment")
+│        WAIT for Task to complete before proceeding
+│        Verify .caw/context_manifest.json was created
 │        Then proceed to planning
 └─ YES → Proceed directly to planning
 ```
+
+### CRITICAL: Bootstrapper Invocation
+
+When environment is NOT initialized, you MUST:
+
+1. **Invoke Bootstrapper as separate Task agent**:
+   ```
+   Task tool:
+     subagent_type: "caw:bootstrapper"
+     prompt: "Initialize CAW environment. Create .caw/ directory structure, detect project context, and generate context_manifest.json"
+   ```
+
+2. **Wait for completion** - Do NOT proceed until Task returns successfully
+
+3. **Verify initialization**:
+   ```
+   Check: Does .caw/context_manifest.json now exist?
+   ├─ YES → Proceed to Planner
+   └─ NO → Report error, do not proceed
+   ```
+
+**DO NOT** attempt to bootstrap inline. The Bootstrapper agent has specific tools (Bash, Write, Glob) and logic that must be executed as a separate agent to properly create files on disk.
 
 ## Invocation Modes
 
@@ -26,12 +51,37 @@ When invoked with a task description:
 ```
 
 1. **Check environment**: Verify `.caw/context_manifest.json` exists
-2. **If not initialized**: Invoke Bootstrapper Agent first
-3. **Invoke Planner Agent** using Task tool with subagent_type="caw:planner"
+2. **If not initialized**:
+   - Use Task tool with `subagent_type="caw:bootstrapper"` to initialize
+   - Wait for bootstrapper Task to complete
+   - Verify `.caw/context_manifest.json` was created
+3. **Invoke Planner Agent** using Task tool with `subagent_type="caw:planner"`
 4. Planner will:
    - Ask clarifying questions if needed
    - Explore codebase for context
    - Generate `.caw/task_plan.md`
+
+### Post-Bootstrap Verification
+
+After Bootstrapper Task completes (if invoked):
+
+1. **Verify files exist**:
+   - `.caw/context_manifest.json` must exist
+   - `.caw/sessions/` directory must exist
+   - `.caw/archives/` directory must exist
+
+2. **If verification fails**:
+   ```
+   ❌ Bootstrap verification failed
+   - Expected: .caw/context_manifest.json
+   - Status: NOT_FOUND
+
+   Please run /caw:init manually to debug initialization.
+   ```
+
+3. **If verification succeeds**:
+   - Log: "✅ Environment initialized successfully"
+   - Proceed to Planner invocation
 
 ### Mode 2: Import from Plan Mode
 When invoked with `--from-plan`:

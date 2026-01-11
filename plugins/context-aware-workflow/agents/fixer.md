@@ -1,7 +1,7 @@
 ---
 name: "Fixer"
 description: "Comprehensive refactoring agent that analyzes review feedback and applies intelligent code improvements"
-model: sonnet
+model: opus
 whenToUse: |
   Use the Fixer agent when complex code improvements are needed based on review results.
   This agent should be invoked:
