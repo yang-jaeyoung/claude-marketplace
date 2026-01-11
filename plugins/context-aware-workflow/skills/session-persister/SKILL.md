@@ -315,60 +315,12 @@ errors:
 
 ## Forked Context Behavior
 
-이 스킬은 **분리된 컨텍스트(Forked Context)**에서 실행됩니다.
+See [Forked Context Pattern](../../_shared/forked-context.md).
 
-### 분리되는 내용 (메인 컨텍스트에 노출되지 않음)
+**Returns**: `status: restored | saved | archived | fresh_start` with session summary
 
-```yaml
-isolated_operations:
-  - 세션 파일 전체 구조 읽기/쓰기
-  - 복구 시나리오 판단 로직
-  - 아카이브 관리 (30일 보관 정책)
-  - task_plan.md에서 상태 추출
-  - context_manifest.json 파싱
-  - 세션 유효성 검증 (< 24시간)
-  - 손상된 파일 백업 및 복구
-```
-
-### 메인 컨텍스트로 반환되는 내용
-
-```yaml
-returned_result:
-  status: "restored | saved | archived | fresh_start"
-  session:
-    task_title: "JWT Authentication Implementation"
-    progress_percentage: 45
-    current_step: "2.3"
-    last_activity: "2시간 전"
-  action: "이전 세션 복원됨"
-```
-
-### 반환 형식 예시
-
-**복원 성공 시:**
-```
-🔄 Session Restored
-Task: JWT Authentication Implementation
-Progress: Phase 2, Step 2.3 (45%)
-Last: 2시간 전
-```
-
-**저장 시:**
-```
-💾 Session Saved
-Progress: 45% | Files: 4개 | Insights: 3개
-```
-
-**새로 시작 시:**
-```
-🆕 Fresh Start
-Previous session archived (sess_20260103_100000)
-Ready for new workflow
-```
-
-**복구 실패 시:**
-```
-⚠️ Session Recovery Failed
-Reason: 손상된 세션 파일
-Action: 백업 후 새로 시작
-```
+**Output Examples:**
+- `🔄 Session Restored` - Task: [title], Progress: [%]
+- `💾 Session Saved` - Progress: [%] | Files: N
+- `🆕 Fresh Start` - Previous archived
+- `⚠️ Recovery Failed` - Reason + action

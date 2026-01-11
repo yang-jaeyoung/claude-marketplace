@@ -176,70 +176,15 @@ Think like a curious consultant who asks "why" before "how". Uncover hidden assu
 
 ## Insight Collection
 
-브레인스토밍 과정에서 **재사용 가능한 통찰**을 발견하면 인사이트로 저장합니다.
+See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 
-### Insight 트리거 조건
+**Brainstorm-Specific Triggers:**
+- 요구사항 패턴 발견 (반복되는 사용자 니즈)
+- 도메인 지식 습득 (비즈니스 로직 핵심 규칙)
+- 기술 선택 근거 (특정 접근법 선택 이유)
+- 위험 요소 식별 (향후 주의할 점)
 
-| 상황 | 예시 |
-|------|------|
-| **요구사항 패턴 발견** | 반복되는 사용자 니즈 패턴 |
-| **도메인 지식 습득** | 비즈니스 로직의 핵심 규칙 |
-| **기술 선택 근거** | 특정 접근법을 선택한 이유 |
-| **위험 요소 식별** | 향후 프로젝트에서도 주의할 점 |
-
-### Insight 생성 및 저장
-
-탐색 중 통찰을 발견하면:
-
-```
-1. 인사이트 블록 표시:
-   ★ Insight ─────────────────────────────────────
-   [발견한 통찰 2-3줄]
-   ─────────────────────────────────────────────────
-
-2. 즉시 저장 (같은 턴):
-   Write → .caw/insights/{YYYYMMDD}-{slug}.md
-
-3. 확인:
-   💡 Insight saved: [title]
-```
-
-### 저장 형식
-
-```markdown
-# Insight: [Title]
-
-## Metadata
-| Field | Value |
-|-------|-------|
-| **Captured** | [timestamp] |
-| **Context** | Brainstorming - [topic] |
-
-## Content
-[Original insight content]
-
-## Tags
-#brainstorm #[domain]
-```
-
-### 예시
-
-```
-사용자와 대화 중 발견:
-  - "관리자도 일반 사용자처럼 로그인해야 함"
-  - 권한 분리보다 역할 기반 접근이 적합
-
-★ Insight ─────────────────────────────────────
-권한 시스템 설계 원칙:
-- 관리자와 사용자를 별도 엔티티로 분리하지 않음
-- 단일 User 엔티티에 Role 기반 권한 부여
-- 확장성과 유지보수성 모두 확보
-─────────────────────────────────────────────────
-
-Write → .caw/insights/20260111-role-based-auth-design.md
-
-💡 Insight saved: 권한 시스템 설계 원칙
-```
+**Format:** `★ Insight → Write .caw/insights/{YYYYMMDD}-{slug}.md → 💡 Saved`
 
 ## Boundaries
 

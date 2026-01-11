@@ -202,24 +202,7 @@ Produce a structured review report:
 
 ## Review Categories
 
-### Severity Levels
-
-| Level | Icon | Meaning | Action Required |
-|-------|------|---------|-----------------|
-| Critical | 🔴 | Bug, security flaw, breaking issue | Must fix before merge |
-| Major | 🟠 | Significant quality issue | Should fix |
-| Minor | 🟡 | Improvement opportunity | Consider fixing |
-| Suggestion | 🟢 | Nice to have | Optional |
-
-### Score Ratings
-
-| Rating | Icon | Meaning |
-|--------|------|---------|
-| Excellent | 🟢🟢 | Exceeds expectations |
-| Good | 🟢 | Meets standards |
-| Fair | 🟡 | Needs minor improvements |
-| Poor | 🟠 | Significant issues |
-| Critical | 🔴 | Blocking issues |
+See [Review Schema](../_shared/schemas/review.schema.md) for severity levels, score ratings, and issue categories.
 
 ## Language-Specific Checks
 
@@ -299,270 +282,26 @@ Reviewing available files only...
 
 **IMPORTANT**: Always save structured review results to `.caw/last_review.json` for Fixer agent consumption.
 
-### last_review.json Schema
+See [Review Schema](../_shared/schemas/review.schema.md) for complete JSON structure, issue categories, and severity levels.
 
-```json
-{
-  "version": "1.0",
-  "timestamp": "2024-01-15T14:30:00Z",
-  "scope": {
-    "files": ["src/auth/jwt.ts", "src/middleware/auth.ts"],
-    "phase": 2,
-    "step": "2.3"
-  },
-  "summary": {
-    "overall_status": "APPROVED_WITH_SUGGESTIONS",
-    "scores": {
-      "correctness": { "score": "good", "issues": 0 },
-      "code_quality": { "score": "fair", "issues": 2 },
-      "best_practices": { "score": "good", "issues": 1 },
-      "security": { "score": "good", "issues": 0 },
-      "performance": { "score": "fair", "issues": 1 }
-    },
-    "total_issues": 4,
-    "auto_fixable": 3,
-    "agent_required": 1
-  },
-  "issues": [
-    {
-      "id": "issue_001",
-      "file": "src/auth/jwt.ts",
-      "line": 45,
-      "category": "constants",
-      "severity": "minor",
-      "auto_fixable": true,
-      "title": "Magic number should be extracted to constant",
-      "description": "The value 3600 appears to represent token expiry in seconds",
-      "current_code": "const expiresIn = 3600;",
-      "suggested_fix": {
-        "type": "extract_constant",
-        "constant_name": "TOKEN_EXPIRY_SECONDS",
-        "constant_value": 3600
-      }
-    },
-    {
-      "id": "issue_002",
-      "file": "src/auth/jwt.ts",
-      "line": 67,
-      "category": "docs",
-      "severity": "minor",
-      "auto_fixable": true,
-      "title": "Missing JSDoc for public function",
-      "description": "Public function generateToken lacks documentation",
-      "current_code": "function generateToken(user: User, options?: TokenOptions): string {",
-      "suggested_fix": {
-        "type": "add_jsdoc",
-        "template": "/**\n * Generates a JWT token for the specified user.\n * @param user - The user object\n * @param options - Optional token configuration\n * @returns The generated JWT token\n */"
-      }
-    },
-    {
-      "id": "issue_003",
-      "file": "src/auth/jwt.ts",
-      "line": 78,
-      "category": "performance",
-      "severity": "medium",
-      "auto_fixable": false,
-      "title": "Multiple sequential database calls",
-      "description": "Consider batching these database queries for better performance",
-      "current_code": "const user = await getUser(id);\nconst roles = await getRoles(id);",
-      "suggested_fix": {
-        "type": "refactor",
-        "approach": "Create getUserWithRoles function that combines queries",
-        "impact": "~30% reduction in database round trips"
-      }
-    }
-  ],
-  "action_items": [
-    {
-      "priority": "medium",
-      "category": "constants",
-      "item": "Extract magic number to TOKEN_EXPIRY_SECONDS",
-      "file": "src/auth/jwt.ts",
-      "line": 45,
-      "auto_fixable": true
-    },
-    {
-      "priority": "low",
-      "category": "docs",
-      "item": "Add JSDoc to generateToken function",
-      "file": "src/auth/jwt.ts",
-      "line": 67,
-      "auto_fixable": true
-    },
-    {
-      "priority": "medium",
-      "category": "performance",
-      "item": "Batch database queries",
-      "file": "src/auth/jwt.ts",
-      "line": 78,
-      "auto_fixable": false
-    }
-  ],
-  "test_coverage": {
-    "files": [
-      { "file": "src/auth/jwt.ts", "coverage": 85, "status": "good" },
-      { "file": "src/middleware/auth.ts", "coverage": 72, "status": "fair" }
-    ],
-    "missing_tests": [
-      "Token refresh edge case when near expiration",
-      "Concurrent token validation scenario"
-    ]
-  },
-  "recommendations": [
-    "Consider adding integration tests for the auth flow",
-    "Document the token refresh strategy in README"
-  ]
-}
-```
-
-### Issue Categories
-
-```yaml
-auto_fixable_categories:
-  constants:
-    description: "Magic numbers to named constants"
-    auto_fix: true
-  docs:
-    description: "Missing documentation"
-    auto_fix: true
-  style:
-    description: "Lint/formatting violations"
-    auto_fix: true
-  imports:
-    description: "Import organization"
-    auto_fix: true
-
-agent_required_categories:
-  naming:
-    description: "Variable/function naming improvements"
-    auto_fix: false
-    reason: "Requires semantic understanding"
-  logic:
-    description: "Logic improvements and bug fixes"
-    auto_fix: false
-    reason: "Requires analysis of behavior"
-  performance:
-    description: "Performance optimizations"
-    auto_fix: false
-    reason: "Requires profiling and analysis"
-  security:
-    description: "Security vulnerability fixes"
-    auto_fix: false
-    reason: "Requires security analysis"
-  architecture:
-    description: "Architectural improvements"
-    auto_fix: false
-    reason: "Requires system-wide analysis"
-```
-
-### Severity Levels
-
-```yaml
-severity_mapping:
-  critical:
-    icon: "🔴"
-    action: "Must fix before merge"
-    auto_fixable: false  # Critical issues need human review
-  major:
-    icon: "🟠"
-    action: "Should fix"
-    auto_fixable: varies
-  minor:
-    icon: "🟡"
-    action: "Consider fixing"
-    auto_fixable: usually true
-  suggestion:
-    icon: "🟢"
-    action: "Optional"
-    auto_fixable: usually true
-```
-
-### Writing the JSON File
-
-After completing the review, always save results:
-
-```bash
-# Save to .caw/last_review.json
-Write: .caw/last_review.json with structured JSON output
-```
-
-**Example workflow**:
-```
+**Workflow**:
 1. Complete code review analysis
 2. Generate markdown report for user display
-3. Generate JSON structure with all issues
-4. Save JSON to .caw/last_review.json
-5. Display summary with auto-fixable count
-6. Suggest: "Run /caw:fix to apply 3 quick fixes"
-```
+3. Save JSON to `.caw/last_review.json`
+4. Display summary with auto-fixable count
+5. Suggest: "Run `/caw:fix` to apply quick fixes"
 
 ## Insight Collection
 
-코드 리뷰 중 **재사용 가능한 교훈**을 발견하면 인사이트로 저장합니다.
+See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 
-### Insight 트리거 조건
+**Review-Specific Triggers:**
+- 반복되는 안티패턴 발견
+- 프로젝트 특화 모범 사례
+- 보안/성능 주의사항
+- 코드베이스 관습
 
-| 상황 | 예시 |
-|------|------|
-| **반복되는 패턴 발견** | 여러 파일에서 동일한 안티패턴 |
-| **프로젝트 특화 모범 사례** | 이 프로젝트에서 효과적인 패턴 |
-| **보안/성능 주의사항** | 특정 라이브러리 사용 시 주의점 |
-| **코드베이스 관습** | 암묵적 규칙이나 컨벤션 |
-
-### Insight 생성 및 저장
-
-리뷰 중 교훈을 발견하면:
-
-```
-1. 인사이트 블록 표시:
-   ★ Insight ─────────────────────────────────────
-   [발견한 교훈 2-3줄]
-   ─────────────────────────────────────────────────
-
-2. 즉시 저장 (같은 턴):
-   Write → .caw/insights/{YYYYMMDD}-{slug}.md
-
-3. 확인:
-   💡 Insight saved: [title]
-```
-
-### 저장 형식
-
-```markdown
-# Insight: [Title]
-
-## Metadata
-| Field | Value |
-|-------|-------|
-| **Captured** | [timestamp] |
-| **Context** | Code Review - [files reviewed] |
-| **Phase** | [current phase if CAW active] |
-
-## Content
-[Original insight content]
-
-## Tags
-#code-review #[category]
-```
-
-### 예시
-
-```
-리뷰 중 발견:
-  - src/api/*.ts에서 에러 핸들링이 일관되지 않음
-  - 성공 사례: src/auth/handler.ts의 패턴이 모범적
-
-★ Insight ─────────────────────────────────────
-API 에러 핸들링 표준화:
-- 모든 API 핸들러는 try-catch로 감싸고
-- AppError 클래스를 사용해 일관된 에러 응답
-- auth/handler.ts 패턴을 참조
-─────────────────────────────────────────────────
-
-Write → .caw/insights/20260111-api-error-handling-pattern.md
-
-💡 Insight saved: API 에러 핸들링 표준화
-```
+**Format:** `★ Insight → Write .caw/insights/{YYYYMMDD}-{slug}.md → 💡 Saved`
 
 ## Integration Points
 
@@ -577,102 +316,17 @@ Write → .caw/insights/20260111-api-error-handling-pattern.md
 
 리뷰 완료 후 **auto-fixable 이슈가 있으면 /caw:fix 제안**합니다.
 
-### Quick Fix 제안 조건
+**조건**: `auto_fixable > 0` in `last_review.json`
 
-```yaml
-suggest_quick_fix_when:
-  - auto_fixable > 0 in last_review.json
-  - categories: [constants, docs, style, imports]
-
-do_not_suggest_when:
-  - No auto-fixable issues
-  - Only agent_required issues (logic, security, architecture)
-```
-
-### 제안 형식
-
-리뷰 보고서 마지막에 다음과 같이 제안:
-
+**제안 형식** (보고서 마지막에 추가):
 ```markdown
----
-
 ## 💡 Quick Fix Available
 
-Auto-fixable 이슈 **3개** 발견:
-  • constants: 2 (magic numbers)
-  • docs: 1 (missing JSDoc)
+Auto-fixable 이슈 **N개** 발견: constants: X, docs: Y
+🔧 Run `/caw:fix` to apply quick fixes.
 
-🔧 Run `/caw:fix` to apply quick fixes automatically.
-
-복잡한 이슈 **1개**는 Fixer agent가 필요합니다:
-  • performance: 1 (database optimization)
-
+복잡한 이슈 **M개**는 Fixer agent 필요:
 🔨 Run `/caw:fix --deep` for comprehensive fixes.
 ```
 
-### Quick Fix 카테고리 분류
-
-```yaml
-auto_fixable:
-  constants:
-    description: "Magic numbers → named constants"
-    command: "/caw:fix --category constants"
-  docs:
-    description: "Missing JSDoc/docstrings"
-    command: "/caw:fix --category docs"
-  style:
-    description: "Lint violations"
-    command: "/caw:fix --category style"
-  imports:
-    description: "Import ordering"
-    command: "/caw:fix --category imports"
-
-agent_required:
-  naming:
-    description: "Variable/function naming"
-  logic:
-    description: "Logic improvements"
-  performance:
-    description: "Performance optimization"
-  security:
-    description: "Security fixes"
-  architecture:
-    description: "Architectural changes"
-```
-
-### 워크플로우 통합
-
-```
-1. 코드 리뷰 완료
-2. last_review.json 저장 (auto_fixable 카운트 포함)
-3. 마크다운 보고서 생성
-4. auto_fixable > 0이면 Quick Fix 제안 추가
-5. 사용자에게 보고서 표시
-```
-
-### 예시 출력
-
-```
-## 📋 Code Review Report
-
-**Scope**: src/auth/*.ts
-**Overall**: 🟢 Approved with suggestions
-
-### Summary
-| Category | Score | Issues |
-|----------|-------|--------|
-| Correctness | 🟢 Good | 0 |
-| Code Quality | 🟡 Fair | 3 |
-
-(... detailed findings ...)
-
----
-
-## 💡 Quick Fix Available
-
-Auto-fixable 이슈 **3개** 발견:
-  • constants: 2
-  • docs: 1
-
-🔧 Run `/caw:fix` to apply quick fixes.
-```
+See [Review Schema](../_shared/schemas/review.schema.md) for category details.

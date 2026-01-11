@@ -284,37 +284,14 @@ Errors: [Error types]
 - [ ] Proof of concept for [risky component]
 ```
 
-## ASCII Diagram Patterns
+## ASCII Diagram Conventions
 
-### System Components
-```
-Service:    ┌───────────────┐
-            │   Service     │
-            │   [details]   │
-            └───────────────┘
-
-Database:   ┌───────────────┐
-            │ ╔═══════════╗ │
-            │ ║ Database  ║ │
-            │ ╚═══════════╝ │
-            └───────────────┘
-
-Queue:      ┌───────────────┐
-            │ ≋≋≋ Queue ≋≋≋ │
-            └───────────────┘
-
-Cache:      ┌───────────────┐
-            │ ◈◈◈ Cache ◈◈◈ │
-            └───────────────┘
-```
-
-### Relationships
-```
-Sync call:      ────────►
-Async call:     - - - - ►
-Bidirectional:  ◄───────►
-Data flow:      ═════════►
-```
+| Component | Symbol | Arrow Type | Meaning |
+|-----------|--------|------------|---------|
+| Service | `┌─ Service ─┐` | `────►` | Sync call |
+| Database | `╔═ DB ═╗` | `- - -►` | Async call |
+| Queue | `≋≋ Queue ≋≋` | `◄────►` | Bidirectional |
+| Cache | `◈◈ Cache ◈◈` | `═════►` | Data flow |
 
 ## Integration
 

@@ -23,30 +23,8 @@ Automatically fix or interactively resolve issues identified by the Reviewer age
 
 ### Mode Selection
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     /caw:fix 모드 선택                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  Simple Issues           Complex Issues                     │
-│  (auto-fixable)          (needs analysis)                   │
-│       │                        │                            │
-│       ▼                        ▼                            │
-│  ┌─────────┐            ┌─────────────┐                     │
-│  │ Quick   │            │   Fixer     │                     │
-│  │ Fix     │            │   Agent     │                     │
-│  │ (Skill) │            │  (--deep)   │                     │
-│  └─────────┘            └─────────────┘                     │
-│       │                        │                            │
-│       ▼                        ▼                            │
-│  • Magic numbers        • Logic improvements                │
-│  • JSDoc templates      • Multi-file refactoring            │
-│  • Import ordering      • Pattern extraction                │
-│  • Lint auto-fix        • Architecture changes              │
-│  • Naming suggestions   • Performance optimization          │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+**Quick Fix (default)**: constants, docs, imports, style, naming → Auto-fix or semi-auto
+**Fixer Agent (`--deep`)**: logic, performance, security, architecture → Multi-file refactoring
 
 ### Step 1: Load Review Results
 
@@ -209,102 +187,17 @@ Running quality checks:
 
 ## Fix Categories
 
-### Constants (Auto-fixable)
-
-Extracts magic numbers and strings to named constants:
-
-```typescript
-// Before
-const expiresIn = 3600;
-if (retries > 3) { ... }
-const url = "https://api.example.com";
-
-// After
-const TOKEN_EXPIRY_SECONDS = 3600;
-const MAX_RETRIES = 3;
-const API_BASE_URL = "https://api.example.com";
-
-const expiresIn = TOKEN_EXPIRY_SECONDS;
-if (retries > MAX_RETRIES) { ... }
-const url = API_BASE_URL;
-```
-
-### Documentation (Auto-fixable)
-
-Generates JSDoc/docstring templates:
-
-```typescript
-// Before
-function generateToken(user: User, options?: TokenOptions): string {
-  ...
-}
-
-// After
-/**
- * Generates a JWT token for the specified user.
- *
- * @param user - The user object to generate token for
- * @param options - Optional token configuration
- * @returns The generated JWT token string
- */
-function generateToken(user: User, options?: TokenOptions): string {
-  ...
-}
-```
-
-### Style (Auto-fixable)
-
-Runs linter with auto-fix:
-
-```bash
-# Detected linter
-npx eslint --fix {files}
-# or
-ruff --fix {files}
-# or
-gofmt -w {files}
-```
-
-### Imports (Auto-fixable)
-
-Organizes imports according to project conventions:
-
-```typescript
-// Before (random order)
-import { jwt } from 'jsonwebtoken';
-import { User } from '../types';
-import express from 'express';
-import { config } from './config';
-
-// After (external → internal → types)
-import express from 'express';
-import { jwt } from 'jsonwebtoken';
-
-import { config } from './config';
-
-import { User } from '../types';
-```
-
-### Naming (Semi-auto)
-
-Suggests improved names with confirmation:
-
-```
-🔧 Naming Suggestion
-
-File: src/auth/jwt.ts:12
-
-Current:  const d = new Date();
-Suggested: const createdAt = new Date();
-
-Context: Used for token creation timestamp
-
-[A]pply  [S]kip  [C]ustom name
-```
-
-### Complex Categories (Fixer Agent Required)
-
-For `logic`, `performance`, `security`, `architecture` - requires `--deep` flag to invoke Fixer agent.
+| Category | Auto-Fix | Action | Example |
+|----------|----------|--------|---------|
+| `constants` | ✅ Yes | Magic numbers → NAMED_CONSTANTS | `3600 → TOKEN_EXPIRY_SECONDS` |
+| `docs` | ✅ Yes | Generate JSDoc/docstrings | `function → /** @param ... */` |
+| `style` | ✅ Yes | Run linter auto-fix | `eslint --fix` / `ruff --fix` |
+| `imports` | ✅ Yes | Organize: external → internal → types | Reorder + group |
+| `naming` | ⚠️ Semi | Suggest + confirm | `d → createdAt` |
+| `logic` | ❌ --deep | Fixer agent refactoring | Algorithm improvements |
+| `performance` | ❌ --deep | Fixer agent analysis | DB query optimization |
+| `security` | ❌ --deep | Fixer agent remediation | Vulnerability fixes |
+| `architecture` | ❌ --deep | Fixer agent extraction | Pattern refactoring |
 
 ## Options
 
@@ -320,37 +213,9 @@ For `logic`, `performance`, `security`, `architecture` - requires `--deep` flag 
 
 ## Integration
 
-```
-┌─────────────────┐
-│   /caw:review   │ ──── Identify issues
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│   /caw:fix      │ ──── Apply fixes
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-  Simple    Complex
-    │         │
-    ▼         ▼
-  Quick     Fixer
-  Fix       Agent
-    │         │
-    └────┬────┘
-         │
-         ▼
-┌─────────────────┐
-│ Quality Gate    │ ──── Verify fixes
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  /caw:review    │ ──── Re-review (optional)
-└─────────────────┘
-```
+**Flow**: `/caw:review` → `/caw:fix` → Quality Gate → `/caw:review` (optional re-check)
+
+**Routing**: Simple issues → Quick Fix skill | Complex issues → Fixer Agent (`--deep`)
 
 ## Edge Cases
 

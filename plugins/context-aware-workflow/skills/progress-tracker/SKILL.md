@@ -354,49 +354,11 @@ warnings:
 
 ## Forked Context Behavior
 
-이 스킬은 **분리된 컨텍스트(Forked Context)**에서 실행됩니다.
+See [Forked Context Pattern](../../_shared/forked-context.md).
 
-### 분리되는 내용 (메인 컨텍스트에 노출되지 않음)
+**Returns**: Progress percentage with visualization
 
-```yaml
-isolated_operations:
-  - metrics.json 전체 구조 읽기/쓰기
-  - 진행률 계산 로직 (가중치 적용)
-  - 타임라인 이벤트 생성 및 저장
-  - 예상 완료 시간 계산
-  - 성능 분석 (평균 시간, 이상치 등)
-  - 마일스톤 알림 판단 로직
-```
-
-### 메인 컨텍스트로 반환되는 내용
-
-```yaml
-returned_result:
-  progress: 45
-  current:
-    phase: 2
-    phase_name: "Core Implementation"
-    step: "2.3"
-    step_name: "Auth middleware validation"
-  eta: "14:00 (2시간 남음)"
-  visualization: "[45%] Phase 2/3 | Step 5/11 | ETA: 14:00"
-```
-
-### 반환 형식 예시
-
-**상태 요청 시:**
-```
-📊 [45%] Phase 2/3 | Step 5/11 | ETA: 14:00
-```
-
-**마일스톤 도달 시:**
-```
-🎉 Phase 1 completed (30분 소요)
-📊 [33%] → Phase 2 시작
-```
-
-**완료 시:**
-```
-✅ Workflow completed in 3시간 45분
-Total: 11 steps | Quality Gate Pass Rate: 85%
-```
+**Output Examples:**
+- `📊 [45%] Phase 2/3 | Step 5/11 | ETA: 14:00` - Status
+- `🎉 Phase 1 completed (30분)` - Milestone
+- `✅ Workflow completed in 3시간 45분` - Completion

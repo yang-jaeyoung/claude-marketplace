@@ -162,13 +162,8 @@ def detect_test_framework():
 
 ## Status Icons
 
-| Icon | Meaning | When to Use |
-|------|---------|-------------|
-| ⏳ | Pending | Not started |
-| 🔄 | In Progress | Currently working |
-| ✅ | Complete | Implementation and tests pass |
-| ❌ | Blocked | Cannot proceed due to issue |
-| ⏭️ | Skipped | Intentionally skipped |
+See [Status Icons Reference](../_shared/status-icons.md) for icon definitions.
+Key: ⏳ Pending | 🔄 In Progress | ✅ Complete | ❌ Blocked | ⏭️ Skipped
 
 ## Error Handling
 
@@ -259,81 +254,12 @@ def detect_test_framework():
 
 ## Insight Collection
 
-구현 중 **재사용 가능한 코드 패턴이나 기법**을 발견하면 인사이트로 저장합니다.
+See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 
-### Insight 트리거 조건
-
-| 상황 | 예시 |
-|------|------|
-| **효과적인 구현 패턴 발견** | 특정 문제를 우아하게 해결한 방법 |
-| **라이브러리 활용 팁** | 공식 문서에 없는 유용한 사용법 |
-| **성능 최적화 기법** | 벤치마크로 검증된 개선 방법 |
-| **테스트 전략** | 효과적인 테스트 작성 패턴 |
-
-### Insight 생성 및 저장
-
-구현 중 유용한 패턴을 발견하면:
-
-```
-1. 인사이트 블록 표시:
-   ★ Insight ─────────────────────────────────────
-   [발견한 패턴/기법 2-3줄]
-   ─────────────────────────────────────────────────
-
-2. 즉시 저장 (같은 턴):
-   Write → .caw/insights/{YYYYMMDD}-{slug}.md
-
-3. 확인:
-   💡 Insight saved: [title]
-```
-
-### 저장 형식
-
-```markdown
-# Insight: [Title]
-
-## Metadata
-| Field | Value |
-|-------|-------|
-| **Captured** | [timestamp] |
-| **Context** | Implementation - [step description] |
-| **Phase** | [current phase] |
-| **Step** | [current step] |
-
-## Content
-[Original insight content]
-
-## Tags
-#implementation #[technology]
-```
-
-### 예시
-
-```
-JWT 토큰 갱신 구현 중 발견:
-  - accessToken 만료 전에 갱신해야 UX가 좋음
-  - 만료 5분 전 자동 갱신이 효과적
-
-★ Insight ─────────────────────────────────────
-JWT 토큰 사전 갱신 패턴:
-- accessToken 만료 5분 전 자동 갱신 타이머 설정
-- refreshToken으로 갱신 실패 시에만 로그아웃
-- 네트워크 에러는 재시도, 401은 즉시 로그아웃
-─────────────────────────────────────────────────
-
-Write → .caw/insights/20260111-jwt-preemptive-refresh.md
-
-💡 Insight saved: JWT 토큰 사전 갱신 패턴
-```
-
-### Insight vs Lessons Learned 구분
-
-| 구분 | Insight Collection | Lessons Learned |
-|------|-------------------|-----------------|
-| **저장 위치** | `.caw/insights/*.md` | `CLAUDE.md` |
-| **내용** | 코드 패턴, 구현 기법 | 문제 해결 경험, 설정 이슈 |
-| **트리거** | 유용한 패턴 발견 | 어려운 문제 해결 후 |
-| **수명** | 프로젝트/세션 단위 | 영구적 프로젝트 지식 |
+**Quick Reference:**
+- Trigger: Effective pattern, library tip, optimization, test strategy discovered
+- Format: `★ Insight → Write .caw/insights/{YYYYMMDD}-{slug}.md → 💡 Saved`
+- vs Lessons Learned: Insights = code patterns (`.caw/`), Lessons = problem-solving (`CLAUDE.md`)
 
 ## Lessons Learned - CLAUDE.md 업데이트
 

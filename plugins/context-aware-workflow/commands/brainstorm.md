@@ -106,81 +106,24 @@ Created: .caw/brainstorm.md
     └── Recommended Direction
 ```
 
-## Examples
-
-### Example 1: New Feature Ideation
+## Example
 
 ```bash
 /caw:brainstorm "사용자 알림 시스템"
 ```
 
-**Ideator Questions**:
-```
-📋 Requirements Discovery
+**Ideator Process**: Problem Understanding → Scope Definition → Success Criteria
 
-I'd like to understand your notification system needs better.
+**Question Categories**:
+| Round | Focus | Sample Questions |
+|-------|-------|------------------|
+| 1 | Problem | "What types of notifications?" (Email/Push/In-app/SMS) |
+| 2 | Scope | "What triggers? What volume?" (Low/Med/High) |
+| 3 | Success | "How to measure success? Acceptable false positive rate?" |
 
-1. What types of notifications are needed?
-   □ Email  □ Push  □ In-app  □ SMS
-
-2. Who receives notifications?
-   - All users
-   - Specific user roles
-   - Based on user preferences
-
-3. What triggers notifications?
-   - System events
-   - User actions
-   - Scheduled tasks
-
-4. What's the expected volume?
-   - Low (< 100/day)
-   - Medium (100-10K/day)
-   - High (> 10K/day)
-```
-
-### Example 2: Resume Existing
-
-```bash
-/caw:brainstorm
-```
-
-```
-📋 Existing Brainstorm Found
-
-Project: User Notification System
-Status: Draft
-Confidence: Medium
-Last Updated: 10분 전
-
-Requirements discovered:
-- ✅ P0: 3 items defined
-- 🔄 P1: 2 items (needs refinement)
-- ⏳ Open Questions: 4 items
-
-[1] Continue refining  [2] View summary  [3] Proceed to design
-```
-
-### Example 3: Complex Project
-
-```bash
-/caw:brainstorm "AI 기반 코드 리뷰 시스템"
-```
-
-**Multi-round Discovery**:
-```
-Round 1: Problem Understanding
-- "What specific code quality issues do you want to catch?"
-- "Who will use this system? (developers, tech leads, CI/CD)"
-
-Round 2: Scope Definition
-- "Should this integrate with existing tools? (GitHub, GitLab)"
-- "What languages need support?"
-
-Round 3: Success Criteria
-- "How will you measure if this is successful?"
-- "What's the acceptable false positive rate?"
-```
+**Variants:**
+- `(no args)` - Resume existing brainstorm or view summary
+- `--reset` - Archive existing and start fresh
 
 ## Edge Cases
 

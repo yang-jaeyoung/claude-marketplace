@@ -312,50 +312,11 @@ retry_policy:
 
 ## Forked Context Behavior
 
-이 스킬은 **분리된 컨텍스트(Forked Context)**에서 실행됩니다.
+See [Forked Context Pattern](../../_shared/forked-context.md).
 
-### 분리되는 내용 (메인 컨텍스트에 노출되지 않음)
+**Returns**: `status: PASSED | FAILED | PASSED_WITH_WARNINGS` with check summary
 
-```yaml
-isolated_operations:
-  - 전체 빌드 출력 (tsc, go build 등)
-  - 상세 테스트 결과 (jest, pytest 출력)
-  - 전체 린트 경고 목록
-  - 재시도 로직 (최대 3회)
-  - 중간 검증 과정
-```
-
-### 메인 컨텍스트로 반환되는 내용
-
-```yaml
-returned_result:
-  status: "PASSED | FAILED | PASSED_WITH_WARNINGS"
-  summary:
-    passed: 4
-    warnings: 1
-    failed: 0
-  key_errors:
-    - "src/auth.ts:45 - Type error: Property 'token' does not exist"
-    - "tests/auth.test.ts:23 - Expected token to be valid"
-    - "..." # 최대 3개
-  action_needed: "테스트 수정 후 재검증 필요"
-```
-
-### 반환 형식 예시
-
-**성공 시:**
-```
-✅ Quality Gate: Step 2.3 PASSED
-Summary: 4 checks passed, 1 warning
-Next: 다음 단계로 진행 가능
-```
-
-**실패 시:**
-```
-❌ Quality Gate: Step 2.3 FAILED
-Summary: 3 passed, 0 warnings, 2 failed
-Key Errors:
-  • auth.test.ts:23 - Expected token to be valid
-  • auth.test.ts:45 - Timeout in async operation
-Action: 테스트 수정 필요
-```
+**Output Examples:**
+- `✅ Quality Gate PASSED` - Summary: N passed, M warnings
+- `❌ Quality Gate FAILED` - Key errors (max 3) + action needed
+- `key_errors: [핵심 에러 최대 3개]` - Focused error list

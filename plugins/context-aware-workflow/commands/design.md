@@ -177,119 +177,24 @@ Created Files:
     [Cache]            [Users DB]        [Orders DB]
 ```
 
-## Examples
-
-### Example 1: UI Design Only
-
-```bash
-/caw:design --ui
-```
-
-```
-📐 Starting UX/UI Design
-
-Context:
-  ✅ Reading .caw/brainstorm.md
-  📊 Analyzing existing UI patterns...
-
-Designer Agent Working:
-  🔄 Creating user flows...
-  🔄 Designing wireframes...
-  🔄 Specifying components...
-
-✅ Design Complete: .caw/design/ux-ui.md
-
-Summary:
-  • User Flows: 3 (Login, Dashboard, Settings)
-  • Screens: 5 wireframes
-  • Components: 12 specifications
-  • Accessibility: WCAG AA compliance planned
-
-💡 Next: /caw:design --arch or /caw:start
-```
-
-### Example 2: Architecture Design Only
+## Example
 
 ```bash
 /caw:design --arch
 ```
 
-```
-📐 Starting Architecture Design
+**Output**: `📐 Design Complete: .caw/design/architecture.md`
+- Components: N services
+- Data Models: M entities
+- API Endpoints: K documented
 
-Context:
-  ✅ Reading .caw/brainstorm.md
-  ✅ Reading .caw/design/ux-ui.md
-  📊 Analyzing existing codebase...
-
-Architect Agent Working:
-  🔄 Designing system components...
-  🔄 Creating data models...
-  🔄 Specifying APIs...
-
-✅ Design Complete: .caw/design/architecture.md
-
-Summary:
-  • Components: 4 services
-  • Data Models: 6 entities
-  • API Endpoints: 12
-  • Technical Decisions: 3 documented
-
-💡 Next: /caw:start to create implementation plan
-```
-
-### Example 3: Both Designs
-
-```bash
-/caw:design --all
-```
-
-```
-📐 Starting Full Design Phase
-
-Step 1/2: UX/UI Design
-  🔄 Designer agent working...
-  ✅ Created .caw/design/ux-ui.md
-
-Step 2/2: Architecture Design
-  🔄 Architect agent working...
-  ✅ Created .caw/design/architecture.md
-
-📊 Design Phase Complete
-
-Files Created:
-  ├── .caw/design/ux-ui.md
-  └── .caw/design/architecture.md
-
-💡 Ready for: /caw:start
-```
-
-### Example 4: Interactive Mode
-
-```bash
-/caw:design
-```
-
-```
-📐 Design Phase
-
-What would you like to design?
-
-[1] UX/UI Design
-    → User flows, wireframes, component specs
-    → Best for: Frontend-heavy features
-
-[2] Architecture Design
-    → System components, data models, APIs
-    → Best for: Backend-heavy features
-
-[3] Both (Full Design)
-    → Complete design documentation
-    → Best for: New features or major changes
-
-[4] Skip Design
-    → Go directly to /caw:start
-```
+**Mode Matrix:**
+| Flag | Agent | Output | Best For |
+|------|-------|--------|----------|
+| `--ui` | Designer | `ux-ui.md` | Frontend-heavy features |
+| `--arch` | Architect | `architecture.md` | Backend-heavy features |
+| `--all` | Both | Both files | New features, major changes |
+| (none) | Interactive | Choose type | Uncertain scope |
 
 ## Edge Cases
 

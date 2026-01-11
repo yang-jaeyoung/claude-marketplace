@@ -138,115 +138,19 @@ Glob: README.md, docs/**/*.md
 | `go.mod` | Go | main.go |
 | `pom.xml` | Java/Maven | src/main/java |
 
-### Step 3.1: Framework Detection Logic (Detailed)
+### Step 3.1: Framework Detection Logic
 
-**For Node.js Projects** (package.json exists):
+See [Manifest Schema](../_shared/schemas/manifest.schema.md) for detection patterns.
 
-```javascript
-// Parse package.json and detect frameworks
-Read: package.json → Parse JSON
+**Quick Reference:**
+| File | Type | Scan For |
+|------|------|----------|
+| package.json | nodejs | react, vue, angular, next, express, typescript, jest, eslint |
+| pyproject.toml | python | fastapi, django, flask, pytest, mypy, ruff |
+| Cargo.toml | rust | tokio, actix-web, axum, serde |
+| go.mod | go | gin-gonic, labstack/echo, gofiber/fiber |
 
-// Detection Rules:
-dependencies + devDependencies → scan for patterns:
-
-// Frontend Frameworks
-"react" | "react-dom"           → React
-"vue"                           → Vue
-"@angular/core"                 → Angular
-"svelte"                        → Svelte
-"next"                          → Next.js
-"nuxt"                          → Nuxt
-
-// Backend Frameworks
-"express"                       → Express
-"fastify"                       → Fastify
-"@nestjs/core"                  → NestJS
-"koa"                           → Koa
-"hono"                          → Hono
-
-// Testing Frameworks
-"jest" | "@types/jest"          → Jest
-"vitest"                        → Vitest
-"mocha"                         → Mocha
-"playwright"                    → Playwright
-"cypress"                       → Cypress
-
-// Build/TypeScript
-"typescript" | "@types/*"       → TypeScript
-"esbuild"                       → esbuild
-"vite"                          → Vite
-"webpack"                       → Webpack
-
-// Linting/Formatting
-"eslint"                        → ESLint
-"prettier"                      → Prettier
-"biome" | "@biomejs/biome"      → Biome
-```
-
-**For Python Projects** (pyproject.toml exists):
-
-```python
-# Parse pyproject.toml or requirements.txt
-
-# Detection Rules:
-[project.dependencies] or requirements.txt → scan for:
-
-# Web Frameworks
-"fastapi"                       → FastAPI
-"django"                        → Django
-"flask"                         → Flask
-"starlette"                     → Starlette
-
-# Testing
-"pytest"                        → pytest
-"unittest"                      → unittest (built-in)
-
-# Type Checking
-"mypy"                          → mypy
-"pyright"                       → Pyright
-
-# Linting
-"ruff"                          → Ruff
-"flake8"                        → Flake8
-"black"                         → Black
-```
-
-**For Rust Projects** (Cargo.toml exists):
-
-```toml
-# Parse Cargo.toml [dependencies]
-
-# Detection Rules:
-"tokio"                         → Async runtime
-"actix-web" | "axum" | "rocket" → Web framework
-"serde"                         → Serialization
-"clap"                          → CLI framework
-```
-
-**For Go Projects** (go.mod exists):
-
-```go
-# Parse go.mod require section
-
-# Detection Rules:
-"github.com/gin-gonic/gin"      → Gin
-"github.com/labstack/echo"      → Echo
-"github.com/gofiber/fiber"      → Fiber
-"github.com/stretchr/testify"   → Testify
-```
-
-**Framework Detection Output**:
-
-```json
-{
-  "detected_frameworks": [
-    {"name": "React", "version": "18.2.0", "category": "frontend"},
-    {"name": "TypeScript", "version": "5.3.0", "category": "language"},
-    {"name": "Jest", "version": "29.7.0", "category": "testing"},
-    {"name": "ESLint", "version": "8.56.0", "category": "linting"}
-  ]
-}
-```
+**Output**: `{"detected_frameworks": [{"name": "...", "version": "...", "category": "frontend|backend|testing|linting"}]}`
 
 ### Step 4: Detect Existing Plans
 

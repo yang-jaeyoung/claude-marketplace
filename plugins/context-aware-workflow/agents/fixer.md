@@ -176,25 +176,7 @@ For each change:
 6. If FAIL: Rollback and report
 ```
 
-**Execution Flow**:
-```
-┌─────────────────────────────────────────────────────┐
-│                    Change N                          │
-├─────────────────────────────────────────────────────┤
-│  ┌─────────┐   ┌─────────┐   ┌─────────┐           │
-│  │ Backup  │ → │ Apply   │ → │ Verify  │           │
-│  └─────────┘   └─────────┘   └────┬────┘           │
-│                                   │                 │
-│                              ┌────┴────┐            │
-│                              │         │            │
-│                              ▼         ▼            │
-│                            Pass      Fail           │
-│                              │         │            │
-│                              ▼         ▼            │
-│                           Next     Rollback         │
-│                           Change   & Report         │
-└─────────────────────────────────────────────────────┘
-```
+**Execution Flow**: `Backup → Apply → Verify → Pass? → Next : Rollback & Report`
 
 ### Step 6: Report Results
 
@@ -273,140 +255,43 @@ Coverage: 87% (+2%)
 
 ## Fix Strategies by Category
 
-### Performance Fixes
-
-```yaml
-strategies:
-  db_batching:
-    pattern: "Multiple sequential DB calls"
-    fix: "Batch into single query with joins"
-    risk: low
-
-  algorithm_optimization:
-    pattern: "O(n²) or worse complexity"
-    fix: "Optimize algorithm or use efficient data structures"
-    risk: medium
-
-  caching:
-    pattern: "Repeated expensive computations"
-    fix: "Add memoization or caching layer"
-    risk: low
-
-  lazy_loading:
-    pattern: "Loading unused data"
-    fix: "Implement lazy loading or pagination"
-    risk: low
-```
-
-### Architecture Fixes
-
-```yaml
-strategies:
-  extract_module:
-    pattern: "Large file with multiple responsibilities"
-    fix: "Extract to separate modules"
-    risk: medium
-
-  pattern_extraction:
-    pattern: "Duplicated logic across files"
-    fix: "Extract to shared utility/service"
-    risk: low
-
-  interface_introduction:
-    pattern: "Direct dependencies on implementations"
-    fix: "Introduce interfaces for abstraction"
-    risk: medium
-
-  dependency_inversion:
-    pattern: "High coupling between modules"
-    fix: "Invert dependencies using DI pattern"
-    risk: high
-```
-
-### Security Fixes
-
-```yaml
-strategies:
-  input_validation:
-    pattern: "Unvalidated user input"
-    fix: "Add validation with sanitization"
-    risk: low
-
-  sql_injection:
-    pattern: "String concatenation in queries"
-    fix: "Use parameterized queries"
-    risk: critical - must fix
-
-  xss_prevention:
-    pattern: "Unescaped output to HTML"
-    fix: "Add output encoding"
-    risk: critical - must fix
-
-  auth_check:
-    pattern: "Missing authorization check"
-    fix: "Add middleware/guard"
-    risk: critical - must fix
-```
-
-### Logic Fixes
-
-```yaml
-strategies:
-  error_handling:
-    pattern: "Missing or inconsistent error handling"
-    fix: "Add proper try/catch with error propagation"
-    risk: low
-
-  null_safety:
-    pattern: "Potential null/undefined access"
-    fix: "Add null checks or optional chaining"
-    risk: low
-
-  race_condition:
-    pattern: "Async operations without proper sequencing"
-    fix: "Add proper async/await or locks"
-    risk: medium
-
-  edge_cases:
-    pattern: "Missing boundary condition handling"
-    fix: "Add edge case handling"
-    risk: low
-```
+| Category | Pattern | Fix Approach | Risk |
+|----------|---------|--------------|------|
+| **Performance** |
+| db_batching | Sequential DB calls | Batch with joins | Low |
+| algorithm | O(n²) complexity | Optimize/use efficient DS | Medium |
+| caching | Repeated computation | Add memoization | Low |
+| lazy_loading | Loading unused data | Lazy load/paginate | Low |
+| **Architecture** |
+| extract_module | Large file | Extract to modules | Medium |
+| pattern_extraction | Duplicated logic | Shared utility/service | Low |
+| interface | Direct dependencies | Introduce abstractions | Medium |
+| dependency_inversion | High coupling | DI pattern | High |
+| **Security** (Critical - must fix) |
+| input_validation | Unvalidated input | Validate + sanitize | Low |
+| sql_injection | String concat in queries | Parameterized queries | Critical |
+| xss_prevention | Unescaped HTML output | Output encoding | Critical |
+| auth_check | Missing authorization | Add middleware/guard | Critical |
+| **Logic** |
+| error_handling | Inconsistent errors | Proper try/catch | Low |
+| null_safety | Null/undefined access | Optional chaining | Low |
+| race_condition | Async without sequence | async/await or locks | Medium |
+| edge_cases | Missing boundaries | Add edge case handling | Low |
 
 ## Safety Guardrails
 
-### Pre-Fix Checks
+**Pre-Fix Checks**: Git clean state → Tests pass → No uncommitted changes → User consent for high-risk
 
-```yaml
-before_any_fix:
-  - Verify git clean state (or stash changes)
-  - Ensure tests pass before starting
-  - Check for uncommitted changes
-  - Validate refactoring plan with user if high risk
-```
+**Risk Assessment**:
+| Change Type | Coverage >80% | Coverage <80% |
+|-------------|---------------|---------------|
+| Add function | Low | Low |
+| Modify impl | Low | Medium |
+| Change signature | Medium | High |
+| Modify exports | High | High |
+| Delete code | High | High |
 
-### Risk Assessment Matrix
-
-| Change Type | Test Coverage | Risk Level |
-|-------------|---------------|------------|
-| Add new function | Any | Low |
-| Modify implementation | >80% | Low |
-| Modify implementation | <80% | Medium |
-| Change signature | >80% | Medium |
-| Change signature | <80% | High |
-| Modify exports | Any | High |
-| Delete code | Any | High |
-
-### Rollback Protocol
-
-```
-If fix fails:
-1. Capture error details
-2. Revert to backup state
-3. Log failure with context
-4. Report to user with analysis
-5. Suggest manual intervention if needed
-```
+**Rollback Protocol**: Capture error → Revert → Log → Report → Suggest manual fix
 
 ## Communication Style
 

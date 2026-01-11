@@ -285,40 +285,14 @@ Summary: 8 changes ready to apply
 
 ## Forked Context Behavior
 
-이 스킬은 **분리된 컨텍스트(Forked Context)**에서 실행됩니다.
+See [Forked Context Pattern](../../_shared/forked-context.md).
 
-### 분리되는 내용
+**Returns**: `status: SUCCESS | PARTIAL | FAILED` with fix summary
 
-```yaml
-isolated_operations:
-  - 전체 린터 출력
-  - 각 파일의 상세 변경 내용
-  - 반복적인 검증 과정
-  - AST 분석 결과
-```
-
-### 메인 컨텍스트로 반환되는 내용
-
-```yaml
-returned_result:
-  status: "SUCCESS | PARTIAL | FAILED"
-  summary:
-    fixed: 10
-    skipped: 3
-    failed: 0
-  changes:
-    - file: "src/auth/jwt.ts"
-      line: 45
-      category: "constants"
-      description: "3600 → TOKEN_EXPIRY_SECONDS"
-    - file: "src/auth/jwt.ts"
-      line: 67
-      category: "docs"
-      description: "Added JSDoc to generateToken()"
-  remaining:
-    - "Performance: Batch DB queries in jwt.ts:78"
-    - "Architecture: Extract validation module"
-```
+**Output Examples:**
+- `🔧 Quick Fix: 10 fixed, 3 skipped` - Summary
+- `changes: [{file, line, category, description}]` - Applied changes
+- `remaining: [complex issues for --deep]` - Fixer agent items
 
 ## Configuration
 
