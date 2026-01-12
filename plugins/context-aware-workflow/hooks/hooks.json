@@ -12,9 +12,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": {
-          "tool_name": "Write"
-        },
+        "matcher": "Write",
         "hooks": [
           {
             "type": "prompt",
@@ -25,9 +23,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": {
-          "tool_name": "Bash"
-        },
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "prompt",
