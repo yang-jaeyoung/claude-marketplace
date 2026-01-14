@@ -10,16 +10,6 @@
           }
         ]
       }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "CAW Continuation Guard:\n\n1. Check .caw/mode.json: If DEEP_WORK mode with completion_required, continue until all tasks complete\n\n2. Check TodoWrite: If pending/in_progress items exist, continue working\n\n3. Check .caw/task_plan.md: If steps show ⏳ or 🔄, continue working\n\n4. Stop allowed when: All tasks completed, user says stop/pause, or unrecoverable error\n\n5. If cannot stop: '🔄 Continuing - [N] tasks remaining'\n\n6. Before stopping: Save state to .caw/, suggest '💡 Run /caw:reflect for improvement insights'"
-          }
-        ]
-      }
     ]
   }
 }
