@@ -58,6 +58,6 @@ Defines the structure for `.caw/mode.json` - tracks the active workflow mode.
 
 ## Integration
 
-- **UserPromptSubmit hook**: Creates/updates mode.json when keyword detected
-- **Stop hook**: Checks mode.json to enforce completion requirements
+- **Magic keywords**: Detected keywords set the active mode
 - **/caw:status**: Displays active mode in status output
+- **Agents**: Check mode.json to adapt behavior accordingly

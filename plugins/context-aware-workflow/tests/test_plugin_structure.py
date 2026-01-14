@@ -532,23 +532,6 @@ class TestHooksConfiguration(unittest.TestCase):
         self.assertIn("PostToolUse", self.hooks_data["hooks"])
         self.assertGreater(len(self.hooks_data["hooks"]["PostToolUse"]), 0)
 
-    def test_stop_hook_exists(self):
-        """Stop hook must be configured for continuation guard and reflection."""
-        self.assertIn("Stop", self.hooks_data["hooks"])
-        self.assertGreater(len(self.hooks_data["hooks"]["Stop"]), 0)
-
-    def test_stop_hook_suggests_reflection(self):
-        """Stop hook should suggest /caw:reflect for improvement insights."""
-        stop_hooks = self.hooks_data["hooks"].get("Stop", [])
-        found_reflection = False
-        for hook_group in stop_hooks:
-            for hook in hook_group.get("hooks", []):
-                prompt = hook.get("prompt", "")
-                if "/caw:reflect" in prompt or "reflect" in prompt.lower():
-                    found_reflection = True
-                    break
-        self.assertTrue(found_reflection, "Stop hook should suggest reflection")
-
     def test_hook_types_valid(self):
         """All hooks must have valid type field."""
         valid_types = {"prompt", "command"}

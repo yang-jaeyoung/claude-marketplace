@@ -70,8 +70,8 @@ cp -r context-aware-workflow /your/project/.claude-plugin/
 | `.caw/task_plan.md` | Current task plan |
 | `.caw/context_manifest.json` | Active/Packed/Ignored file tracking |
 | `.caw/mode.json` | Active mode state (DEEP_WORK, NORMAL, etc.) |
+| `.caw/session.json` | Current session state |
 | `.caw/learnings.md` | Accumulated improvement insights from Ralph Loop |
-| `.caw/sessions/` | Session state snapshots |
 | `.caw/archives/` | Completed/abandoned plans |
 
 ## Configuration
@@ -110,15 +110,15 @@ Activate special modes by including keywords in your prompt:
 "quickfix the failing tests"
 ```
 
-## Work Continuation
+## Work Mode Tracking
 
-CAW includes intelligent work continuation guards:
+CAW tracks workflow mode to adapt agent behavior:
 
-- **Todo Continuation**: Prevents stopping with incomplete TodoWrite items
-- **Plan Progress Check**: Verifies all task_plan.md steps are complete
-- **Deep Work Enforcement**: In DEEP WORK mode, won't stop until 100% complete
+- **Mode State**: Agents check `.caw/mode.json` to adjust their approach
+- **DEEP_WORK mode**: Agents prioritize thoroughness over speed
+- **MINIMAL_CHANGE mode**: Agents focus on quick, targeted fixes
 
-Mode state is persisted in `.caw/mode.json`.
+Use `/caw:status` to see current mode and task progress.
 
 ## Ralph Loop - Continuous Improvement
 
@@ -172,9 +172,9 @@ CAW includes a continuous improvement cycle inspired by systematic learning prac
 
 ### Integration Points
 
-- **Stop Hook**: Suggests `/caw:reflect` after task completion
 - **Serena Memory**: Stores learnings for future sessions
 - **Learnings File**: `.caw/learnings.md` accumulates insights
+- **Status Command**: `/caw:status` suggests reflection when appropriate
 
 ## Model Routing System
 
@@ -278,7 +278,6 @@ Schemas are located in `schemas/` and `_shared/schemas/`:
 - [x] Ralph Loop continuous improvement cycle (RALPH: Reflect-Analyze-Learn-Plan-Habituate)
 - [x] `/caw:reflect` skill for post-task improvement analysis
 - [x] Learnings persistence (`.caw/learnings.md`, Serena memories)
-- [x] Stop hook integration for reflection suggestions
 - [x] Ralph Loop schema for structured improvement data
 
 ### Completed (v1.4.0)
@@ -289,8 +288,7 @@ Schemas are located in `schemas/` and `_shared/schemas/`:
 - [x] Model routing schema and documentation
 
 ### Completed (v1.3.0)
-- [x] Magic Keyword detection (UserPromptSubmit hook)
-- [x] Todo Continuation guard (Stop hook)
+- [x] Magic Keyword detection for workflow modes
 - [x] Visual progress bar in `/caw:status`
 - [x] Mode state persistence (`.caw/mode.json`)
 

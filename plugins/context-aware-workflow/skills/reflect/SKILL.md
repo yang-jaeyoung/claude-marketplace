@@ -25,7 +25,7 @@ Review what happened during the task.
 
 ```
 📝 Reading .caw/task_plan.md for completed steps
-📝 Reading .caw/sessions/ for execution history
+📝 Reading .caw/session.json for execution history
 
 Output:
 - Task summary
@@ -162,10 +162,10 @@ Store persistent learnings:
 write_memory("ralph_learning_[date]", insights)
 ```
 
-### With Stop Hook
-The Stop hook can suggest reflection:
+### After Task Completion
+Consider running reflection after completing tasks:
 ```
-"💡 Task complete. Consider /caw:reflect for continuous improvement."
+💡 Task complete. Consider /caw:reflect for continuous improvement.
 ```
 
 ## Learnings Storage

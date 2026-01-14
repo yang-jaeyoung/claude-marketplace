@@ -402,9 +402,9 @@ skills/knowledge-base/
 
 | 속성 | 값 |
 |------|-----|
-| **트리거** | 세션 시작/종료, 주기적 체크포인트 |
-| **출력** | `.caw/sessions/` 세션 데이터 |
-| **연동** | SessionStart Hook |
+| **트리거** | 세션 시작, 수동 요청 |
+| **출력** | `.caw/session.json` 세션 데이터 |
+| **연동** | `/caw:status`, `/caw:start` |
 
 **저장 데이터:**
 ```json

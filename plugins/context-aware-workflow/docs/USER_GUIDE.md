@@ -261,7 +261,7 @@ CAW 환경을 초기화합니다. `/caw:start` 실행 시 자동으로 호출되
 
 1. **환경 확인**: `.caw/` 디렉토리 존재 여부 확인
 2. **프로젝트 분석**: 파일 구조, 기술 스택, 패키지 매니저 탐지
-3. **디렉토리 생성**: `.caw/`, `.caw/design/`, `.caw/sessions/`, `.caw/archives/`
+3. **디렉토리 생성**: `.caw/`, `.caw/design/`, `.caw/archives/`
 4. **매니페스트 생성**: `context_manifest.json` 초기화
 
 #### 출력 예시
@@ -272,7 +272,6 @@ CAW 환경을 초기화합니다. `/caw:start` 실행 시 자동으로 호출되
 📁 Created:
   ✅ .caw/
   ✅ .caw/design/
-  ✅ .caw/sessions/
   ✅ .caw/archives/
 
 📋 Project Analysis:
@@ -779,7 +778,7 @@ ComplianceChecker 에이전트를 호출하여 프로젝트 규칙 준수를 검
 ```
 1. 환경 확인: .caw/ 디렉토리 존재 여부
 2. 프로젝트 분석: 파일 구조, 기술 스택 탐지
-3. 디렉토리 생성: .caw/, .caw/design/, .caw/sessions/, .caw/archives/
+3. 디렉토리 생성: .caw/, .caw/design/, .caw/archives/
 4. 매니페스트 생성: context_manifest.json 초기화
 5. 완료 보고: 환경 상태 요약 제공
 ```

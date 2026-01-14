@@ -27,7 +27,7 @@ This command executes a structured improvement cycle to capture learnings and im
 Review what happened during the task.
 
 1. Read `.caw/task_plan.md` for completed steps
-2. Read `.caw/sessions/` for execution history
+2. Read `.caw/session.json` for execution history
 3. Generate:
 
 ```
@@ -181,9 +181,9 @@ Store persistent learnings:
 write_memory("ralph_learning_[date]", insights)
 ```
 
-### With Stop Hook
+### After Task Completion
 
-The Stop hook suggests reflection after task completion:
+Consider running reflection when tasks complete:
 ```
 💡 Task complete. Consider /caw:reflect for continuous improvement.
 ```

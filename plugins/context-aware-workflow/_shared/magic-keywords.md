@@ -76,12 +76,12 @@ When a keyword is detected, mode state is stored in `.caw/mode.json`:
 1. Keywords are case-insensitive
 2. Process only highest priority keyword if multiple detected
 3. Mode persists until task completion or explicit reset
-4. DEEP_WORK mode prevents stopping until all steps complete
+4. DEEP_WORK mode signals agents to prioritize thorough completion
 
 ## Integration
 
 Magic Keywords work with:
 - `/caw:start` - Sets initial mode for workflow
 - `/caw:next` - Maintains mode through execution
-- Stop hook - Enforces completion in DEEP_WORK mode
+- `/caw:status` - Shows current active mode
 - Model Routing - Influences tier selection

@@ -67,7 +67,6 @@ After Bootstrapper Task completes (if invoked):
 
 1. **Verify files exist**:
    - `.caw/context_manifest.json` must exist
-   - `.caw/sessions/` directory must exist
    - `.caw/archives/` directory must exist
 
 2. **If verification fails**:

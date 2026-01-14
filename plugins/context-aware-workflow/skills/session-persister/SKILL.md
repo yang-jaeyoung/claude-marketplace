@@ -12,10 +12,6 @@ hooks:
     action: restore
     priority: 1
     condition: "requires .caw/ directory"
-  Stop:
-    action: save
-    priority: 1
-    condition: "requires .caw/ directory"
 ---
 
 # Session Persister
@@ -26,13 +22,11 @@ Maintain workflow continuity across Claude Code sessions by persisting and resto
 
 This skill activates:
 1. **SessionStart**: Check for existing session to restore
-2. **Stop/Session End**: Save current session state
-3. **Periodic**: Checkpoint every 30 minutes of activity
-4. **Manual**: User requests save/restore
+2. **Manual**: User requests save/restore via `/caw:status`
 
 ## Session Data Structure
 
-### Session File: `.caw/sessions/current.json`
+### Session File: `.caw/session.json`
 
 세션 데이터는 `templates/session-template.json` 스키마를 따릅니다.
 
@@ -69,12 +63,12 @@ This skill activates:
 ### On Session Start (Restore)
 
 ```
-1. Check for .caw/sessions/current.json
+1. Check for .caw/session.json
 2. If exists and recent (< 24 hours):
    - Display session summary
    - Offer restore options
 3. If exists but old (> 24 hours):
-   - Offer to archive and start fresh
+   - Offer to start fresh
 4. If not exists:
    - Silent continue (no action needed)
 ```
@@ -97,14 +91,14 @@ Last Activity: 2시간 전
 [3] 새로 시작 (이전 세션 아카이브)
 ```
 
-### On Session End (Save)
+### On Manual Save
 
 ```
 1. Gather current state:
    - Parse task_plan.md for progress
    - Identify active context files
    - Collect any pending questions
-2. Write to .caw/sessions/current.json
+2. Write to .caw/session.json
 3. Display save confirmation
 ```
 
@@ -117,16 +111,6 @@ Files tracked: 4개
 Insights captured: 3개
 
 다음 세션에서 /caw:status 또는 자동 복구로 이어서 진행할 수 있습니다.
-```
-
-### Periodic Checkpoint
-
-```
-1. Every 30 minutes of activity
-2. After completing each Step
-3. After major file edits
-4. Silent save (no prompt)
-5. Brief indicator: "📌 Checkpoint saved"
 ```
 
 ## Directory Structure
@@ -142,35 +126,10 @@ skills/session-persister/
 ### Runtime Files
 ```
 .caw/
-└── sessions/
-    ├── current.json              # Active session
-    └── archive/
-        ├── sess_20260103_100000.json
-        └── sess_20260102_140000.json
+├── session.json                  # Current session state
+└── archives/
+    └── session_YYYYMMDD.json     # Archived sessions
 ```
-
-## Archive Management
-
-### Auto-Archive Rules
-
-```yaml
-archive_policy:
-  trigger:
-    - new_task_started
-    - session_older_than: 24h
-    - user_request
-
-  retention:
-    max_archived: 10
-    max_age_days: 30
-
-  cleanup:
-    delete_oldest_when_full: true
-```
-
-### Archive Format
-
-Archived sessions are moved to `.caw/sessions/archive/` with original session ID as filename.
 
 ## State Extraction
 
@@ -237,30 +196,10 @@ Multiple .caw/ directories found (monorepo)
 | context-helper | Session provides context priority |
 | quality-gate | Session records validation results |
 
-### With Hooks
+### With Commands
 
-```json
-{
-  "SessionStart": [
-    {
-      "hooks": [{
-        "type": "skill",
-        "skill": "session-persister",
-        "action": "restore"
-      }]
-    }
-  ],
-  "Stop": [
-    {
-      "hooks": [{
-        "type": "skill",
-        "skill": "session-persister",
-        "action": "save"
-      }]
-    }
-  ]
-}
-```
+- `/caw:status` - Shows current session state and offers save option
+- `/caw:start` - Checks for existing session on workflow start
 
 ## User Commands
 

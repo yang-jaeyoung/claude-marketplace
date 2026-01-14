@@ -94,7 +94,6 @@ ls -la .claude/plan.md .claude/plans/ 2>/dev/null
 Create the CAW workspace:
 
 ```bash
-mkdir -p .caw/sessions
 mkdir -p .caw/archives
 ```
 
@@ -103,8 +102,7 @@ mkdir -p .caw/archives
 .caw/
 ├── context_manifest.json   # Active context tracking
 ├── task_plan.md           # Current task plan (created by Planner)
-├── sessions/              # Session state snapshots
-│   └── session_YYYYMMDD_HHMMSS.json
+├── session.json           # Current session state
 └── archives/              # Completed/abandoned plans
     └── archived_YYYYMMDD_task-name.md
 ```
@@ -263,9 +261,9 @@ When invoked with reset:
    mv .caw/context_manifest.json .caw/archives/manifest_backup_$(date +%Y%m%d).json 2>/dev/null
    ```
 
-2. **Clear sessions**:
+2. **Clear session**:
    ```bash
-   rm -rf .caw/sessions/*
+   rm -f .caw/session.json
    ```
 
 3. **Reinitialize**: Run Steps 3-7 again
@@ -460,7 +458,6 @@ When invoked with `--verbose`:
 [2024-01-15T14:30:00Z] Action: Will create new environment
 
 ### Step 2: Directory Creation
-[2024-01-15T14:30:01Z] mkdir -p .caw/sessions → SUCCESS
 [2024-01-15T14:30:01Z] mkdir -p .caw/archives → SUCCESS
 
 ### Step 3: Project Analysis
@@ -540,7 +537,7 @@ When invoked with `--verbose`:
 
 1. **Create directories** with Bash:
    ```
-   Bash: mkdir -p .caw/sessions .caw/archives
+   Bash: mkdir -p .caw/archives
    ```
 
 2. **Write manifest** with Write tool:
