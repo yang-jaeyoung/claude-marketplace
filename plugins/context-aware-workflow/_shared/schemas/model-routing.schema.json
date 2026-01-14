@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Model Routing Schema",
+  "description": "Complexity-based model tier selection for CAW agents",
+  "type": "object",
+  "properties": {
+    "complexity_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Calculated complexity score (0.0 - 1.0)"
+    },
+    "indicators": {
+      "type": "object",
+      "description": "Factors contributing to complexity score",
+      "properties": {
+        "file_count": {
+          "type": "object",
+          "properties": {
+            "count": { "type": "integer" },
+            "weight": { "type": "number" }
+          }
+        },
+        "scope_keywords": {
+          "type": "object",
+          "properties": {
+            "detected": { "type": "array", "items": { "type": "string" } },
+            "weight": { "type": "number" }
+          }
+        },
+        "cross_module": {
+          "type": "object",
+          "properties": {
+            "module_count": { "type": "integer" },
+            "weight": { "type": "number" }
+          }
+        },
+        "dependencies": {
+          "type": "object",
+          "properties": {
+            "has_deps": { "type": "boolean" },
+            "weight": { "type": "number" }
+          }
+        }
+      }
+    },
+    "selected_tier": {
+      "type": "string",
+      "enum": ["haiku", "sonnet", "opus"],
+      "description": "Model tier selected based on complexity"
+    },
+    "tier_thresholds": {
+      "type": "object",
+      "properties": {
+        "haiku_max": { "type": "number", "default": 0.3 },
+        "sonnet_max": { "type": "number", "default": 0.7 },
+        "opus_min": { "type": "number", "default": 0.7 }
+      }
+    },
+    "user_override": {
+      "type": "object",
+      "description": "User-specified tier override",
+      "properties": {
+        "flag": { "type": "string", "enum": ["--haiku", "--sonnet", "--opus", "--security", "--deep"] },
+        "forced_tier": { "type": "string", "enum": ["haiku", "sonnet", "opus"] }
+      }
+    },
+    "agent_config": {
+      "type": "object",
+      "description": "Per-agent tier configuration",
+      "properties": {
+        "agent_name": { "type": "string" },
+        "default_tier": { "type": "string", "enum": ["haiku", "sonnet", "opus"] },
+        "available_tiers": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["haiku", "sonnet", "opus"] }
+        },
+        "upgrade_triggers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Keywords that trigger tier upgrade"
+        }
+      }
+    }
+  }
+}

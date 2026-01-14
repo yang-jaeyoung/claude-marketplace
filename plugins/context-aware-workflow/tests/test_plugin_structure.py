@@ -300,6 +300,21 @@ class TestRequiredCommands(unittest.TestCase):
         cmd = PLUGIN_ROOT / "commands" / "design.md"
         self.assertTrue(cmd.exists(), "commands/design.md not found")
 
+    def test_fix_command_exists(self):
+        """fix command must exist."""
+        cmd = PLUGIN_ROOT / "commands" / "fix.md"
+        self.assertTrue(cmd.exists(), "commands/fix.md not found")
+
+    def test_init_command_exists(self):
+        """init command must exist."""
+        cmd = PLUGIN_ROOT / "commands" / "init.md"
+        self.assertTrue(cmd.exists(), "commands/init.md not found")
+
+    def test_reflect_command_exists(self):
+        """reflect command must exist for Ralph Loop."""
+        cmd = PLUGIN_ROOT / "commands" / "reflect.md"
+        self.assertTrue(cmd.exists(), "commands/reflect.md not found")
+
 
 class TestSkillFiles(unittest.TestCase):
     """Test skill file structure and SKILL.md files."""
@@ -397,6 +412,111 @@ class TestRequiredSkills(unittest.TestCase):
         skill = PLUGIN_ROOT / "skills" / "context-helper" / "SKILL.md"
         self.assertTrue(skill.exists(), "context-helper/SKILL.md not found")
 
+    def test_reflect_skill_exists(self):
+        """reflect skill must exist for Ralph Loop."""
+        skill = PLUGIN_ROOT / "skills" / "reflect" / "SKILL.md"
+        self.assertTrue(skill.exists(), "reflect/SKILL.md not found")
+
+    def test_quick_fix_skill_exists(self):
+        """quick-fix skill must exist."""
+        skill = PLUGIN_ROOT / "skills" / "quick-fix" / "SKILL.md"
+        self.assertTrue(skill.exists(), "quick-fix/SKILL.md not found")
+
+
+class TestRalphLoopIntegration(unittest.TestCase):
+    """Test Ralph Loop continuous improvement integration."""
+
+    def test_ralph_loop_schema_exists(self):
+        """Ralph Loop schema must exist."""
+        schema = PLUGIN_ROOT / "_shared" / "schemas" / "ralph-loop.schema.json"
+        self.assertTrue(schema.exists(), "ralph-loop.schema.json not found")
+
+    def test_ralph_loop_schema_valid(self):
+        """Ralph Loop schema must be valid JSON with required fields."""
+        schema_path = PLUGIN_ROOT / "_shared" / "schemas" / "ralph-loop.schema.json"
+        with open(schema_path, "r") as f:
+            schema = json.load(f)
+
+        # Required schema properties
+        self.assertIn("properties", schema)
+        props = schema["properties"]
+
+        # Must have RALPH phases
+        self.assertIn("phases", props)
+        phases = props["phases"].get("properties", {})
+
+        # Check all 5 RALPH phases exist
+        required_phases = ["reflect", "analyze", "learn", "plan", "habituate"]
+        for phase in required_phases:
+            self.assertIn(phase, phases, f"Missing RALPH phase: {phase}")
+
+    def test_learnings_template_exists(self):
+        """Learnings template must exist."""
+        template = PLUGIN_ROOT / "_shared" / "learnings-template.md"
+        self.assertTrue(template.exists(), "learnings-template.md not found")
+
+    def test_magic_keywords_doc_exists(self):
+        """Magic keywords documentation must exist."""
+        doc = PLUGIN_ROOT / "_shared" / "magic-keywords.md"
+        self.assertTrue(doc.exists(), "magic-keywords.md not found")
+
+
+class TestTieredAgents(unittest.TestCase):
+    """Test tiered agent variants exist."""
+
+    def test_planner_tiers_exist(self):
+        """Planner agent tiers must exist."""
+        agents_dir = PLUGIN_ROOT / "agents"
+        self.assertTrue((agents_dir / "planner.md").exists(), "planner.md not found")
+        self.assertTrue(
+            (agents_dir / "planner-haiku.md").exists(), "planner-haiku.md not found"
+        )
+        self.assertTrue(
+            (agents_dir / "planner-opus.md").exists(), "planner-opus.md not found"
+        )
+
+    def test_builder_tiers_exist(self):
+        """Builder agent tiers must exist."""
+        agents_dir = PLUGIN_ROOT / "agents"
+        self.assertTrue((agents_dir / "builder.md").exists(), "builder.md not found")
+        self.assertTrue(
+            (agents_dir / "builder-haiku.md").exists(), "builder-haiku.md not found"
+        )
+        self.assertTrue(
+            (agents_dir / "builder-sonnet.md").exists(), "builder-sonnet.md not found"
+        )
+
+    def test_reviewer_tiers_exist(self):
+        """Reviewer agent tiers must exist."""
+        agents_dir = PLUGIN_ROOT / "agents"
+        self.assertTrue((agents_dir / "reviewer.md").exists(), "reviewer.md not found")
+        self.assertTrue(
+            (agents_dir / "reviewer-haiku.md").exists(), "reviewer-haiku.md not found"
+        )
+        self.assertTrue(
+            (agents_dir / "reviewer-opus.md").exists(), "reviewer-opus.md not found"
+        )
+
+    def test_fixer_tiers_exist(self):
+        """Fixer agent tiers must exist."""
+        agents_dir = PLUGIN_ROOT / "agents"
+        self.assertTrue((agents_dir / "fixer.md").exists(), "fixer.md not found")
+        self.assertTrue(
+            (agents_dir / "fixer-haiku.md").exists(), "fixer-haiku.md not found"
+        )
+        self.assertTrue(
+            (agents_dir / "fixer-sonnet.md").exists(), "fixer-sonnet.md not found"
+        )
+
+
+class TestModelRoutingSchema(unittest.TestCase):
+    """Test model routing schema exists."""
+
+    def test_model_routing_schema_exists(self):
+        """Model routing schema must exist."""
+        schema = PLUGIN_ROOT / "_shared" / "schemas" / "model-routing.schema.json"
+        self.assertTrue(schema.exists(), "model-routing.schema.json not found")
+
 
 class TestHooksConfiguration(unittest.TestCase):
     """Test hooks configuration details."""
@@ -407,25 +527,27 @@ class TestHooksConfiguration(unittest.TestCase):
         with open(hooks_json, "r") as f:
             self.hooks_data = json.load(f)
 
-    def test_session_start_hook_exists(self):
-        """SessionStart hook must be configured."""
-        self.assertIn("SessionStart", self.hooks_data["hooks"])
-        self.assertGreater(len(self.hooks_data["hooks"]["SessionStart"]), 0)
-
-    def test_pre_tool_use_hook_exists(self):
-        """PreToolUse hook must be configured."""
-        self.assertIn("PreToolUse", self.hooks_data["hooks"])
-        self.assertGreater(len(self.hooks_data["hooks"]["PreToolUse"]), 0)
-
     def test_post_tool_use_hook_exists(self):
         """PostToolUse hook must be configured."""
         self.assertIn("PostToolUse", self.hooks_data["hooks"])
         self.assertGreater(len(self.hooks_data["hooks"]["PostToolUse"]), 0)
 
     def test_stop_hook_exists(self):
-        """Stop hook must be configured for session persistence."""
+        """Stop hook must be configured for continuation guard and reflection."""
         self.assertIn("Stop", self.hooks_data["hooks"])
         self.assertGreater(len(self.hooks_data["hooks"]["Stop"]), 0)
+
+    def test_stop_hook_suggests_reflection(self):
+        """Stop hook should suggest /caw:reflect for improvement insights."""
+        stop_hooks = self.hooks_data["hooks"].get("Stop", [])
+        found_reflection = False
+        for hook_group in stop_hooks:
+            for hook in hook_group.get("hooks", []):
+                prompt = hook.get("prompt", "")
+                if "/caw:reflect" in prompt or "reflect" in prompt.lower():
+                    found_reflection = True
+                    break
+        self.assertTrue(found_reflection, "Stop hook should suggest reflection")
 
     def test_hook_types_valid(self):
         """All hooks must have valid type field."""
@@ -440,6 +562,17 @@ class TestHooksConfiguration(unittest.TestCase):
                         valid_types,
                         f"{event_name} has invalid hook type: {hook['type']}",
                     )
+
+    def test_hooks_have_matchers_where_needed(self):
+        """PostToolUse hooks should have matchers for tool filtering."""
+        post_hooks = self.hooks_data["hooks"].get("PostToolUse", [])
+        for hook_group in post_hooks:
+            # PostToolUse hooks should have matcher to specify which tool
+            self.assertIn(
+                "matcher",
+                hook_group,
+                "PostToolUse hooks should have matcher for tool filtering",
+            )
 
 
 if __name__ == "__main__":

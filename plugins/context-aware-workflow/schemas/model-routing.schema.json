@@ -1,0 +1,252 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CAW Model Routing Configuration",
+  "description": "Defines complexity-based model selection for intelligent agent routing",
+  "type": "object",
+  "required": ["version", "tiers", "routing_rules", "complexity_indicators"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "tiers": {
+      "type": "object",
+      "description": "Model tier definitions with capabilities",
+      "properties": {
+        "haiku": {
+          "type": "object",
+          "properties": {
+            "model": { "type": "string", "const": "haiku" },
+            "max_complexity": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.3 },
+            "strengths": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["speed", "simple_tasks", "boilerplate", "formatting"]
+            },
+            "token_cost": { "type": "string", "const": "low" },
+            "latency": { "type": "string", "const": "fast" }
+          }
+        },
+        "sonnet": {
+          "type": "object",
+          "properties": {
+            "model": { "type": "string", "const": "sonnet" },
+            "max_complexity": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.7 },
+            "strengths": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["balanced", "standard_tasks", "code_review", "planning"]
+            },
+            "token_cost": { "type": "string", "const": "medium" },
+            "latency": { "type": "string", "const": "moderate" }
+          }
+        },
+        "opus": {
+          "type": "object",
+          "properties": {
+            "model": { "type": "string", "const": "opus" },
+            "max_complexity": { "type": "number", "minimum": 0, "maximum": 1, "default": 1.0 },
+            "strengths": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["complex_reasoning", "architecture", "security_audit", "deep_analysis"]
+            },
+            "token_cost": { "type": "string", "const": "high" },
+            "latency": { "type": "string", "const": "slower" }
+          }
+        }
+      }
+    },
+    "complexity_indicators": {
+      "type": "object",
+      "description": "Factors that determine task complexity",
+      "properties": {
+        "file_count": {
+          "type": "object",
+          "properties": {
+            "weight": { "type": "number", "default": 0.2 },
+            "thresholds": {
+              "type": "object",
+              "properties": {
+                "low": { "type": "integer", "default": 3 },
+                "medium": { "type": "integer", "default": 10 },
+                "high": { "type": "integer", "default": 20 }
+              }
+            }
+          }
+        },
+        "scope_keywords": {
+          "type": "object",
+          "properties": {
+            "weight": { "type": "number", "default": 0.3 },
+            "high_complexity": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["architecture", "security", "refactor", "migrate", "redesign", "audit"]
+            },
+            "medium_complexity": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["feature", "implement", "integrate", "optimize", "test"]
+            },
+            "low_complexity": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["fix", "update", "add", "simple", "quick", "typo"]
+            }
+          }
+        },
+        "cross_module": {
+          "type": "object",
+          "properties": {
+            "weight": { "type": "number", "default": 0.25 },
+            "description": "Changes spanning multiple modules/directories"
+          }
+        },
+        "has_dependencies": {
+          "type": "object",
+          "properties": {
+            "weight": { "type": "number", "default": 0.15 },
+            "description": "Task involves dependency changes or external integrations"
+          }
+        },
+        "user_override": {
+          "type": "object",
+          "properties": {
+            "weight": { "type": "number", "default": 1.0 },
+            "keywords": {
+              "type": "object",
+              "properties": {
+                "force_haiku": { "type": "array", "default": ["quick", "fast", "simple"] },
+                "force_sonnet": { "type": "array", "default": ["standard", "normal"] },
+                "force_opus": { "type": "array", "default": ["complex", "deep", "thorough", "ultrathink"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "routing_rules": {
+      "type": "object",
+      "description": "Default routing rules per agent type",
+      "properties": {
+        "Bootstrapper": {
+          "type": "object",
+          "properties": {
+            "default_tier": { "type": "string", "const": "haiku" },
+            "allow_upgrade": { "type": "boolean", "default": false },
+            "reason": { "type": "string", "default": "Fast initialization, simple task" }
+          }
+        },
+        "Planner": {
+          "type": "object",
+          "properties": {
+            "default_tier": { "type": "string", "const": "sonnet" },
+            "allow_upgrade": { "type": "boolean", "default": true },
+            "upgrade_triggers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["architecture", "large_scope", "security"]
+            },
+            "downgrade_triggers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["simple_feature", "single_file"]
+            }
+          }
+        },
+        "Builder": {
+          "type": "object",
+          "properties": {
+            "default_tier": { "type": "string", "const": "sonnet" },
+            "allow_upgrade": { "type": "boolean", "default": true },
+            "upgrade_triggers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["complex_algorithm", "security_critical", "performance_optimization"]
+            },
+            "downgrade_triggers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["boilerplate", "simple_crud", "formatting"]
+            }
+          }
+        },
+        "Reviewer": {
+          "type": "object",
+          "properties": {
+            "default_tier": { "type": "string", "const": "sonnet" },
+            "allow_upgrade": { "type": "boolean", "default": true },
+            "upgrade_triggers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["security_audit", "architecture_review", "performance_analysis"]
+            },
+            "downgrade_triggers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["quick_check", "style_only"]
+            }
+          }
+        },
+        "Fixer": {
+          "type": "object",
+          "properties": {
+            "default_tier": { "type": "string", "const": "sonnet" },
+            "allow_upgrade": { "type": "boolean", "default": true },
+            "upgrade_triggers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["multi_file_refactor", "architecture_change", "security_fix"]
+            },
+            "downgrade_triggers": {
+              "type": "array",
+              "items": { "type": "string" },
+              "default": ["auto_fix", "simple_rename"]
+            }
+          }
+        }
+      }
+    },
+    "cost_optimization": {
+      "type": "object",
+      "properties": {
+        "prefer_lower_tier": {
+          "type": "boolean",
+          "default": true,
+          "description": "When complexity is ambiguous, prefer lower cost tier"
+        },
+        "cascade_on_failure": {
+          "type": "boolean",
+          "default": true,
+          "description": "Upgrade tier if lower tier produces poor results"
+        },
+        "max_cascade_upgrades": {
+          "type": "integer",
+          "default": 1,
+          "description": "Maximum number of tier upgrades per task"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "scenario": "Simple bug fix",
+      "complexity_score": 0.2,
+      "selected_tier": "haiku",
+      "agent": "Builder"
+    },
+    {
+      "scenario": "Implement new API endpoint",
+      "complexity_score": 0.5,
+      "selected_tier": "sonnet",
+      "agent": "Builder"
+    },
+    {
+      "scenario": "Security audit of authentication system",
+      "complexity_score": 0.9,
+      "selected_tier": "opus",
+      "agent": "Reviewer"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Ralph Loop Schema",
+  "description": "Continuous improvement cycle: Reflect-Analyze-Learn-Plan-Habituate",
+  "type": "object",
+  "properties": {
+    "cycle_id": {
+      "type": "string",
+      "description": "Unique identifier for this improvement cycle"
+    },
+    "task_reference": {
+      "type": "string",
+      "description": "Reference to the completed task being reflected upon"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "phases": {
+      "type": "object",
+      "properties": {
+        "reflect": {
+          "type": "object",
+          "description": "R - Review what happened",
+          "properties": {
+            "task_summary": { "type": "string" },
+            "outcome": { "enum": ["success", "partial", "failure"] },
+            "duration_assessment": { "enum": ["faster", "expected", "slower"] },
+            "blockers_encountered": { "type": "array", "items": { "type": "string" } },
+            "tools_used": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "analyze": {
+          "type": "object",
+          "description": "A - Identify patterns and issues",
+          "properties": {
+            "what_worked": { "type": "array", "items": { "type": "string" } },
+            "what_didnt_work": { "type": "array", "items": { "type": "string" } },
+            "root_causes": { "type": "array", "items": { "type": "string" } },
+            "patterns_identified": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "learn": {
+          "type": "object",
+          "description": "L - Extract lessons",
+          "properties": {
+            "key_insights": { "type": "array", "items": { "type": "string" } },
+            "skills_improved": { "type": "array", "items": { "type": "string" } },
+            "knowledge_gaps": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "plan": {
+          "type": "object",
+          "description": "P - Plan improvements",
+          "properties": {
+            "action_items": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "action": { "type": "string" },
+                  "priority": { "enum": ["high", "medium", "low"] },
+                  "applies_to": { "type": "string" }
+                }
+              }
+            },
+            "process_changes": { "type": "array", "items": { "type": "string" } },
+            "tool_recommendations": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "habituate": {
+          "type": "object",
+          "description": "H - Apply learnings to future work",
+          "properties": {
+            "new_defaults": { "type": "array", "items": { "type": "string" } },
+            "checklist_additions": { "type": "array", "items": { "type": "string" } },
+            "memory_updates": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "improvement_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "cycle_count": { "type": "integer" },
+        "cumulative_learnings": { "type": "integer" }
+      }
+    }
+  }
+}

@@ -39,6 +39,21 @@ Read and parse `.caw/task_plan.md` to extract:
 - All phases and steps with their statuses
 - Context files
 
+### Step 2.5: Check Active Mode
+
+Check if `.caw/mode.json` exists to determine active mode:
+
+```json
+{
+  "active_mode": "DEEP_WORK" | "NORMAL",
+  "activated_at": "ISO timestamp",
+  "keyword_trigger": "deepwork" | null,
+  "completion_required": true | false
+}
+```
+
+If file doesn't exist, default to NORMAL mode.
+
 ### Step 3: Calculate Progress
 
 Count steps by status:
@@ -52,6 +67,25 @@ blocked = count(steps with ❌)
 progress_percent = (completed / total) * 100
 ```
 
+### Step 3.5: Generate Visual Progress Bar
+
+Create a visual progress bar based on completion percentage:
+
+```
+bar_width = 20  # Total characters in progress bar
+filled = round(progress_percent / 100 * bar_width)
+empty = bar_width - filled
+
+progress_bar = "█" * filled + "░" * empty
+```
+
+**Progress Bar Examples**:
+- 0%:   `░░░░░░░░░░░░░░░░░░░░`
+- 25%:  `█████░░░░░░░░░░░░░░░`
+- 50%:  `██████████░░░░░░░░░░`
+- 75%:  `███████████████░░░░░`
+- 100%: `████████████████████`
+
 ### Step 4: Display Status
 
 **Standard Output Format**:
@@ -64,6 +98,7 @@ progress_percent = (completed / total) * 100
 📁 Plan: .caw/task_plan.md
 🕐 Created: [date from metadata]
 📌 Status: [status from metadata]
+🎯 Mode: [DEEP WORK | NORMAL] (if Deep Work active, show: "⚡ Must complete ALL tasks")
 
 ──────────────────────────────────────────
 Phase [N]: [Phase Name]
@@ -82,10 +117,20 @@ Phase [N+1]: [Phase Name]
 ══════════════════════════════════════════
 📈 Progress: [X]% ([completed]/[total] steps)
 
+   [progress_bar] [X]%
+
    ✅ Completed: [N]
    🔄 In Progress: [N]
    ⏳ Pending: [N]
    ❌ Blocked: [N]
+
+──────────────────────────────────────────
+⏳ Remaining Tasks
+──────────────────────────────────────────
+[List first 5 pending/in-progress steps]
+  • [N.X] [Step description]
+  • [N.Y] [Step description]
+  [+N more if applicable]
 
 💡 Next: /caw:next to continue with step [N.X]
 ══════════════════════════════════════════

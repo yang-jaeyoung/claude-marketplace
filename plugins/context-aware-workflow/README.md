@@ -69,6 +69,8 @@ cp -r context-aware-workflow /your/project/.claude-plugin/
 |------|---------|
 | `.caw/task_plan.md` | Current task plan |
 | `.caw/context_manifest.json` | Active/Packed/Ignored file tracking |
+| `.caw/mode.json` | Active mode state (DEEP_WORK, NORMAL, etc.) |
+| `.caw/learnings.md` | Accumulated improvement insights from Ralph Loop |
 | `.caw/sessions/` | Session state snapshots |
 | `.caw/archives/` | Completed/abandoned plans |
 
@@ -88,7 +90,209 @@ Create `.claude/caw.local.md` for project-specific settings (optional):
 - Auto-detect plans: true
 ```
 
+## Magic Keywords
+
+Activate special modes by including keywords in your prompt:
+
+| Keyword | Mode | Behavior |
+|---------|------|----------|
+| `deepwork`, `fullwork`, `ultrawork` | DEEP WORK | Complete ALL tasks without stopping |
+| `thinkhard`, `ultrathink` | DEEP ANALYSIS | Extended reasoning, validate before acting |
+| `quickfix`, `quick`, `fast` | MINIMAL CHANGE | Essential changes only, speed priority |
+| `research`, `investigate` | RESEARCH | Comprehensive information gathering first |
+
+**Example:**
+```bash
+# Start a task that won't stop until fully complete
+"deepwork implement the user authentication system"
+
+# Quick fixes only
+"quickfix the failing tests"
+```
+
+## Work Continuation
+
+CAW includes intelligent work continuation guards:
+
+- **Todo Continuation**: Prevents stopping with incomplete TodoWrite items
+- **Plan Progress Check**: Verifies all task_plan.md steps are complete
+- **Deep Work Enforcement**: In DEEP WORK mode, won't stop until 100% complete
+
+Mode state is persisted in `.caw/mode.json`.
+
+## Ralph Loop - Continuous Improvement
+
+CAW includes a continuous improvement cycle inspired by systematic learning practices:
+
+### The RALPH Cycle
+
+| Phase | Action | Output |
+|-------|--------|--------|
+| **R**eflect | Review what happened during the task | Task summary, outcome assessment |
+| **A**nalyze | Identify patterns and root causes | What worked, what didn't, patterns |
+| **L**earn | Extract actionable lessons | Key insights, skills improved, gaps |
+| **P**lan | Create improvement actions | Prioritized action items |
+| **H**abituate | Apply to future work | Updated defaults, checklists, memories |
+
+### Usage
+
+```bash
+# Reflect on last completed task
+/caw:reflect
+
+# Reflect on specific step
+/caw:reflect --task 2.3
+
+# Full workflow retrospective
+/caw:reflect --full
+```
+
+### Output Example
+
+```markdown
+## 🔄 Ralph Loop - Improvement Cycle
+
+**Task**: Implement JWT Authentication
+**Outcome**: ✅ Success | **Duration**: ⏱️ Expected
+
+### 💡 LEARN
+**Key Insights**:
+1. TDD approach reduced debugging time by 50%
+2. Security review should happen earlier
+
+### 📋 PLAN
+| Priority | Action | Applies To |
+|----------|--------|------------|
+| 🔴 High | Add security review to Phase 1 | All auth tasks |
+
+### 🔧 HABITUATE
+- ✅ Added to .caw/learnings.md
+- ✅ Created memory: ralph_learning_2024-01-15
+```
+
+### Integration Points
+
+- **Stop Hook**: Suggests `/caw:reflect` after task completion
+- **Serena Memory**: Stores learnings for future sessions
+- **Learnings File**: `.caw/learnings.md` accumulates insights
+
+## Model Routing System
+
+CAW automatically selects the optimal model tier based on task complexity:
+
+### Complexity Scoring (0.0 - 1.0)
+
+| Indicator | Low | Medium | High |
+|-----------|-----|--------|------|
+| File Count | 1-3 (+0.0) | 4-10 (+0.1) | 10+ (+0.2) |
+| Scope Keywords | simple/quick (+0.0) | standard (+0.15) | architecture/security (+0.3) |
+| Cross Module | 1 module (+0.0) | 2-3 modules (+0.12) | 4+ modules (+0.25) |
+| Dependencies | None (+0.0) | Has deps (+0.15) | - |
+
+### Model Tier Selection
+
+| Complexity | Tier | Use Case |
+|------------|------|----------|
+| ≤ 0.3 | Haiku | Fast, simple tasks, boilerplate |
+| 0.3 - 0.7 | Sonnet | Standard development, TDD |
+| > 0.7 | Opus | Architecture, security audits |
+
+### User Overrides
+
+Force a specific model tier with flags:
+```bash
+/caw:review --haiku     # Quick review
+/caw:review --sonnet    # Standard review
+/caw:review --security  # Auto-selects Opus
+
+/caw:fix --deep         # Sonnet-level fixes
+/caw:fix --opus         # Force Opus for complex refactoring
+```
+
+### Agent-Specific Routing
+
+| Agent | Default | Available Tiers | Upgrade Triggers |
+|-------|---------|-----------------|------------------|
+| Planner | Sonnet | Haiku, Sonnet, Opus | architecture, security, migration |
+| Builder | Sonnet | Haiku, Sonnet, Opus | complex_algorithm, performance_critical |
+| Reviewer | Sonnet | Haiku, Sonnet, Opus | --security, --audit, vulnerability |
+| Fixer | Haiku | Haiku, Sonnet, Opus | --deep, multi-file changes |
+
+### Tiered Agent Variants
+
+Each agent has tier-specific implementations:
+
+**Planner**:
+- `planner-haiku.md` - Fast planning, max 5 steps, single-file focus
+- `planner.md` (Sonnet) - Balanced planning with context analysis
+- `planner-opus.md` - Deep architectural planning with risk assessment
+
+**Builder**:
+- `builder-haiku.md` - Quick implementation, minimal context
+- `builder-sonnet.md` - TDD approach, pattern-following
+- `builder.md` (Opus) - Full implementation with comprehensive verification
+
+**Reviewer**:
+- `reviewer-haiku.md` - Quick style checks, linting
+- `reviewer.md` (Sonnet) - Standard code review with quality gates
+- `reviewer-opus.md` - Security audits, architecture review, OWASP analysis
+
+**Fixer**:
+- `fixer-haiku.md` - Auto-fix: lint, imports, formatting
+- `fixer-sonnet.md` - Multi-file refactoring, pattern extraction
+- `fixer.md` (Opus) - Security fixes, architectural refactoring
+
+## Commands Reference
+
+| Command | Description |
+|---------|-------------|
+| `/caw:init` | Initialize CAW environment (creates `.caw/` directory) |
+| `/caw:start` | Start a new workflow with task description or import Plan Mode plans |
+| `/caw:status` | Display current workflow status with visual progress bar |
+| `/caw:next` | Execute the next pending step from task plan |
+| `/caw:review` | Run code review with configurable depth (--haiku/--sonnet/--opus) |
+| `/caw:fix` | Apply fixes from review results (auto-fix or manual) |
+| `/caw:check` | Validate compliance with project rules and conventions |
+| `/caw:context` | Manage context files (add, remove, pack, view) |
+| `/caw:brainstorm` | Interactive requirements discovery through Socratic dialogue |
+| `/caw:design` | Create UX/UI or architecture design documents |
+| `/caw:reflect` | Run Ralph Loop - continuous improvement cycle |
+
+## Schema Reference
+
+Schemas are located in `schemas/` and `_shared/schemas/`:
+
+| Schema | Location | Purpose |
+|--------|----------|---------|
+| `mode.schema.json` | `schemas/` | Mode state tracking (DEEP_WORK, NORMAL, etc.) |
+| `model-routing.schema.json` | `schemas/` | Model tier selection and complexity scoring |
+| `last_review.schema.json` | `schemas/` | Reviewer output format for Fixer integration |
+| `ralph-loop.schema.json` | `_shared/schemas/` | Continuous improvement cycle data structure |
+| `task-plan.schema.md` | `_shared/schemas/` | Task plan document format specification |
+| `review.schema.md` | `_shared/schemas/` | Review output format specification |
+| `manifest.schema.md` | `_shared/schemas/` | Context manifest file format |
+
 ## Roadmap
+
+### Completed (v1.5.0)
+- [x] Ralph Loop continuous improvement cycle (RALPH: Reflect-Analyze-Learn-Plan-Habituate)
+- [x] `/caw:reflect` skill for post-task improvement analysis
+- [x] Learnings persistence (`.caw/learnings.md`, Serena memories)
+- [x] Stop hook integration for reflection suggestions
+- [x] Ralph Loop schema for structured improvement data
+
+### Completed (v1.4.0)
+- [x] Model Routing System with complexity-based tier selection
+- [x] Tiered Agent variants (Haiku, Sonnet, Opus for each agent)
+- [x] User override flags (--haiku, --sonnet, --opus, --security, --deep)
+- [x] Intelligent upgrade triggers per agent type
+- [x] Model routing schema and documentation
+
+### Completed (v1.3.0)
+- [x] Magic Keyword detection (UserPromptSubmit hook)
+- [x] Todo Continuation guard (Stop hook)
+- [x] Visual progress bar in `/caw:status`
+- [x] Mode state persistence (`.caw/mode.json`)
 
 ### Completed (v1.2.1)
 - [x] Quick Fix skill for auto-fixable issues

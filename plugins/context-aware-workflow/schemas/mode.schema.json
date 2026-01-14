@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CAW Mode State",
+  "description": "Tracks the active mode state for context-aware workflow",
+  "type": "object",
+  "required": ["active_mode", "activated_at"],
+  "properties": {
+    "active_mode": {
+      "type": "string",
+      "enum": ["DEEP_WORK", "MINIMAL_CHANGE", "DEEP_ANALYSIS", "RESEARCH", "NORMAL"],
+      "description": "The currently active mode"
+    },
+    "activated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO timestamp when mode was activated"
+    },
+    "keyword_trigger": {
+      "type": ["string", "null"],
+      "description": "The keyword that triggered this mode",
+      "enum": ["deepwork", "fullwork", "ultrawork", "nonstop", "keepgoing", "thinkhard", "ultrathink", "think", "quickfix", "quick", "fast", "research", "investigate", "explore", null]
+    },
+    "completion_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, all tasks must be completed before stopping"
+    },
+    "session_id": {
+      "type": ["string", "null"],
+      "description": "Optional session identifier for tracking"
+    }
+  },
+  "examples": [
+    {
+      "active_mode": "DEEP_WORK",
+      "activated_at": "2025-01-14T10:30:00Z",
+      "keyword_trigger": "deepwork",
+      "completion_required": true
+    },
+    {
+      "active_mode": "NORMAL",
+      "activated_at": "2025-01-14T10:30:00Z",
+      "keyword_trigger": null,
+      "completion_required": false
+    }
+  ]
+}

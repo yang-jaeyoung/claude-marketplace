@@ -76,6 +76,7 @@ allowed-tools: ["Bash", "Read"]    # Optional tool restrictions
 name: "AgentName"
 description: "What the agent does"
 model: sonnet                      # sonnet, opus, or haiku
+tier: sonnet                       # Optional: complexity tier indicator
 whenToUse: |
   Usage guidance with <example> blocks
 tools:
@@ -88,6 +89,13 @@ mcp_servers:
 ---
 # Agent system prompt
 ```
+
+**Tiered Agents** (model routing pattern):
+- Base agent: `<name>.md` (default tier, usually Sonnet)
+- Lower tier: `<name>-haiku.md` (fast, simple tasks)
+- Higher tier: `<name>-opus.md` (complex, security-critical tasks)
+
+Selection is automatic based on task complexity scoring (0.0-1.0).
 
 **Skills** (`skills/*/SKILL.md`):
 ```yaml
@@ -144,6 +152,9 @@ await server.connect(transport);
 
 - [marketplace.json](.claude-plugin/marketplace.json) - Plugin registry
 - [mssql/index.ts](plugins/mssql/mcp-server/src/index.ts) - MCP server example
-- [caw/planner.md](plugins/context-aware-workflow/agents/planner.md) - Agent example
+- [caw/planner.md](plugins/context-aware-workflow/agents/planner.md) - Agent example (Sonnet tier)
+- [caw/planner-haiku.md](plugins/context-aware-workflow/agents/planner-haiku.md) - Tiered agent example (Haiku)
 - [caw/start.md](plugins/context-aware-workflow/commands/start.md) - Command example
+- [caw/reflect.md](plugins/context-aware-workflow/skills/reflect/SKILL.md) - Skill example (Ralph Loop)
+- [caw/model-routing.md](plugins/context-aware-workflow/_shared/model-routing.md) - Model routing documentation
 - [test_plugin_structure.py](plugins/context-aware-workflow/tests/test_plugin_structure.py) - Structure validation tests
