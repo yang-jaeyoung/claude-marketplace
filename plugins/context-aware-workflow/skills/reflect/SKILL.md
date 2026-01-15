@@ -89,13 +89,70 @@ Apply learnings to future work.
 Actions:
 - Update .caw/learnings.md with new insights
 - Add items to project checklists
-- Create Serena memories for persistent learnings
+- Create Serena memories for persistent learnings (ENHANCED)
 
 Output:
 - New defaults established
 - Checklist additions
 - Memory updates for future sessions
 ```
+
+#### Serena Memory Persistence (ENHANCED)
+
+Ralph Loop 결과를 Serena 메모리에 저장하여 크로스 세션 활용:
+
+```
+# 1. Workflow patterns 저장 (성공적인 접근법)
+write_memory("workflow_patterns", """
+# Workflow Patterns
+
+## Last Updated
+[ISO timestamp] by Ralph Loop
+
+## Successful Approaches
+
+### [Task Type]: [Pattern Name]
+- **Context**: When to use this pattern
+- **Approach**: Step-by-step method
+- **Outcome**: Expected results
+- **Caveats**: Things to watch out for
+
+## Anti-patterns
+- [What to avoid]
+""")
+
+# 2. Ralph learning 개별 저장 (상세 분석)
+write_memory("ralph_learning_YYYYMMDD", """
+# Ralph Learning: [Date]
+
+## Cycle Summary
+- **Task**: [name]
+- **Outcome**: [success/partial/failure]
+- **Duration**: [faster/expected/slower]
+
+## Key Insights
+1. [insight 1]
+2. [insight 2]
+
+## Action Items
+- [ ] [action 1]
+- [ ] [action 2]
+
+## Patterns Identified
+- [pattern 1]
+- [pattern 2]
+""")
+```
+
+**저장 시점**:
+- Ralph Loop 완료 직후 자동 저장
+- `/caw:sync --to-serena` 명시적 실행 시
+
+**메모리 명명 규칙**:
+| Memory | Content | Retention |
+|--------|---------|-----------|
+| `workflow_patterns` | 누적된 성공 패턴 | 영구 (업데이트) |
+| `ralph_learning_YYYYMMDD` | 개별 회고 결과 | 90일 후 정리 |
 
 ## Output Format
 

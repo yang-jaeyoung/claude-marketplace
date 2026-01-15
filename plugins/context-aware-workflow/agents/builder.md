@@ -78,6 +78,69 @@ Grep: Related function names, imports, patterns
 Glob: Find similar implementations in codebase
 ```
 
+### Step 2.1: Serena Symbol-Based Exploration (NEW)
+
+Use Serena MCP for precise code analysis:
+
+```
+# Get file overview
+get_symbols_overview("src/services/user.ts")
+  → Lists all classes, methods, functions in file
+
+# Find specific symbol
+find_symbol("UserService/validateEmail", include_body=True)
+  → Returns full function body and location
+
+# Find references
+find_referencing_symbols("validateEmail", "src/services/user.ts")
+  → Shows all usages of this function
+
+# Check lessons learned (avoid past mistakes)
+read_memory("lessons_learned")
+  → Load known gotchas before implementing
+```
+
+### Symbolic Editing Priority (ENHANCED)
+
+When modifying code, prefer Serena tools in this order:
+
+| Priority | Tool | Use Case |
+|----------|------|----------|
+| 1 | `find_symbol` | Locate exact symbol to modify |
+| 2 | `replace_symbol_body` | Replace entire function/method |
+| 3 | `insert_after_symbol` | Add new code after existing symbol |
+| 4 | `insert_before_symbol` | Add imports, decorators |
+| 5 | `replace_content` (regex) | Partial changes within symbol |
+| 6 | Edit/Write tools | Fallback for non-symbol changes |
+
+**Symbol Path Patterns**:
+```
+"validateEmail"           # Simple name (any match)
+"UserService/validateEmail"  # Relative path
+"/UserService/validateEmail" # Absolute path in file
+"process[0]"              # First overload of process()
+```
+
+**Example Workflow**:
+```
+# 1. Find the function to modify
+find_symbol("processPayment", include_body=True)
+
+# 2. Replace entire function body
+replace_symbol_body("processPayment", "src/payments/service.ts", """
+def processPayment(self, amount: float, currency: str) -> PaymentResult:
+    # New implementation
+    validated = self.validate(amount, currency)
+    return self.execute(validated)
+""")
+
+# 3. Add a new helper method after the function
+insert_after_symbol("processPayment", "src/payments/service.ts", """
+def validatePayment(self, amount: float, currency: str) -> bool:
+    return amount > 0 and currency in SUPPORTED_CURRENCIES
+""")
+```
+
 ### Step 3: Write Tests First (TDD)
 
 Create or update test files BEFORE implementation:
@@ -328,7 +391,54 @@ See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 3. CLAUDE.md 읽기 (기존 Lessons Learned 섹션 확인)
 4. 중복 여부 확인 (이미 기록된 내용인지)
 5. 새로운 교훈이면 형식에 맞게 추가
-6. 완료 보고 시 교훈 기록 사실 언급
+6. Serena 메모리에도 동기화 (NEW)
+7. 완료 보고 시 교훈 기록 사실 언급
+```
+
+### Serena Memory Sync for Lessons (NEW)
+
+교훈을 CLAUDE.md에 기록한 후, Serena 메모리에도 저장하여 크로스 세션 영속성을 확보합니다:
+
+```
+# 교훈 기록 후 Serena 메모리에 동기화
+write_memory("lessons_learned", """
+# Lessons Learned
+
+## [Date]: [Title]
+- **Problem**: [description]
+- **Cause**: [root cause]
+- **Solution**: [fix]
+- **Prevention**: [checklist]
+
+[...existing lessons...]
+""")
+```
+
+**동기화 시점**:
+- 새 교훈 CLAUDE.md에 추가 직후
+- `/caw:sync --to-serena` 명시적 실행 시
+- 세션 종료 전 (설정된 경우)
+
+**메모리 형식**:
+```markdown
+# Lessons Learned
+
+## Last Updated
+2024-01-15T14:30:00Z by Builder
+
+## Entries
+
+### 2024-01-15: TypeScript Path Alias Issue
+- **Problem**: @/components import fails on build
+- **Cause**: tsconfig.json paths not synced with bundler
+- **Solution**: Add resolve.alias to vite.config.ts
+- **Prevention**: Check both tsconfig + bundler when adding aliases
+
+### 2024-01-14: React Query Cache
+- **Problem**: UI not updating after mutation
+- **Cause**: Missing invalidateQueries
+- **Solution**: Add onSuccess handler with invalidation
+- **Prevention**: Always check cache strategy for mutations
 ```
 
 ### 보고 예시

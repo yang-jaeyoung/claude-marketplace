@@ -238,6 +238,73 @@ errors:
     note: "Task plan not found, saving basic state"
 ```
 
+## Serena Memory Integration (NEW)
+
+### Backup to Serena
+
+세션 저장 시 Serena 메모리에도 백업하여 크로스 세션 영속성 강화:
+
+```yaml
+backup_to_serena:
+  enabled: true  # .claude/caw.local.md에서 설정 가능
+  memory_name: "session_backup"
+  trigger:
+    - session_save
+    - phase_complete
+    - explicit_request
+```
+
+**저장 워크플로우**:
+```
+On Session Save:
+1. Write to .caw/session.json (기존 방식)
+2. If serena_backup enabled:
+   write_memory("session_backup", {
+     session_id: "[id]",
+     task_title: "[title]",
+     progress: { current_phase, current_step, percentage },
+     last_updated: "[ISO timestamp]",
+     context_summary: "[active files summary]"
+   })
+3. Display: "💾 Session saved (+ Serena backup)"
+```
+
+### Restore from Serena
+
+세션 복원 시 Serena 메모리 우선 체크:
+
+```
+On Session Restore:
+1. Check .caw/session.json (기존 방식)
+2. If not found or corrupted:
+   - Check Serena: read_memory("session_backup")
+   - If found: Offer to restore from Serena
+3. Display available recovery options
+```
+
+**Serena 복원 프롬프트**:
+```
+⚠️ 로컬 세션 파일 없음
+
+🔍 Serena 메모리에서 백업 발견:
+   Task: JWT Authentication
+   Progress: Phase 2, Step 2.3 (45%)
+   Last Backup: 3일 전
+
+[1] Serena 백업에서 복원
+[2] 새로 시작
+```
+
+### Priority Order
+
+```yaml
+restore_priority:
+  1: .caw/session.json (local, most recent)
+  2: Serena session_backup (cross-session)
+  3: Parse from .caw/task_plan.md (fallback)
+  4: Fresh start
+```
+
 ## Boundaries
 
 **Will:**
@@ -245,12 +312,15 @@ errors:
 - Restore session on start (with confirmation)
 - Maintain session history
 - Handle corrupted states gracefully
+- **Backup to Serena memory (if enabled)**
+- **Restore from Serena if local not available**
 
 **Will Not:**
 - Save sensitive information (credentials, tokens)
 - Automatically restore without user confirmation
 - Keep sessions indefinitely (30-day max)
 - Sync across different machines
+- **Overwrite Serena backup without confirmation**
 
 ## Forked Context Behavior
 

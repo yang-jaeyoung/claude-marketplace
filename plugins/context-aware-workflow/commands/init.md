@@ -39,6 +39,9 @@ Initialize the CAW environment without starting a planning workflow.
 | `--verbose` | `-v` | Show detailed step-by-step logging |
 | `--quiet` | `-q` | Show only errors |
 | `--json` | | Output machine-readable JSON |
+| `--serena-sync` | | Sync initialization with Serena memory (save onboarding) |
+| `--from-serena` | | Restore context from Serena memory only (skip detection) |
+| `--no-serena` | | Skip Serena integration (local-only mode) |
 
 ## Behavior
 
@@ -67,6 +70,35 @@ When invoked with `--reset`:
    - Want to start fresh
    - Manifest became corrupted
 
+### Serena Integration (NEW)
+
+#### With `--serena-sync`
+
+1. Run standard initialization
+2. After manifest creation, save to Serena:
+   ```
+   write_memory("project_onboarding", {
+     project_type, frameworks, conventions, key_files
+   })
+   ```
+3. Report: "Serena onboarding saved for future sessions"
+
+#### With `--from-serena`
+
+1. Skip local detection
+2. Restore from Serena memory:
+   ```
+   read_memory("project_onboarding")
+   ```
+3. Pre-populate `context_manifest.json` from Serena
+4. Report: "Context restored from Serena memory"
+
+#### With `--no-serena`
+
+1. Skip all Serena operations
+2. Local-only initialization
+3. Useful for offline work or when Serena unavailable
+
 ### Already Initialized
 
 If `.caw/context_manifest.json` already exists:
@@ -78,6 +110,7 @@ Current Status:
 - Project Type: nodejs
 - Active Files: 3
 - Last Updated: 2024-01-15
+- Serena Onboarding: ✅ Saved
 
 Use /caw:init --reset to reinitialize.
 ```

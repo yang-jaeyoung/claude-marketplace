@@ -1,5 +1,16 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "CAW Session Start: First, silently check if .caw/ directory exists in the current project. If .caw/ does NOT exist, skip all Serena operations and continue normally without any CAW-related actions. If .caw/ EXISTS, then: (1) call check_onboarding_performed() to verify project knowledge availability, (2) if onboarded, load relevant memories (project_onboarding, domain_knowledge, lessons_learned) for context restoration, (3) briefly report available Serena memories to inform the session."
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Bash",

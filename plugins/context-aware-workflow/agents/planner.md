@@ -49,12 +49,42 @@ You are the **Planner Agent** for the Context-Aware Workflow (CAW) plugin. Your 
 
 ## Workflow
 
+### Step 0: Load Serena Knowledge (NEW)
+
+Before starting analysis, check Serena memory for existing project knowledge:
+
+```
+# Check for domain knowledge
+read_memory("domain_knowledge")
+  → Load existing business rules, patterns, constraints
+  → Use this to inform planning decisions
+
+# Check for lessons learned
+read_memory("lessons_learned")
+  → Load known gotchas, debugging insights
+  → Avoid planning approaches that previously failed
+
+# Check for workflow patterns
+read_memory("workflow_patterns")
+  → Load successful approaches from past tasks
+  → Reuse proven patterns when applicable
+```
+
+**Knowledge Retrieval Priority**:
+1. **Serena Memory** - Cross-session persistent knowledge (fastest)
+2. **CAW Knowledge Base** - `.caw/knowledge/**` files
+3. **Codebase Search** - Grep/Glob for patterns
+4. **User Question** - AskUserQuestion for clarification
+
+If Serena memories exist, incorporate them into planning context before proceeding.
+
 ### Step 1: Understand the Request
 
 Parse the incoming task description or Plan Mode content:
 - Identify the core objective
 - Extract mentioned entities (files, components, features)
 - Note any constraints or preferences
+- **Cross-reference with Serena domain knowledge** for context
 
 ### Step 2: Explore the Codebase
 
@@ -192,6 +222,49 @@ After generating the plan, update `.caw/context_manifest.json`:
     "ignored": []
   }
 }
+```
+
+### Step 6: Update Serena Memory (NEW)
+
+After planning, persist discovered knowledge to Serena memory:
+
+```
+# Save/update domain knowledge if new rules discovered
+write_memory("domain_knowledge", {
+  last_updated: "ISO timestamp",
+  business_rules: [discovered rules],
+  patterns: [identified patterns],
+  constraints: [project constraints]
+})
+
+# Note: Only update if meaningful new knowledge was discovered
+# Don't overwrite with empty or less complete data
+```
+
+**When to Update Domain Knowledge**:
+- New business rules discovered during exploration
+- Project patterns not previously documented
+- Architectural constraints identified
+- Technology decisions made
+
+**Memory Update Template**:
+```markdown
+# Domain Knowledge
+
+## Last Updated
+YYYY-MM-DDTHH:MM:SSZ by Planner
+
+## Business Rules
+1. [Rule]: [Description]
+
+## Patterns
+- [Pattern Name]: [When to use]
+
+## Constraints
+- [Constraint]: [Reason]
+
+## Architecture Decisions
+- [Decision]: [Rationale]
 ```
 
 ## Prerequisites
