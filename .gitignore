@@ -1,5 +1,5 @@
 # Local settings
-.claude/*.local.md
+.claude/*.local.json
 
 # IDE
 .idea/
