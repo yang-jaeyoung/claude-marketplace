@@ -10,8 +10,11 @@ Automatically proceed with the next pending step from the task plan, invoking th
 
 ```bash
 /caw:next              # Execute next pending step
-/caw:next --all        # Execute all steps in current phase
+/caw:next --all        # Execute all steps in current phase (sequential)
 /caw:next --step 2.3   # Execute specific step
+/caw:next --parallel   # Execute all runnable steps in parallel
+/caw:next --batch 3    # Execute up to 3 steps in parallel
+/caw:next --worktree   # Create worktrees for parallel execution (see /caw:worktree)
 ```
 
 ## Behavior
@@ -169,6 +172,91 @@ Step 2.3: Implement login endpoint...
 - Executes the specified step regardless of order
 - Warns if dependencies are incomplete
 - Updates status for that specific step
+
+### Parallel Mode (Same Session)
+
+```bash
+/caw:next --parallel
+/caw:next --batch 3
+```
+
+**Prerequisites**: Task plan must have `Deps` column. If missing, falls back to sequential.
+
+**Workflow**:
+1. **Analyze Dependencies**: Use `dependency-analyzer` skill to find runnable steps
+2. **Identify Parallel Group**: Steps with same dependencies and different target files
+3. **Launch Parallel Builders**: Invoke multiple Builder agents via Task tool in single message
+4. **Aggregate Results**: Collect all results, batch update task_plan.md
+5. **Report Summary**: Show parallel execution results
+
+**Example**:
+```
+🚀 Parallel Execution Mode
+
+Runnable steps identified:
+  ⚡ 2.2 - Implement token generation
+  ⚡ 2.3 - Implement token validation
+
+Launching 2 Builder agents in parallel...
+
+Results:
+  ✅ 2.2 Complete (45s, tests: 3/3)
+  ✅ 2.3 Complete (38s, tests: 4/4)
+
+⏱️ Total: 48s (vs ~83s sequential)
+📈 Speedup: 1.7x
+
+💡 Next: /caw:next --parallel to continue
+```
+
+**Batch Mode**:
+```bash
+/caw:next --batch 3   # Max 3 concurrent steps
+```
+
+Limits concurrent execution to prevent resource exhaustion. Remaining runnable steps execute in next batch.
+
+### Worktree Mode (Multi-Session)
+
+```bash
+/caw:next --worktree
+```
+
+**When to Use**:
+- Large independent branches requiring full isolation
+- Steps that modify many files in same subsystem
+- When single-session parallel has conflict risk
+
+**Workflow**:
+1. **Analyze for Worktree**: Identify steps suitable for isolation
+2. **Create Worktrees**: Generate `.worktrees/caw-step-N.M/` directories
+3. **Output Guide**: Print terminal commands for user
+4. **User Executes**: User opens terminals and runs commands
+5. **Merge**: User runs `/caw:merge` when complete
+
+**Output**:
+```
+🌳 Worktree Mode Activated
+
+Creating worktrees for parallel execution:
+  ✓ .worktrees/caw-step-2.2/ (branch: caw/step-2.2)
+  ✓ .worktrees/caw-step-2.3/ (branch: caw/step-2.3)
+
+📋 Run these commands in separate terminals:
+
+Terminal 1:
+  cd .worktrees/caw-step-2.2 && claude
+  /caw:next --step 2.2
+
+Terminal 2:
+  cd .worktrees/caw-step-2.3 && claude
+  /caw:next --step 2.3
+
+After all complete, return here and run:
+  /caw:merge
+```
+
+**See Also**: `/caw:worktree`, `/caw:merge`
 
 ## Edge Cases
 

@@ -213,8 +213,63 @@ Blocked steps:
 💡 Resolve blockers to continue
 ```
 
+## Worktree Status (Parallel Execution)
+
+### Step 3.5b: Check for Active Worktrees
+
+Scan for `.worktrees/caw-step-*` directories:
+
+```
+if .worktrees/ exists:
+    worktrees = glob(".worktrees/caw-step-*")
+    for each worktree:
+        read worktree/.caw/task_plan.md
+        extract step status
+```
+
+### Worktree Status Display
+
+If active worktrees exist, add this section after Progress:
+
+```
+──────────────────────────────────────────
+🌳 Parallel Worktrees
+──────────────────────────────────────────
+│ Path                      │ Step │ Status        │
+│ .worktrees/caw-step-2.2   │ 2.2  │ ✅ Complete   │
+│ .worktrees/caw-step-2.3   │ 2.3  │ 🔄 In Progress│
+
+💡 Run /caw:merge to merge completed worktrees
+```
+
+### Parallel Opportunity Display
+
+If `Deps` column exists in task_plan.md, show runnable parallel steps:
+
+```
+──────────────────────────────────────────
+⚡ Parallel Opportunities
+──────────────────────────────────────────
+Runnable in parallel:
+  • 2.2 - Implement token generation
+  • 2.3 - Implement token validation
+
+💡 Run /caw:next --parallel to execute both
+   Run /caw:worktree create for isolated execution
+```
+
+### No Worktrees Case
+
+If no worktrees but parallel opportunities exist:
+
+```
+⚡ Tip: Steps 2.2 and 2.3 can run in parallel
+   Use /caw:next --parallel or /caw:worktree create
+```
+
 ## Integration
 
-- **Reads**: `.caw/task_plan.md`
-- **Suggests**: `/caw:next` command
+- **Reads**: `.caw/task_plan.md`, `.worktrees/caw-step-*/.caw/task_plan.md`
+- **Suggests**: `/caw:next`, `/caw:merge`, `/caw:worktree` commands
 - **Works with**: All CAW commands
+- **Uses**: `dependency-analyzer` skill for parallel opportunity detection

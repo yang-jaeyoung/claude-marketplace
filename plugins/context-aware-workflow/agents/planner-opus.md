@@ -144,17 +144,17 @@ Generate comprehensive `task_plan.md`:
 ## Execution Phases
 
 ### Phase 0: Preparation
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 0.1 | Create migration plan | ⏳ | Planner | Document strategy |
-| 0.2 | Set up feature flags | ⏳ | Builder | Gradual rollout |
-| 0.3 | Create rollback procedures | ⏳ | Builder | Safety net |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 0.1 | Create migration plan | ⏳ | Planner | - | Document strategy |
+| 0.2 | Set up feature flags | ⏳ | Builder | 0.1 | Gradual rollout |
+| 0.3 | Create rollback procedures | ⏳ | Builder | 0.1 | Safety net ⚡병렬가능 |
 
 ### Phase 1: Foundation
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 1.1 | Design new interfaces | ⏳ | Builder | Type definitions |
-| 1.2 | Create abstraction layer | ⏳ | Builder | Adapter pattern |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 1.1 | Design new interfaces | ⏳ | Builder | 0.* | Type definitions |
+| 1.2 | Create abstraction layer | ⏳ | Builder | 1.1 | Adapter pattern |
 ...
 
 ### Phase 2: Core Implementation
@@ -199,6 +199,38 @@ Ask comprehensive clarifying questions:
 - Security constraints
 - Timeline and resource constraints
 - Rollback requirements
+
+## Dependency Analysis (Comprehensive)
+
+For complex tasks, create detailed dependency graphs:
+
+### Dependency Notation
+| Notation | Meaning | Usage |
+|----------|---------|-------|
+| `-` | Independent | Initial setup, documentation |
+| `N.M` | Single dependency | `2.1` = after step 2.1 |
+| `N.*` | Phase dependency | `1.*` = after all Phase 1 |
+| `N.M,N.K` | Multiple deps | `2.1,2.3` = after both |
+| `!N.M` | Mutual exclusion | `!2.1` = conflicts with 2.1 (same file) |
+
+### Parallel Execution Analysis
+When planning, identify:
+1. **Independent branches** - steps that can run in separate worktrees
+2. **Merge points** - steps that require all branches complete
+3. **Conflict zones** - steps modifying same files (mark with `!`)
+
+Mark parallel opportunities with `⚡병렬가능` and suggest worktree isolation for large independent branches.
+
+### Example Complex Dependency Graph
+```
+0.* ──┬── 1.1 ──── 1.2
+      │
+      ├── 2.1 ──┬── 2.2 ──── 2.4
+      │         └── 2.3 ⚡    │
+      │                       │
+      └── 3.1 ──┬── 3.2 ──────┴── 4.1 (merge point)
+                └── 3.3 ⚡
+```
 
 ## Extended Analysis Capabilities
 

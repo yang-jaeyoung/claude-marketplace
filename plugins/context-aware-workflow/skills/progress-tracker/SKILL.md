@@ -114,7 +114,37 @@ This skill activates when:
     "quality_gate_pass_rate": 0.85
   },
   "insights_captured": 3,
-  "decisions_logged": 2
+  "decisions_logged": 2,
+  "parallel_execution": {
+    "enabled": true,
+    "total_batches": 3,
+    "max_concurrent_achieved": 3,
+    "steps_executed_parallel": ["2.2", "2.3", "3.2", "3.3"],
+    "time_saved_minutes": 25,
+    "parallel_efficiency": 0.72,
+    "speedup_factor": 2.0
+  },
+  "worktrees": {
+    "active": [
+      {
+        "path": ".worktrees/caw-step-2.2",
+        "branch": "caw/step-2.2",
+        "step_id": "2.2",
+        "status": "completed",
+        "merged": true
+      },
+      {
+        "path": ".worktrees/caw-step-2.3",
+        "branch": "caw/step-2.3",
+        "step_id": "2.3",
+        "status": "in_progress",
+        "merged": false
+      }
+    ],
+    "total_created": 4,
+    "total_merged": 2,
+    "merge_conflicts": 0
+  }
 }
 ```
 
@@ -232,6 +262,99 @@ Estimated completion: 14:00 (2시간 남음)
 
 ```
 [45%] Phase 2/3 | Step 5/11 | ETA: 14:00
+```
+
+## Parallel & Worktree Tracking
+
+### On Parallel Execution Start
+
+```yaml
+action: parallel_batch_started
+updates:
+  - Record batch start time
+  - Log parallel step IDs
+  - Increment total_batches
+  - Track max_concurrent_achieved
+```
+
+### On Parallel Execution Complete
+
+```yaml
+action: parallel_batch_completed
+updates:
+  - Calculate time saved vs sequential
+  - Update parallel_efficiency
+  - Update speedup_factor
+  - Record steps_executed_parallel
+```
+
+### Parallel Efficiency Calculation
+
+```python
+def calculate_parallel_efficiency(metrics):
+    # Theoretical max speedup = number of concurrent steps
+    max_concurrent = metrics['parallel_execution']['max_concurrent_achieved']
+
+    # Actual speedup
+    sequential_time = sum(step_durations)
+    parallel_time = max(step_durations)  # Longest step determines batch time
+    actual_speedup = sequential_time / parallel_time
+
+    # Efficiency = actual / theoretical
+    efficiency = actual_speedup / max_concurrent
+    return efficiency  # 0.0 to 1.0
+```
+
+### Worktree State Aggregation
+
+When checking status across multiple worktrees:
+
+```yaml
+action: aggregate_worktree_status
+workflow:
+  1. Scan .worktrees/caw-step-* directories
+  2. Read each worktree's .caw/task_plan.md
+  3. Extract step status for assigned step
+  4. Combine into single view
+
+output:
+  worktrees:
+    - path: .worktrees/caw-step-2.2
+      step: 2.2
+      status: ✅ Complete
+    - path: .worktrees/caw-step-2.3
+      step: 2.3
+      status: 🔄 In Progress (45%)
+```
+
+### Post-Merge Metrics Update
+
+After `/caw:merge`:
+
+```yaml
+action: merge_completed
+updates:
+  - Mark worktree as merged: true
+  - Update main metrics with worktree data
+  - Combine timelines
+  - Recalculate total progress
+  - Record merge_conflicts count
+```
+
+### Worktree Progress Visualization
+
+```
+📊 Parallel Execution Progress
+
+Main Branch: 45% (5/11 steps)
+
+Worktrees:
+  🌳 caw-step-2.2: ✅ Complete (merged)
+  🌳 caw-step-2.3: 🔄 70% in progress
+
+Combined Progress: 55% effective
+  ├─ Sequential estimate: 3h 20m
+  └─ Parallel actual: 2h 10m (⚡ 1.5x speedup)
 ```
 
 ## Performance Analytics

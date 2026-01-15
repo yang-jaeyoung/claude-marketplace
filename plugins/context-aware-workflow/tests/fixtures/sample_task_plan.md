@@ -21,32 +21,32 @@
 ## Execution Phases
 
 ### Phase 1: Setup
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 1.1 | Install jsonwebtoken package | ✅ Complete | Builder | Added jsonwebtoken@9.0.0 |
-| 1.2 | Configure environment variables | ✅ Complete | Builder | Added JWT_SECRET to .env |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 1.1 | Install jsonwebtoken package | ✅ Complete | Builder | - | Added jsonwebtoken@9.0.0 |
+| 1.2 | Configure environment variables | ✅ Complete | Builder | 1.1 | Added JWT_SECRET to .env |
 
 ### Phase 2: Core Implementation
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 2.1 | Create JWT utility module | 🔄 In Progress | Builder | `src/auth/jwt.ts` |
-| 2.2 | Implement token generation | ⏳ Pending | Builder | |
-| 2.3 | Implement token validation | ⏳ Pending | Builder | |
-| 2.4 | Add token refresh logic | ⏳ Pending | Builder | |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 2.1 | Create JWT utility module | 🔄 In Progress | Builder | 1.* | `src/auth/jwt.ts` |
+| 2.2 | Implement token generation | ⏳ Pending | Builder | 2.1 | |
+| 2.3 | Implement token validation | ⏳ Pending | Builder | 2.1 | ⚡병렬가능 (2.2와) |
+| 2.4 | Add token refresh logic | ⏳ Pending | Builder | 2.2,2.3 | |
 
 ### Phase 3: Middleware
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 3.1 | Create auth middleware | ⏳ Pending | Builder | `src/middleware/auth.ts` |
-| 3.2 | Add route protection | ⏳ Pending | Builder | |
-| 3.3 | Handle unauthorized access | ⏳ Pending | Builder | |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 3.1 | Create auth middleware | ⏳ Pending | Builder | 2.* | `src/middleware/auth.ts` |
+| 3.2 | Add route protection | ⏳ Pending | Builder | 3.1 | |
+| 3.3 | Handle unauthorized access | ⏳ Pending | Builder | 3.1 | ⚡병렬가능 (3.2와) |
 
 ### Phase 4: Testing
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 4.1 | Write unit tests for JWT utils | ⏳ Pending | Builder | |
-| 4.2 | Write integration tests | ⏳ Pending | Builder | |
-| 4.3 | Test edge cases | ⏳ Pending | Builder | |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 4.1 | Write unit tests for JWT utils | ⏳ Pending | Builder | 2.* | |
+| 4.2 | Write integration tests | ⏳ Pending | Builder | 3.* | ⚡병렬가능 (4.1와) |
+| 4.3 | Test edge cases | ⏳ Pending | Builder | 4.1,4.2 | |
 
 ## Notes
 

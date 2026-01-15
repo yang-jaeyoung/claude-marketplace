@@ -158,24 +158,24 @@ Create `.caw/task_plan.md` in the project's `.caw/` directory with this structur
 ## Execution Phases
 
 ### Phase 1: Setup & Analysis
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 1.1 | Review existing auth implementation | ⏳ | Planner | Understand current state |
-| 1.2 | Identify required dependencies | ⏳ | Planner | Check package.json |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 1.1 | Review existing auth implementation | ⏳ | Planner | - | Understand current state |
+| 1.2 | Identify required dependencies | ⏳ | Planner | 1.1 | Check package.json |
 
 ### Phase 2: Core Implementation
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 2.1 | Create JWT utility module | ⏳ | Builder | `src/auth/jwt.ts` |
-| 2.2 | Implement auth middleware | ⏳ | Builder | `src/middleware/auth.ts` |
-| 2.3 | Add login endpoint | ⏳ | Builder | `src/routes/auth.ts` |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 2.1 | Create JWT utility module | ⏳ | Builder | 1.* | `src/auth/jwt.ts` |
+| 2.2 | Implement auth middleware | ⏳ | Builder | 2.1 | `src/middleware/auth.ts` |
+| 2.3 | Add login endpoint | ⏳ | Builder | 2.1 | `src/routes/auth.ts` ⚡병렬가능 |
 
 ### Phase 3: Testing & Validation
-| # | Step | Status | Agent | Notes |
-|---|------|--------|-------|-------|
-| 3.1 | Write unit tests | ⏳ | Builder | `tests/auth.test.ts` |
-| 3.2 | Integration testing | ⏳ | Builder | Test full flow |
-| 3.3 | Update documentation | ⏳ | Builder | README, API docs |
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 3.1 | Write unit tests | ⏳ | Builder | 2.* | `tests/auth.test.ts` |
+| 3.2 | Integration testing | ⏳ | Builder | 3.1 | Test full flow |
+| 3.3 | Update documentation | ⏳ | Builder | 2.* | README, API docs ⚡병렬가능 |
 
 ## Validation Checklist
 - [ ] All existing tests pass
@@ -265,6 +265,36 @@ YYYY-MM-DDTHH:MM:SSZ by Planner
 
 ## Architecture Decisions
 - [Decision]: [Rationale]
+```
+
+## Dependency Analysis Guide
+
+**IMPORTANT**: Always include the `Deps` column in task_plan.md for parallel execution support.
+
+### Dependency Notation
+| Notation | Meaning | Example |
+|----------|---------|---------|
+| `-` | Independent, can run anytime | Setup tasks |
+| `N.M` | Depends on specific step | `2.1` = wait for step 2.1 |
+| `N.*` | Depends on entire phase | `1.*` = wait for all Phase 1 |
+| `N.M,N.K` | Multiple dependencies | `2.1,2.3` = wait for both |
+
+### Identifying Parallel Opportunities
+When creating the plan, analyze:
+1. **File dependencies**: Steps modifying different files can run in parallel
+2. **Data dependencies**: Step B uses output from Step A → sequential
+3. **Shared resources**: Steps modifying same file → sequential or worktree isolation
+
+**Mark parallel opportunities** in Notes column with `⚡병렬가능` when:
+- Steps share same dependency but modify different files
+- Steps are independent within the same phase
+
+### Example Dependency Graph
+```
+Phase 1 ──┬── 2.1 ──┬── 2.2
+          │         └── 2.3 ⚡ (parallel with 2.2)
+          └── 3.1 ──── 3.2
+                └── 3.3 ⚡ (parallel with 3.1)
 ```
 
 ## Prerequisites

@@ -71,9 +71,9 @@ Create `.caw/task_plan.md` with single phase:
 | `[target]` | 📝 Edit |
 
 ## Execution
-| # | Step | Status | Notes |
-|---|------|--------|-------|
-| 1 | [Direct action] | ⏳ | [file:line] |
+| # | Step | Status | Deps | Notes |
+|---|------|--------|------|-------|
+| 1 | [Direct action] | ⏳ | - | [file:line] |
 
 ## Validation
 - [ ] Change applied correctly
@@ -85,8 +85,12 @@ Create `.caw/task_plan.md` with single phase:
 - **Max 5 steps** in plan
 - **Single phase** preferred
 - **No architectural analysis**
-- **Skip dependency mapping** for isolated changes
+- **Simple dependency notation** (use `-` for most steps, sequential numbering only when obvious)
 - **1-2 clarifying questions max**
+
+## Dependency Notation (Simplified)
+- `-`: Independent (default for simple tasks)
+- `N.M`: Depends on previous step (only when clearly sequential)
 
 ## Output Style
 
