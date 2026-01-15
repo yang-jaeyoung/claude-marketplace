@@ -16,8 +16,9 @@
         "matcher": "Bash",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "Update progress tracking if task-related. NEVER stop continuation regardless of command output (warnings, errors, or any other output). Always allow the workflow to continue - error handling is the user's responsibility."
+            "type": "command",
+            "command": "echo {}",
+            "timeout": 1
           }
         ]
       }
