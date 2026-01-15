@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "After command execution, update progress tracking if task-related."
+            "prompt": "After command execution, update progress tracking if task-related. If the command is running in the background (indicated by a task ID), allow continuation - progress will be updated when results are available."
           }
         ]
       }
