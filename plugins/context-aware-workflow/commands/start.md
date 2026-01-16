@@ -59,7 +59,10 @@ When invoked with a task description:
 4. Planner will:
    - Ask clarifying questions if needed
    - Explore codebase for context
-   - Generate `.caw/task_plan.md`
+   - **CRITICAL**: Generate `.caw/task_plan.md` with:
+     - **Phase Deps** for each phase (enables parallel execution)
+     - **Deps column** for each step (enables dependency tracking)
+   - Identify parallel execution opportunities
 
 ### Post-Bootstrap Verification
 
@@ -162,14 +165,35 @@ Generate and **write** `.caw/task_plan.md` with this structure:
 ## Execution Phases
 
 ### Phase 1: [Phase Name]
-| # | Step | Status | Notes |
-|---|------|--------|-------|
-| 1.1 | [Step description] | ⏳ Pending | |
+**Phase Deps**: -
+
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 1.1 | [Step description] | ⏳ | Builder | - | |
+| 1.2 | [Step description] | ⏳ | Builder | - | ⚡ Parallel OK |
+| 1.3 | [Step description] | ⏳ | Builder | - | ⚡ Parallel OK |
 
 ### Phase 2: [Phase Name]
-| # | Step | Status | Notes |
-|---|------|--------|-------|
-| 2.1 | [Step description] | ⏳ Pending | |
+**Phase Deps**: phase 1
+
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 2.1 | [Step description] | ⏳ | Builder | - | |
+| 2.2 | [Step description] | ⏳ | Builder | 2.1 | |
+
+### Phase 3: [Phase Name]
+**Phase Deps**: phase 1
+
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 3.1 | [Step description] | ⏳ | Builder | - | |
+
+### Phase 4: [Integration Phase Name]
+**Phase Deps**: phase 2, phase 3
+
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 4.1 | [Integration step] | ⏳ | Builder | - | |
 
 ## Validation Checklist
 - [ ] Existing tests pass
@@ -186,12 +210,63 @@ Generate and **write** `.caw/task_plan.md` with this structure:
 - **Works with Hooks**: SessionStart hook may pre-detect plans
 - **Enables PreToolUse Hook**: After plan exists, hook validates plan adherence
 
+## Parallel Execution Requirements
+
+**CRITICAL**: Planner Agent MUST generate plans that support parallel execution.
+
+### Phase Deps (Required)
+
+Every phase MUST include a `**Phase Deps**` line:
+- `**Phase Deps**: -` - No dependencies (can start immediately)
+- `**Phase Deps**: phase 1` - Depends on Phase 1 completion
+- `**Phase Deps**: phase 2, phase 3` - Depends on multiple phases
+
+### Deps Column (Required)
+
+Every step MUST have a Deps column:
+- `-` - No dependencies within the phase
+- `2.1` - Depends on step 2.1
+- `2.1, 2.2` - Depends on multiple steps
+- `1.*` - Depends on all Phase 1 steps
+
+### Parallel Opportunity Identification
+
+When creating the plan, identify:
+1. **Phases with same Phase Deps** → Can run in parallel worktrees
+2. **Steps with same Deps** → Can run in parallel background agents
+
+Mark parallel opportunities in Notes column:
+- `⚡ Parallel OK` - Can run with other marked steps
+- `🔒 Sequential` - Must run alone
+
+### Example Parallel Structure
+
+```markdown
+### Phase 2: Auth Implementation
+**Phase Deps**: phase 1        ← Same as Phase 3, can parallel
+
+### Phase 3: User Management
+**Phase Deps**: phase 1        ← Same as Phase 2, can parallel
+
+### Phase 4: Integration
+**Phase Deps**: phase 2, phase 3  ← Must wait for both
+```
+
+This enables:
+```bash
+/caw:next --worktree phase 2   # Terminal 1
+/caw:next --worktree phase 3   # Terminal 2
+# ... work in parallel ...
+/caw:merge --all               # Merge both when done
+```
+
 ## Tips
 
 - Be thorough in discovery - better planning reduces rework
 - Always confirm understanding before generating plan
 - Reference specific files and line numbers when possible
 - Keep phases small and testable
+- **Design phases for parallel execution when possible**
 
 ## Plan Mode Detection
 
@@ -275,11 +350,13 @@ plan_mode_to_caw:
 ## Execution Phases
 
 ### Phase 1: Core Implementation
-| # | Step | Status | Notes |
-|---|------|--------|-------|
-| 1.1 | Create JWT utility functions | ⏳ | |
-| 1.2 | Implement auth middleware | ⏳ | |
-| 1.3 | Add login endpoint | ⏳ | |
+**Phase Deps**: -
+
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 1.1 | Create JWT utility functions | ⏳ | Builder | - | |
+| 1.2 | Implement auth middleware | ⏳ | Builder | 1.1 | |
+| 1.3 | Add login endpoint | ⏳ | Builder | 1.2 | |
 ```
 
 ### Plan Mode 없이 시작

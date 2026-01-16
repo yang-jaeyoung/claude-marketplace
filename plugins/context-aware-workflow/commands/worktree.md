@@ -5,108 +5,168 @@ argument-hint: "<subcommand> [options]"
 
 # /caw:worktree - Git Worktree Management
 
-Manage git worktrees for parallel execution of CAW steps in fully isolated environments.
+Manage git worktrees for parallel execution of CAW phases/steps in fully isolated environments.
 
 ## Usage
 
 ```bash
-/caw:worktree create              # Create worktrees for runnable parallel steps
+# Phase-based (PRIMARY)
+/caw:worktree create phase 2          # Create worktree for Phase 2
+/caw:worktree create phase 2,3,4      # Create worktrees for multiple phases
+
+# Step-based (Legacy)
 /caw:worktree create --steps 2.2,2.3  # Create for specific steps
-/caw:worktree list                # Show current worktree status
-/caw:worktree clean               # Remove completed/merged worktrees
-/caw:worktree clean --all         # Remove all CAW worktrees
+
+# Management
+/caw:worktree list                    # Show all worktree status
+/caw:worktree clean                   # Remove completed/merged worktrees
+/caw:worktree clean --all             # Remove all CAW worktrees
 ```
 
 ## Subcommands
 
-### create
+### create phase N
 
-Creates isolated git worktrees for parallel step execution.
+Creates isolated git worktree for an entire phase.
+
+**Usage**:
+```bash
+/caw:worktree create phase 2          # Single phase
+/caw:worktree create phase 2,3,4      # Multiple phases at once
+```
 
 **Workflow**:
-1. **Analyze Dependencies**: Use `dependency-analyzer` skill to find parallelizable steps
-2. **Create Worktrees**: For each step, create `.worktrees/caw-step-N.M/`
-3. **Create Branches**: Create `caw/step-N.M` branch from current HEAD
-4. **Copy CAW State**: Copy `.caw/` directory to each worktree
+1. **Validate Phase**: Check Phase Deps are satisfied
+2. **Create Worktree**: Create `.worktrees/phase-N/`
+3. **Create Branch**: Create `caw/phase-N` branch from current HEAD
+4. **Copy CAW State**: Copy `.caw/` directory to worktree
 5. **Output Guide**: Print terminal commands
 
-**Output**:
+**Output (Single Phase)**:
 ```
-🌳 Creating Worktrees for Parallel Execution
+🌳 Creating Worktree for Phase 2
 
-Analyzing dependencies...
-  Runnable steps: 2.2, 2.3, 3.3
-  Parallel groups: [2.2, 2.3], [3.3]
+Checking dependencies...
+  Phase Deps: phase 1 ✅
+
+Creating worktree:
+  ✓ Directory: .worktrees/phase-2/
+  ✓ Branch: caw/phase-2
+  ✓ Copied: .caw/task_plan.md
+
+📋 Execute in new terminal:
+
+  cd .worktrees/phase-2 && claude
+  /caw:next phase 2              # Sequential
+  # or
+  /caw:next --parallel phase 2   # Parallel
+
+After complete, return to main and run:
+  /caw:merge
+```
+
+**Output (Multiple Phases)**:
+```
+🌳 Creating Worktrees for Phases 2, 3, 4
+
+Checking dependencies...
+  Phase 2 Deps: phase 1 ✅
+  Phase 3 Deps: phase 1 ✅
+  Phase 4 Deps: phase 1 ✅
 
 Creating worktrees:
-  ✓ .worktrees/caw-step-2.2/
-    Branch: caw/step-2.2
-    Task: Implement token generation
-
-  ✓ .worktrees/caw-step-2.3/
-    Branch: caw/step-2.3
-    Task: Implement token validation
+  ✓ .worktrees/phase-2/ (branch: caw/phase-2)
+  ✓ .worktrees/phase-3/ (branch: caw/phase-3)
+  ✓ .worktrees/phase-4/ (branch: caw/phase-4)
 
 📋 Terminal Commands:
 
-# Terminal 1 (Step 2.2)
-cd .worktrees/caw-step-2.2 && claude
-/caw:next --step 2.2
+# Terminal 1 (Phase 2)
+cd .worktrees/phase-2 && claude
+/caw:next --parallel phase 2
 
-# Terminal 2 (Step 2.3)
-cd .worktrees/caw-step-2.3 && claude
-/caw:next --step 2.3
+# Terminal 2 (Phase 3)
+cd .worktrees/phase-3 && claude
+/caw:next --parallel phase 3
 
-💡 After completion, run in main directory:
-   /caw:merge
+# Terminal 3 (Phase 4)
+cd .worktrees/phase-4 && claude
+/caw:next phase 4
+
+💡 After all complete, run in main directory:
+   /caw:merge --all
 ```
 
 **Git Commands Executed**:
 ```bash
-# Create worktree directory
+# Create worktrees directory
 mkdir -p .worktrees
 
 # Create worktree with new branch
-git worktree add .worktrees/caw-step-2.2 -b caw/step-2.2
+git worktree add .worktrees/phase-2 -b caw/phase-2
 
 # Copy CAW state
-cp -r .caw .worktrees/caw-step-2.2/
+cp -r .caw .worktrees/phase-2/
+```
+
+### create --steps (Legacy)
+
+Creates worktrees for specific steps. Maintained for backward compatibility.
+
+```bash
+/caw:worktree create --steps 2.2,2.3
+```
+
+**Directory Structure**:
+```
+.worktrees/
+├── caw-step-2.2/    # Step-based (legacy)
+└── caw-step-2.3/    # Step-based (legacy)
 ```
 
 ### list
 
-Shows status of all CAW worktrees.
+Shows status of all CAW worktrees (both phase and step-based).
 
 **Output**:
 ```
 🌳 CAW Worktrees
 
+## Phase Worktrees
+| Path | Branch | Phase | Status | Progress |
+|------|--------|-------|--------|----------|
+| .worktrees/phase-2 | caw/phase-2 | 2 | 🔄 In Progress | 3/5 |
+| .worktrees/phase-3 | caw/phase-3 | 3 | ✅ Complete | 4/4 |
+| .worktrees/phase-4 | caw/phase-4 | 4 | ⏳ Pending | 0/3 |
+
+## Step Worktrees (Legacy)
 | Path | Branch | Step | Status |
 |------|--------|------|--------|
-| .worktrees/caw-step-2.2 | caw/step-2.2 | 2.2 | ✅ Complete |
-| .worktrees/caw-step-2.3 | caw/step-2.3 | 2.3 | 🔄 In Progress |
-| .worktrees/caw-step-3.3 | caw/step-3.3 | 3.3 | ⏳ Pending |
+| (none) |
 
-💡 Run /caw:merge when steps are complete
+💡 Commands:
+  /caw:merge --all          # Merge all completed
+  /caw:merge phase 3        # Merge specific phase
+  /caw:worktree clean       # Clean completed
 ```
 
 **Status Detection**:
 - Reads `.caw/task_plan.md` in each worktree
-- Finds the target step and checks its status
-- Reports aggregate progress
+- Counts completed/total steps for progress
+- Reports aggregate status
 
 ### clean
 
 Removes worktrees that have been merged or are no longer needed.
 
 **Default Behavior** (`/caw:worktree clean`):
-- Only removes worktrees where step is ✅ Complete
+- Only removes worktrees where all steps are ✅ Complete
 - Removes corresponding branch if merged
 - Preserves in-progress worktrees
 
 **Force All** (`/caw:worktree clean --all`):
-- Removes all `.worktrees/caw-step-*` directories
-- Removes all `caw/step-*` branches
+- Removes all `.worktrees/phase-*` and `.worktrees/caw-step-*` directories
+- Removes all corresponding branches
 - Confirmation required
 
 **Output**:
@@ -114,12 +174,12 @@ Removes worktrees that have been merged or are no longer needed.
 🧹 Cleaning Worktrees
 
 Checking worktree status...
-  .worktrees/caw-step-2.2: ✅ Complete, merged
-  .worktrees/caw-step-2.3: 🔄 In Progress (skipping)
+  .worktrees/phase-2: 🔄 In Progress (skipping)
+  .worktrees/phase-3: ✅ Complete, merged
 
 Removing completed worktrees:
-  ✓ Removed .worktrees/caw-step-2.2
-  ✓ Deleted branch caw/step-2.2
+  ✓ Removed .worktrees/phase-3
+  ✓ Deleted branch caw/phase-3
 
 Summary:
   Removed: 1 worktree
@@ -133,15 +193,18 @@ Summary:
 ```
 project/
 ├── .caw/
-│   ├── task_plan.md
+│   ├── task_plan.md           # Master plan
+│   ├── context_manifest.json
 │   └── session.json
 ├── .worktrees/
-│   ├── caw-step-2.2/          # Isolated worktree
-│   │   ├── .caw/              # Copied CAW state
-│   │   │   └── task_plan.md
-│   │   ├── src/               # Full project copy
+│   ├── phase-2/               # Phase 2 worktree (NEW)
+│   │   ├── .caw/
+│   │   │   └── task_plan.md   # Copied plan
+│   │   ├── src/
 │   │   └── ...
-│   └── caw-step-2.3/
+│   ├── phase-3/               # Phase 3 worktree (NEW)
+│   │   └── ...
+│   └── caw-step-2.2/          # Legacy step worktree
 │       └── ...
 └── src/
     └── ...
@@ -151,23 +214,25 @@ project/
 
 ```
 1. CREATE
-   /caw:worktree create
-   → Creates .worktrees/caw-step-N.M/
-   → Creates branch caw/step-N.M
+   /caw:worktree create phase 2
+   → Creates .worktrees/phase-2/
+   → Creates branch caw/phase-2
+   → Copies .caw/ state
 
-2. WORK
-   User opens terminal, navigates to worktree
-   Runs /caw:next --step N.M
-   Builder implements the step
+2. WORK (in separate terminal)
+   cd .worktrees/phase-2 && claude
+   /caw:next --parallel phase 2
+   → Builder executes steps
+   → Updates local task_plan.md
 
 3. COMPLETE
-   Step marked ✅ in worktree's task_plan.md
+   All steps in phase marked ✅
    User returns to main directory
 
 4. MERGE
-   /caw:merge
-   → Merges caw/step-N.M into main
-   → Updates main task_plan.md
+   /caw:merge [--all | phase N]
+   → Merges caw/phase-N into main
+   → Syncs main task_plan.md
 
 5. CLEAN
    /caw:worktree clean
@@ -175,33 +240,66 @@ project/
    → Deletes merged branch
 ```
 
+## Multi-Phase Parallel Workflow
+
+```bash
+# Step 1: Complete Phase 1 in main
+/caw:next phase 1
+
+# Step 2: Create worktrees for independent phases
+/caw:worktree create phase 2,3,4
+
+# Step 3: Work in parallel terminals
+# Terminal 1:
+cd .worktrees/phase-2 && claude
+/caw:next --parallel phase 2
+
+# Terminal 2:
+cd .worktrees/phase-3 && claude
+/caw:next --parallel phase 3
+
+# Terminal 3:
+cd .worktrees/phase-4 && claude
+/caw:next phase 4
+
+# Step 4: Merge all back
+cd /path/to/main/project
+/caw:merge --all
+
+# Step 5: Continue with dependent phases
+/caw:next phase 5
+```
+
 ## Edge Cases
 
-### No Parallelizable Steps
+### Phase Dependencies Not Met
 
 ```
-⚠️ No steps available for worktree execution
+⚠️ Cannot create worktree for Phase 3
 
-Current state:
-  - Completed: 2.1
-  - In Progress: 2.2
-  - Blocked: 2.3 (waiting for 2.2)
+Dependencies not satisfied:
+  Phase Deps: phase 2
+  Phase 2 Status: 🔄 In Progress (2/5 steps)
 
-💡 Wait for 2.2 to complete, or use /caw:next for sequential
+💡 Options:
+  • Wait for Phase 2 to complete
+  • Create worktree for Phase 2 instead
+  • Force create with --force (not recommended)
 ```
 
 ### Worktree Already Exists
 
 ```
-⚠️ Worktree already exists for step 2.2
+⚠️ Worktree already exists for Phase 2
 
-Path: .worktrees/caw-step-2.2
-Branch: caw/step-2.2
-Status: 🔄 In Progress
+Path: .worktrees/phase-2
+Branch: caw/phase-2
+Status: 🔄 In Progress (3/5 steps)
 
-Options:
-  • Continue in existing worktree
-  • /caw:worktree clean --step 2.2 to remove and recreate
+💡 Options:
+  [1] Continue in existing worktree
+  [2] Delete and recreate (⚠️ loses progress)
+  [3] View worktree status
 ```
 
 ### Uncommitted Changes
@@ -211,16 +309,30 @@ Options:
 
 Please commit or stash your changes first:
   git stash
-  /caw:worktree create
+  /caw:worktree create phase 2
   git stash pop
+```
+
+### Conflicting Phase Dependencies
+
+```
+⚠️ Phases 3 and 4 have conflicting dependencies
+
+Phase 3 Deps: phase 2 (not complete)
+Phase 4 Deps: phase 2, phase 3 (phase 3 not complete)
+
+Cannot create worktrees for both simultaneously.
+
+💡 Create worktree for Phase 3 first:
+  /caw:worktree create phase 3
 ```
 
 ## Integration
 
-- **`/caw:next --worktree`**: Shortcut that calls `worktree create`
+- **`/caw:next --worktree phase N`**: Shortcut that calls `worktree create phase N`
 - **`/caw:merge`**: Merges completed worktrees back
-- **`/caw:status`**: Shows worktree status if any exist
-- **`dependency-analyzer`**: Identifies parallelizable steps
+- **`/caw:status --worktrees`**: Shows worktree status
+- **`dependency-analyzer`**: Validates phase dependencies
 
 ## .gitignore Recommendation
 
