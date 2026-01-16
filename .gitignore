@@ -13,3 +13,17 @@ Thumbs.db
 
 # Node (if using any scripts)
 node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.egg-info/
+
+# CAW worktrees (local only)
+.worktrees/
+.caw/
+
+# Windows
+nul
