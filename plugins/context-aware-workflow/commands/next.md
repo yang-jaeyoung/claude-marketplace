@@ -9,31 +9,69 @@ Automatically proceed with the next pending step from the task plan, invoking th
 ## Usage
 
 ```bash
-# Basic (existing)
-/caw:next                      # Execute next pending step
-/caw:next --all                # Execute all steps in current phase (sequential, lightweight)
+# Basic - Auto Parallel (DEFAULT)
+/caw:next                      # 병렬 가능 step ≥2개 → 자동 background 병렬 실행
+/caw:next --sequential         # 강제 순차 실행 (병렬 가능해도 단일 step만)
 /caw:next --step 2.3           # Execute specific step
 
-# Phase-based execution (NEW)
-/caw:next phase 1              # Execute Phase 1 sequentially
-/caw:next --parallel phase 1   # Execute Phase 1 with background agents
+# Phase-based execution
+/caw:next phase 1              # Phase 1 실행 (자동 병렬 적용)
+/caw:next --sequential phase 1 # Phase 1 순차 실행
+/caw:next --parallel phase 1   # Phase 1 강제 병렬 (1개여도 background)
 /caw:next --worktree phase 2   # Create worktree for Phase 2
-/caw:next --parallel --worktree phase 2  # Create worktree with parallel hint
 
 # Batch control
 /caw:next --batch 3            # Execute up to 3 steps in parallel
+/caw:next --all                # Execute all steps in current phase (sequential)
 ```
 
 ## Flags
 
 | Flag | Description |
 |------|-------------|
-| `--all` | 현재 phase 순차 실행 (가벼운 작업용, 기존 호환) |
-| `--parallel` | Background agent로 병렬 실행 |
+| (none) | **자동 병렬**: 실행 가능 step ≥2개면 background agent 병렬 실행 |
+| `--sequential` | 강제 순차 실행 (병렬 가능해도 단일 step만 실행) |
+| `--parallel` | 강제 병렬 실행 (1개여도 background agent 사용) |
+| `--all` | 현재 phase 전체 순차 실행 (가벼운 작업용) |
 | `--worktree` | Phase 단위 worktree 생성 |
 | `--step N.M` | 특정 step 실행 |
-| `--batch N` | 최대 N개 병렬 실행 |
+| `--batch N` | 최대 N개 병렬 실행 (default: 5) |
 | `phase N` | Phase 번호 지정 (positional argument) |
+
+## Auto-Parallel Behavior (NEW)
+
+기본 동작이 **자동 병렬 실행**으로 변경되었습니다:
+
+```
+/caw:next 실행 시:
+
+1. dependency-analyzer로 실행 가능한 step 분석
+2. 병렬 가능 step 개수 확인:
+   - 0개: "No runnable steps" 메시지
+   - 1개: 단일 step 실행 (blocking)
+   - ≥2개: 자동 background agent 병렬 실행
+3. 병렬 실행 시 진행 상황 안내
+```
+
+**Example Output (Auto-Parallel)**:
+```
+🚀 Analyzing runnable steps...
+
+Found 3 parallelizable steps:
+  ⚡ 2.1 - Create Module A interface (Deps: -)
+  ⚡ 3.1 - Create Module B interface (Deps: -)
+  ⚡ 3.2 - Implement core logic (Deps: 3.1) [blocked]
+
+Launching 2 background agents:
+  → Step 2.1 (task_id: abc123)
+  → Step 3.1 (task_id: def456)
+
+📋 Monitor progress:
+  /caw:status --agents    # Check agent status
+  TaskOutput abc123       # Get specific output
+
+💡 Use --sequential to run one step at a time
+```
 
 ## Behavior
 
@@ -95,12 +133,20 @@ Options:
 
 ## Execution Modes
 
-### Mode 1: Default (Single Step)
+### Mode 1: Default (Auto-Parallel)
 
 ```bash
 /caw:next
 ```
 
+**자동 병렬 실행 로직**:
+1. `dependency-analyzer`로 실행 가능한 step 분석
+2. 병렬 가능 step 개수에 따라:
+   - **0개**: "No runnable steps" 출력
+   - **1개**: 단일 step 실행 (blocking)
+   - **≥2개**: Background agent로 병렬 실행
+
+**단일 Step 실행 (1개일 때)**:
 - Finds first ⏳ Pending step
 - Invokes Builder agent (blocking)
 - Updates task_plan.md status
