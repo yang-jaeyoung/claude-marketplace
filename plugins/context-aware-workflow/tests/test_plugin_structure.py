@@ -124,7 +124,7 @@ class TestAgentFiles(unittest.TestCase):
     def test_agent_frontmatter(self):
         """Each agent must have valid YAML frontmatter."""
         for agent_file in self.get_agent_files():
-            with open(agent_file, "r") as f:
+            with open(agent_file, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # Must start with ---
@@ -153,7 +153,7 @@ class TestAgentFiles(unittest.TestCase):
     def test_agent_has_system_prompt(self):
         """Each agent must have a system prompt section."""
         for agent_file in self.get_agent_files():
-            with open(agent_file, "r") as f:
+            with open(agent_file, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # Should have a heading with "System Prompt" or similar
@@ -179,7 +179,7 @@ class TestCommandFiles(unittest.TestCase):
     def test_command_frontmatter(self):
         """Each command must have valid YAML frontmatter with description."""
         for cmd_file in self.get_command_files():
-            with open(cmd_file, "r") as f:
+            with open(cmd_file, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # Must start with ---
@@ -205,7 +205,7 @@ class TestCommandFiles(unittest.TestCase):
     def test_command_has_usage(self):
         """Each command should have a Usage or Invocation section."""
         for cmd_file in self.get_command_files():
-            with open(cmd_file, "r") as f:
+            with open(cmd_file, "r", encoding="utf-8") as f:
                 content = f.read()
             content_lower = content.lower()
 
@@ -352,7 +352,7 @@ class TestSkillFiles(unittest.TestCase):
             if not skill_md.exists():
                 continue
 
-            with open(skill_md, "r") as f:
+            with open(skill_md, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # Must start with ---

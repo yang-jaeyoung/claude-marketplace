@@ -123,6 +123,8 @@ Keep questions:
 
 Create `.caw/task_plan.md` in the project's `.caw/` directory with this structure:
 
+**CRITICAL**: Every Phase MUST include a `**Phase Deps**` line for parallel execution support.
+
 ```markdown
 # Task Plan: [Descriptive Title]
 
@@ -158,24 +160,37 @@ Create `.caw/task_plan.md` in the project's `.caw/` directory with this structur
 ## Execution Phases
 
 ### Phase 1: Setup & Analysis
+**Phase Deps**: -
+
 | # | Step | Status | Agent | Deps | Notes |
 |---|------|--------|-------|------|-------|
 | 1.1 | Review existing auth implementation | ⏳ | Planner | - | Understand current state |
-| 1.2 | Identify required dependencies | ⏳ | Planner | 1.1 | Check package.json |
+| 1.2 | Identify required dependencies | ⏳ | Planner | - | ⚡ 1.1과 병렬 가능 |
 
 ### Phase 2: Core Implementation
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 2.1 | Create JWT utility module | ⏳ | Builder | 1.* | `src/auth/jwt.ts` |
-| 2.2 | Implement auth middleware | ⏳ | Builder | 2.1 | `src/middleware/auth.ts` |
-| 2.3 | Add login endpoint | ⏳ | Builder | 2.1 | `src/routes/auth.ts` ⚡병렬가능 |
+**Phase Deps**: phase 1
 
-### Phase 3: Testing & Validation
 | # | Step | Status | Agent | Deps | Notes |
 |---|------|--------|-------|------|-------|
-| 3.1 | Write unit tests | ⏳ | Builder | 2.* | `tests/auth.test.ts` |
-| 3.2 | Integration testing | ⏳ | Builder | 3.1 | Test full flow |
-| 3.3 | Update documentation | ⏳ | Builder | 2.* | README, API docs ⚡병렬가능 |
+| 2.1 | Create JWT utility module | ⏳ | Builder | - | `src/auth/jwt.ts` |
+| 2.2 | Implement auth middleware | ⏳ | Builder | 2.1 | `src/middleware/auth.ts` |
+| 2.3 | Add login endpoint | ⏳ | Builder | 2.1 | `src/routes/auth.ts` ⚡ 2.2와 병렬 가능 |
+
+### Phase 3: API Layer
+**Phase Deps**: phase 1
+
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 3.1 | User 모델 정의 | ⏳ | Builder | - | |
+| 3.2 | 비밀번호 해싱 유틸리티 | ⏳ | Builder | - | ⚡ 3.1과 병렬 가능 |
+
+### Phase 4: Integration & Testing
+**Phase Deps**: phase 2, phase 3
+
+| # | Step | Status | Agent | Deps | Notes |
+|---|------|--------|-------|------|-------|
+| 4.1 | 통합 테스트 | ⏳ | Builder | - | |
+| 4.2 | 문서 업데이트 | ⏳ | Builder | - | ⚡ 4.1과 병렬 가능 |
 
 ## Validation Checklist
 - [ ] All existing tests pass
@@ -269,32 +284,70 @@ YYYY-MM-DDTHH:MM:SSZ by Planner
 
 ## Dependency Analysis Guide
 
-**IMPORTANT**: Always include the `Deps` column in task_plan.md for parallel execution support.
+**CRITICAL**: You MUST include both Phase Deps and Step Deps for parallel execution support.
 
-### Dependency Notation
+### Phase-Level Dependencies (REQUIRED)
+
+Every Phase header MUST include a `**Phase Deps**` line:
+
+```markdown
+### Phase N: [Name]
+**Phase Deps**: - | phase N | phase N, M
+```
+
+| Notation | Meaning | Parallel Implication |
+|----------|---------|---------------------|
+| `-` | 독립적, 즉시 시작 가능 | 다른 독립 Phase와 병렬 가능 |
+| `phase N` | Phase N 완료 후 시작 | 동일 deps를 가진 Phase와 병렬 가능 |
+| `phase N, M` | N과 M 모두 완료 후 | N, M 완료 대기 필요 |
+
+**Phase 병렬 실행 판단**:
+- Phase 2 (`phase 1`), Phase 3 (`phase 1`) → **병렬 가능** (동일 deps)
+- Phase 4 (`phase 2, 3`) → Phase 2, 3 완료 후에만 시작
+
+### Step-Level Dependencies
+
 | Notation | Meaning | Example |
 |----------|---------|---------|
-| `-` | Independent, can run anytime | Setup tasks |
-| `N.M` | Depends on specific step | `2.1` = wait for step 2.1 |
-| `N.*` | Depends on entire phase | `1.*` = wait for all Phase 1 |
-| `N.M,N.K` | Multiple dependencies | `2.1,2.3` = wait for both |
+| `-` | 독립적, Phase 시작 시 즉시 실행 | Setup tasks |
+| `N.M` | 특정 step 완료 후 | `2.1` = step 2.1 대기 |
+| `N.*` | Phase 전체 완료 후 | `1.*` = Phase 1 전체 대기 |
+| `N.M,N.K` | 여러 step 완료 후 | `2.1,2.3` = 둘 다 대기 |
+| `!N.M` | 동시 실행 불가 (mutual exclusion) | `!2.3` = 2.3과 같이 실행 불가 |
 
 ### Identifying Parallel Opportunities
-When creating the plan, analyze:
-1. **File dependencies**: Steps modifying different files can run in parallel
-2. **Data dependencies**: Step B uses output from Step A → sequential
-3. **Shared resources**: Steps modifying same file → sequential or worktree isolation
 
-**Mark parallel opportunities** in Notes column with `⚡병렬가능` when:
+**Phase 병렬**:
+1. 동일한 Phase Deps를 가진 Phase 찾기
+2. 서로 다른 디렉토리/모듈 작업인지 확인
+3. 독립적이면 worktree로 병렬 실행 가능
+
+**Step 병렬**:
+1. **File dependencies**: 다른 파일 수정 → 병렬 가능
+2. **Data dependencies**: 출력 사용 → 순차
+3. **Shared resources**: 같은 파일 수정 → 순차 또는 worktree
+
+**Mark parallel opportunities** in Notes column with `⚡` when:
 - Steps share same dependency but modify different files
 - Steps are independent within the same phase
 
-### Example Dependency Graph
+### Example: Parallel Execution Analysis
+
 ```
-Phase 1 ──┬── 2.1 ──┬── 2.2
-          │         └── 2.3 ⚡ (parallel with 2.2)
-          └── 3.1 ──── 3.2
-                └── 3.3 ⚡ (parallel with 3.1)
+task_plan.md:
+
+Phase 1 (Deps: -)     ─────────────────────────┐
+                                               │
+Phase 2 (Deps: phase 1) ─┬─ 2.1 ─┬─ 2.2       │
+                         │       └─ 2.3 ⚡     ├─ 동시 worktree 가능
+Phase 3 (Deps: phase 1) ─┴─ 3.1 ─┬─ 3.2 ⚡    │
+                                 └─ 3.3       │
+                                               │
+Phase 4 (Deps: phase 2, 3) ────────────────────┘
+
+실행 가능:
+  터미널 1: /caw:next --worktree phase 2  # 2.2, 2.3 병렬
+  터미널 2: /caw:next --worktree phase 3  # 3.2, 3.3 병렬
 ```
 
 ## Prerequisites
