@@ -119,11 +119,15 @@ Keep questions:
 - Limited to 2-3 at a time
 - Focused on decisions that impact the plan
 
-### Step 4: Generate task_plan.md
+### Step 4: Generate task_plan.md (Tidy First)
 
-Create `.caw/task_plan.md` in the project's `.caw/` directory with this structure:
+Create `.caw/task_plan.md` following Kent Beck's **Tidy First** methodology:
 
-**CRITICAL**: Every Phase MUST include a `**Phase Deps**` line for parallel execution support.
+**CRITICAL PRINCIPLES**:
+1. Every Phase MUST include a `**Phase Deps**` line for parallel execution
+2. Each Step MUST have a **Type** column: 🧹 Tidy or 🔨 Build
+3. **Tidy steps come FIRST** within each phase
+4. Tidy steps prepare clean code structure for behavioral changes
 
 ```markdown
 # Task Plan: [Descriptive Title]
@@ -134,6 +138,7 @@ Create `.caw/task_plan.md` in the project's `.caw/` directory with this structur
 | **Created** | YYYY-MM-DD HH:MM |
 | **Source** | User request / Plan Mode import |
 | **Status** | Planning → Ready → In Progress → Review → Complete |
+| **Methodology** | Tidy First (Kent Beck) |
 
 ## Context Files
 
@@ -162,35 +167,37 @@ Create `.caw/task_plan.md` in the project's `.caw/` directory with this structur
 ### Phase 1: Setup & Analysis
 **Phase Deps**: -
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 1.1 | Review existing auth implementation | ⏳ | Planner | - | Understand current state |
-| 1.2 | Identify required dependencies | ⏳ | Planner | - | ⚡ 1.1과 병렬 가능 |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| 1.1 | Review existing auth implementation | 🔨 Build | ⏳ | Planner | - | Understand current state |
+| 1.2 | Identify required dependencies | 🔨 Build | ⏳ | Planner | - | ⚡ 1.1과 병렬 가능 |
 
 ### Phase 2: Core Implementation
 **Phase Deps**: phase 1
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 2.1 | Create JWT utility module | ⏳ | Builder | - | `src/auth/jwt.ts` |
-| 2.2 | Implement auth middleware | ⏳ | Builder | 2.1 | `src/middleware/auth.ts` |
-| 2.3 | Add login endpoint | ⏳ | Builder | 2.1 | `src/routes/auth.ts` ⚡ 2.2와 병렬 가능 |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| 2.0 | Clean up existing auth module | 🧹 Tidy | ⏳ | Builder | - | Rename unclear vars |
+| 2.1 | Create JWT utility module | 🔨 Build | ⏳ | Builder | 2.0 | `src/auth/jwt.ts` |
+| 2.2 | Implement auth middleware | 🔨 Build | ⏳ | Builder | 2.1 | `src/middleware/auth.ts` |
+| 2.3 | Add login endpoint | 🔨 Build | ⏳ | Builder | 2.1 | ⚡ 2.2와 병렬 가능 |
 
 ### Phase 3: API Layer
 **Phase Deps**: phase 1
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 3.1 | User 모델 정의 | ⏳ | Builder | - | |
-| 3.2 | 비밀번호 해싱 유틸리티 | ⏳ | Builder | - | ⚡ 3.1과 병렬 가능 |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| 3.0 | Normalize User model structure | 🧹 Tidy | ⏳ | Builder | - | Field naming |
+| 3.1 | Extend User model | 🔨 Build | ⏳ | Builder | 3.0 | |
+| 3.2 | Add password hashing utility | 🔨 Build | ⏳ | Builder | 3.0 | ⚡ 3.1과 병렬 가능 |
 
 ### Phase 4: Integration & Testing
 **Phase Deps**: phase 2, phase 3
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 4.1 | 통합 테스트 | ⏳ | Builder | - | |
-| 4.2 | 문서 업데이트 | ⏳ | Builder | - | ⚡ 4.1과 병렬 가능 |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| 4.1 | Integration tests | 🔨 Build | ⏳ | Builder | - | |
+| 4.2 | Update documentation | 🔨 Build | ⏳ | Builder | - | ⚡ 4.1과 병렬 가능 |
 
 ## Validation Checklist
 - [ ] All existing tests pass
@@ -198,6 +205,7 @@ Create `.caw/task_plan.md` in the project's `.caw/` directory with this structur
 - [ ] Code follows project conventions (linting passes)
 - [ ] No security vulnerabilities introduced
 - [ ] Documentation updated
+- [ ] Tidy commits separated from Build commits
 
 ## Dependencies & Risks
 
@@ -215,6 +223,22 @@ Create `.caw/task_plan.md` in the project's `.caw/` directory with this structur
 ## Notes
 - [Any additional context, decisions made, or assumptions]
 ```
+
+### Tidy First Step Generation Rules
+
+When analyzing target areas for each phase, generate **Tidy steps** when:
+
+| Condition | Tidy Step Needed | Example |
+|-----------|------------------|---------|
+| Existing code has unclear naming | ✅ Yes | Rename `val` → `tokenPayload` |
+| Code duplication will be extended | ✅ Yes | Extract shared utility first |
+| File needs restructuring | ✅ Yes | Split large file into modules |
+| Dead code exists in target area | ✅ Yes | Remove unused functions |
+| Dependencies are implicit | ✅ Yes | Make imports explicit |
+| Starting fresh with no existing code | ❌ No | Just Build steps |
+| Existing code is already clean | ❌ No | Proceed to Build |
+
+**Tidy Step Numbering**: Use `.0` suffix for tidy steps (2.0, 3.0, etc.)
 
 ### Step 5: Update Context Manifest
 

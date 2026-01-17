@@ -13,6 +13,7 @@ Location: `.caw/task_plan.md`
 | **Created** | [timestamp] |
 | **Source** | User request / Plan Mode import |
 | **Status** | Planning / In Progress / Complete |
+| **Methodology** | Tidy First (Kent Beck) |
 
 ## Context Files
 ### Active Context
@@ -32,13 +33,15 @@ Location: `.caw/task_plan.md`
 ### Phase N: [Name]
 **Phase Deps**: - | phase N | phase N, M
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| N.1 | [description] | ⏳/🔄/✅/❌ | Builder | - | |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| N.0 | [structural prep] | 🧹 Tidy | ⏳ | Builder | - | |
+| N.1 | [behavioral change] | 🔨 Build | ⏳ | Builder | N.0 | |
 
 ## Validation Checklist
 - [ ] Tests pass
 - [ ] Follows conventions
+- [ ] Tidy commits separate from Build commits
 
 ## Open Questions
 - [Unresolved items]
@@ -72,6 +75,51 @@ Step 간 의존성을 명시합니다.
 | `N.*` | Phase N 전체 완료 후 실행 | `1.*` |
 | `!N.M` | Step N.M과 동시 실행 불가 (mutual exclusion) | `!2.3` |
 
+## Step Type Column (Tidy First)
+
+Kent Beck의 Tidy First 방법론에 따라 모든 Step은 Type을 명시합니다.
+
+| Icon | Type | Description | Commit Prefix |
+|------|------|-------------|---------------|
+| 🧹 | Tidy | 구조적 변경 (동작 변화 없음) | `[tidy]` |
+| 🔨 | Build | 동작 변경 (새 기능, 버그 수정) | `[feat]`, `[fix]` |
+| 🔧 | Refactor | 혼합 변경 (가급적 피함) | `[refactor]` |
+
+### Tidy First 원칙
+
+1. **구조적 변경 먼저**: 동작 변경 전에 코드 정리
+2. **커밋 분리**: Tidy와 Build 커밋을 절대 혼합하지 않음
+3. **작은 단위**: 각 변경은 최소 단위로
+
+### Tidy Step 예시
+
+| 작업 | Type | 설명 |
+|------|------|------|
+| 변수/함수 이름 변경 | 🧹 Tidy | 명확한 네이밍 |
+| 메서드 추출 | 🧹 Tidy | 중복 코드 분리 |
+| 파일 재구성 | 🧹 Tidy | 디렉토리 정리 |
+| 사용하지 않는 코드 제거 | 🧹 Tidy | Dead code 삭제 |
+| 의존성 명시화 | 🧹 Tidy | 암시적 의존성 노출 |
+
+### Build Step 예시
+
+| 작업 | Type | 설명 |
+|------|------|------|
+| 새 함수 추가 | 🔨 Build | 새 기능 |
+| 로직 수정 | 🔨 Build | 동작 변경 |
+| 버그 수정 | 🔨 Build | 결함 수정 |
+| 테스트 추가 | 🔨 Build | 새 테스트 케이스 |
+
+### Step 순서 규칙
+
+```
+Phase N:
+  N.0 [Tidy] 구조적 정리  ─┐
+  N.1 [Tidy] 리팩토링     ─┼─ Tidy 먼저
+  N.2 [Build] 기능 구현   ─┤
+  N.3 [Build] 테스트      ─┘ Build 나중
+```
+
 ## Status Icons
 
 | Icon | Status | Description |
@@ -92,7 +140,7 @@ Step 간 의존성을 명시합니다.
 | Builder-Opus | 복잡한 작업용 고급 에이전트 |
 | Reviewer | 코드 리뷰 에이전트 |
 
-## Example: Full Task Plan
+## Example: Full Task Plan (Tidy First)
 
 ```markdown
 # Task Plan: User Authentication System
@@ -103,6 +151,7 @@ Step 간 의존성을 명시합니다.
 | **Created** | 2026-01-16 10:00 |
 | **Source** | User request |
 | **Status** | In Progress |
+| **Methodology** | Tidy First (Kent Beck) |
 
 ## Context Files
 ### Active Context
@@ -116,51 +165,54 @@ Step 간 의존성을 명시합니다.
 - `tsconfig.json`
 
 ## Task Summary
-JWT 기반 사용자 인증 시스템을 구현합니다. 토큰 생성/검증, 미들웨어, 로그인 엔드포인트를 포함합니다.
+JWT 기반 사용자 인증 시스템을 구현합니다. Tidy First 방법론에 따라 구조적 정리 후 기능을 구현합니다.
 
 ## Execution Phases
 
 ### Phase 1: Setup
 **Phase Deps**: -
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 1.1 | 의존성 설치 (jsonwebtoken, bcrypt) | ✅ | Builder | - | |
-| 1.2 | 타입 정의 추가 | ✅ | Builder | - | ⚡ 1.1과 병렬 가능 |
-| 1.3 | 테스트 fixture 설정 | ✅ | Builder | - | ⚡ 1.1, 1.2와 병렬 가능 |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| 1.1 | 의존성 설치 (jsonwebtoken, bcrypt) | 🔨 Build | ✅ | Builder | - | |
+| 1.2 | 타입 정의 추가 | 🔨 Build | ✅ | Builder | - | ⚡ 1.1과 병렬 |
+| 1.3 | 테스트 fixture 설정 | 🔨 Build | ✅ | Builder | - | ⚡ 병렬 가능 |
 
 ### Phase 2: Core Implementation
 **Phase Deps**: phase 1
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 2.1 | JWT 유틸리티 함수 구현 | 🔄 | Builder | - | |
-| 2.2 | 토큰 생성 함수 | ⏳ | Builder | 2.1 | |
-| 2.3 | 토큰 검증 함수 | ⏳ | Builder | 2.1 | ⚡ 2.2와 병렬 가능 |
-| 2.4 | 인증 미들웨어 | ⏳ | Builder | 2.2, 2.3 | |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| 2.0 | 기존 auth 코드 정리 | 🧹 Tidy | ✅ | Builder | - | 네이밍 개선 |
+| 2.1 | JWT 유틸리티 함수 구현 | 🔨 Build | 🔄 | Builder | 2.0 | |
+| 2.2 | 토큰 생성 함수 | 🔨 Build | ⏳ | Builder | 2.1 | |
+| 2.3 | 토큰 검증 함수 | 🔨 Build | ⏳ | Builder | 2.1 | ⚡ 2.2와 병렬 |
+| 2.4 | 인증 미들웨어 | 🔨 Build | ⏳ | Builder | 2.2, 2.3 | |
 
 ### Phase 3: API Layer
 **Phase Deps**: phase 1
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 3.1 | User 모델 정의 | ⏳ | Builder | - | |
-| 3.2 | 비밀번호 해싱 유틸리티 | ⏳ | Builder | - | ⚡ 3.1과 병렬 가능 |
-| 3.3 | 회원가입 엔드포인트 | ⏳ | Builder | 3.1, 3.2 | |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| 3.0 | User 모델 리팩토링 | 🧹 Tidy | ⏳ | Builder | - | 필드명 정규화 |
+| 3.1 | User 모델 확장 | 🔨 Build | ⏳ | Builder | 3.0 | |
+| 3.2 | 비밀번호 해싱 유틸리티 | 🔨 Build | ⏳ | Builder | 3.0 | ⚡ 3.1과 병렬 |
+| 3.3 | 회원가입 엔드포인트 | 🔨 Build | ⏳ | Builder | 3.1, 3.2 | |
 
 ### Phase 4: Integration
 **Phase Deps**: phase 2, phase 3
 
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 4.1 | 로그인 엔드포인트 | ⏳ | Builder | - | |
-| 4.2 | 인증 라우트 보호 적용 | ⏳ | Builder | 4.1 | |
-| 4.3 | 통합 테스트 | ⏳ | Builder | 4.2 | |
+| # | Step | Type | Status | Agent | Deps | Notes |
+|---|------|------|--------|-------|------|-------|
+| 4.1 | 로그인 엔드포인트 | 🔨 Build | ⏳ | Builder | - | |
+| 4.2 | 인증 라우트 보호 적용 | 🔨 Build | ⏳ | Builder | 4.1 | |
+| 4.3 | 통합 테스트 | 🔨 Build | ⏳ | Builder | 4.2 | |
 
 ## Validation Checklist
 - [ ] 모든 테스트 통과
 - [ ] 프로젝트 컨벤션 준수
 - [ ] 보안 검토 완료
+- [ ] Tidy/Build 커밋 분리 확인
 
 ## Open Questions
 - 토큰 만료 시간 설정값?

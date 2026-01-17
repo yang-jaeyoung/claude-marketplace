@@ -8,11 +8,21 @@ forked-context-returns: |
   summary: { passed: N, warnings: N, failed: N }
   key_errors: [최대 3개 핵심 에러 메시지]
   action_needed: [다음 단계 제안]
-hooks:
+triggers:
+  # NOTE: These are CAW internal triggers, NOT Claude Code hooks (hooks.json)
+  # Quality Gate is invoked by Builder agent, not by Claude Code hook system
   BuilderComplete:
     action: validate
     required: true
     condition: "requires .caw/ directory"
+
+  # Additional triggers
+  ManualRequest:
+    action: validate
+    required: false
+  PhaseTransition:
+    action: validate
+    required: true
 ---
 
 # Quality Gate
@@ -36,6 +46,7 @@ This skill activates when:
 | Code Changes | Required | Files modified, changes exist |
 | Compilation | Required | No syntax/type errors |
 | Linting | Important | Style rules followed |
+| Tidy First | Important | Change type separation (Kent Beck) |
 | Tests | Important | Related tests pass |
 | Conventions | Recommended | Pattern compliance |
 
@@ -101,6 +112,60 @@ validations:
 source: pattern-learner skill
 ```
 
+#### 6. Tidy First Check (Kent Beck)
+```yaml
+check: tidy_first
+required: true  # For Tidy steps, important for Build steps
+validations:
+  - step_type_match: changes match declared Type (🧹 or 🔨)
+  - no_mixed_changes: structural and behavioral not mixed
+  - commit_prefix: matches step type ([tidy] or [feat]/[fix])
+source: commit-discipline skill
+
+step_type_detection:
+  source: task_plan.md
+  table: "Steps" section
+  column: Type
+  parsing:
+    regex: '\| (\d+\.\d+) \| .* \| (🧹 Tidy|🔨 Build) \|'
+    current_step: step with Status = "🔄" (in_progress)
+  values:
+    "🧹 Tidy": tidy
+    "🧹": tidy
+    "🔨 Build": build
+    "🔨": build
+  fallback: build  # Default if type cannot be determined
+```
+
+**Tidy Step (🧹) Validation:**
+```yaml
+tidy_step_checks:
+  - no_new_exports: true
+  - no_new_functions: true
+  - no_logic_changes: true
+  - tests_unchanged_behavior: tests pass before AND after
+  - commit_prefix: "[tidy]"
+```
+
+**Build Step (🔨) Validation:**
+```yaml
+build_step_checks:
+  - has_tests: new/modified tests exist
+  - no_unrelated_structural: structural changes in target area only
+  - commit_prefix: "[feat]" | "[fix]" | "[test]"
+```
+
+**Mixed Change Detection:**
+```yaml
+mixed_change_response:
+  detection:
+    - structural_indicators AND behavioral_indicators present
+  action:
+    - status: FAILED
+    - message: "Mixed structural and behavioral changes detected"
+    - suggestion: "Split into separate [tidy] and [feat] commits"
+```
+
 ## Behavior
 
 ### Step 1: Detect Framework
@@ -120,9 +185,13 @@ Execute checks in order:
 1. Code Changes → Required, fail-fast
 2. Compilation → Required, fail-fast
 3. Linting → Run, collect warnings
-4. Tests → Required, fail-fast
-5. Conventions → Run, collect warnings
+4. Tidy First → Required for 🧹, important for 🔨 (early feedback)
+5. Tests → Required, fail-fast
+6. Conventions → Run, collect warnings
 ```
+
+> **Note**: Tidy First runs before Tests to provide early feedback on mixed changes,
+> avoiding unnecessary test execution when commit discipline is violated.
 
 ### Step 3: Aggregate Results
 
@@ -159,9 +228,24 @@ Checks:
   ✅ TypeScript: Compiled successfully
   ✅ ESLint: No errors
   ✅ Tests: 5 passed, 0 failed
+  ✅ Tidy First: Build step, no mixed changes
 
 Step 2.3 완료로 표시됩니다.
 다음 단계로 진행하시겠습니까? [Y/n]
+```
+
+**Tidy Step Passed:**
+```
+✅ Quality Gate: Step 2.0 (🧹 Tidy) PASSED
+
+Checks:
+  ✅ Code changes: 2 files modified
+  ✅ TypeScript: Compiled successfully
+  ✅ Tests: All pass (no behavior change)
+  ✅ Tidy First: Structural only, valid [tidy] commit
+
+Step 2.0 완료로 표시됩니다.
+Commit: [tidy] Rename auth variables for clarity
 ```
 
 **Passed with Warnings:**
@@ -195,6 +279,39 @@ Checks:
 
 테스트 실패로 Step을 완료할 수 없습니다.
 실패한 테스트를 수정하시겠습니까? [Y/n]
+```
+
+**Mixed Change Failed (Tidy First Violation):**
+```
+❌ Quality Gate: Step 2.1 FAILED
+
+Checks:
+  ✅ Code changes: 3 files modified
+  ✅ TypeScript: Compiled successfully
+  ✅ ESLint: No errors
+  ✅ Tests: 5 passed, 0 failed
+  ❌ Tidy First: Mixed changes detected!
+
+⚠️ Tidy First Violation
+
+This commit contains BOTH:
+
+Structural changes:
+  • jwt.ts:12 - Renamed `val` → `tokenPayload`
+  • jwt.ts:45 - Extracted method `parseHeader()`
+
+Behavioral changes:
+  • jwt.ts:78 - Added new `refreshToken()` function
+  • jwt.ts:95 - Modified validation logic
+
+Action Required:
+1. Split into separate commits:
+   [tidy] Rename variables and extract method
+   [feat] Add token refresh functionality
+
+2. Or run: /caw:tidy --split
+
+Step을 완료할 수 없습니다.
 ```
 
 ## Framework Detection
