@@ -527,10 +527,11 @@ class TestHooksConfiguration(unittest.TestCase):
         with open(hooks_json, "r") as f:
             self.hooks_data = json.load(f)
 
-    def test_post_tool_use_hook_exists(self):
-        """PostToolUse hook must be configured."""
-        self.assertIn("PostToolUse", self.hooks_data["hooks"])
-        self.assertGreater(len(self.hooks_data["hooks"]["PostToolUse"]), 0)
+    def test_required_hooks_exist(self):
+        """Required hooks (SessionStart, PreToolUse) must be configured."""
+        # PostToolUse is optional - only add if meaningful functionality needed
+        self.assertIn("SessionStart", self.hooks_data["hooks"])
+        self.assertIn("PreToolUse", self.hooks_data["hooks"])
 
     def test_hook_types_valid(self):
         """All hooks must have valid type field."""

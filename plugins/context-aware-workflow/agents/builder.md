@@ -141,6 +141,58 @@ def validatePayment(self, amount: float, currency: str) -> bool:
 """)
 ```
 
+### Step 2.5: Tidy First Check (Kent Beck)
+
+Before implementing behavioral changes, apply Tidy First methodology:
+
+**Check Step Type from task_plan.md**:
+```
+1. Read current step's Type column
+2. If Type = 🧹 Tidy:
+   → Execute structural change only (no behavior change)
+   → Commit with [tidy] prefix
+   → Verify tests still pass
+3. If Type = 🔨 Build:
+   → Check if target area needs tidying first
+   → If messy code found, suggest adding Tidy step
+   → Proceed to TDD
+```
+
+**Tidy Step Execution** (🧹 Type):
+```
+# Structural changes only - NO behavior change
+1. Identify structural improvement (rename, extract, reorganize)
+2. Apply change using Serena tools:
+   - rename_symbol: Change names
+   - replace_symbol_body: Extract methods
+   - replace_content: File reorganization
+3. Run tests to verify no behavior change
+4. Commit: git commit -m "[tidy] <description>"
+5. Update task_plan.md status
+```
+
+**Tidy Verification Checklist**:
+| Check | Condition |
+|-------|-----------|
+| ✅ Valid Tidy | All tests pass, no new functionality |
+| ❌ Invalid Tidy | Tests fail, or new behavior added |
+| ⚠️ Mixed Change | Contains both structural + behavioral → Split! |
+
+**Pre-Build Tidy Analysis** (🔨 Type):
+```
+# Before writing tests, analyze target area
+1. Read target file/module
+2. Check for structural issues:
+   - Unclear variable/function names
+   - Duplicated code
+   - Large methods that should be split
+   - Dead code
+3. If issues found:
+   - Suggest: "Target area needs tidying. Create Tidy step first?"
+   - Option: Add N.0 Tidy step before current Build step
+4. If clean: Proceed directly to TDD
+```
+
 ### Step 3: Write Tests First (TDD)
 
 Create or update test files BEFORE implementation:
@@ -315,6 +367,64 @@ Key: ⏳ Pending | 🔄 In Progress | ✅ Complete | ❌ Blocked | ⏭️ Skippe
 4. **Document Progress**: Update notes in .caw/task_plan.md
 5. **Fail Fast**: Report issues early, don't hide problems
 
+## Tidy First Commit Discipline
+
+Following Kent Beck's Tidy First methodology, commits must be strictly separated:
+
+### Commit Types
+
+| Step Type | Commit Prefix | Rule |
+|-----------|---------------|------|
+| 🧹 Tidy | `[tidy]` | Structural only, no behavior change |
+| 🔨 Build | `[feat]`, `[fix]` | Behavioral changes |
+| 🧪 Test | `[test]` | Test additions/modifications |
+
+### Commit Workflow
+
+```
+# For Tidy Step (🧹)
+git add <files>
+git commit -m "[tidy] <description>
+
+- Renamed X to Y for clarity
+- Extracted Z method
+- No behavior change
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
+
+# For Build Step (🔨)
+git add <files>
+git commit -m "[feat] <description>
+
+- Added new functionality
+- Tests: N passed
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>"
+```
+
+### Mixed Change Detection
+
+If a change contains both structural and behavioral modifications:
+
+```
+⚠️ Mixed Change Detected
+
+This change includes:
+- Structural: Renamed `processData` → `validateInput`
+- Behavioral: Added input length check
+
+Action Required:
+1. Stash behavioral changes: git stash
+2. Commit structural only: [tidy] Rename processData to validateInput
+3. Restore and commit behavioral: [feat] Add input validation
+```
+
+### Never Mix Rule
+
+**NEVER** commit structural and behavioral changes together:
+- ❌ Wrong: `[feat] Add auth and rename variables`
+- ✅ Correct: `[tidy] Rename unclear auth variables` → `[feat] Add JWT auth`
+
 ## Insight Collection
 
 See [Insight Collection](../_shared/insight-collection.md) for full pattern.
@@ -459,238 +569,22 @@ write_memory("lessons_learned", """
 - **중복 방지**: 기존 기록과 유사한 내용이면 기존 항목 보강
 - **위치 선정**: 관련 섹션이 있으면 해당 섹션에, 없으면 "Lessons Learned" 섹션 생성
 
-## Session Persistence - Save & Checkpoint
+## Integrated Skills
 
-작업 중 **세션 상태를 주기적으로 저장**하여 중단 시 복원할 수 있게 합니다.
+Builder automatically applies these skills during execution:
 
-### 저장 트리거
+| Skill | Trigger | Reference |
+|-------|---------|-----------|
+| **Session Persistence** | Step/Phase 완료 시 | See `_shared/session-management.md` |
+| **Progress Tracking** | Step 시작/완료 시 | `skills/progress-tracker/SKILL.md` |
+| **Context Helper** | Step 시작 전 | `skills/context-helper/SKILL.md` |
+| **Quality Gate** | Step 완료 전 | `skills/quality-gate/SKILL.md` |
 
-| 트리거 | 동작 |
-|--------|------|
-| **Step 완료** | 자동 저장 |
-| **Phase 완료** | 전체 스냅샷 저장 |
-| **30분 경과** | 체크포인트 저장 |
-| **위험한 작업 전** | 백업 저장 |
+### Quick Reference
 
-### 저장 워크플로우
+**Session**: Auto-saves to `.caw/session.json` on step/phase completion
+**Progress**: Updates `.caw/metrics.json` with `📊 [N%] Phase X/Y | Step M/N`
+**Context**: Loads critical → important → reference files in priority order
+**Quality Gate**: Runs Code → Compile → Lint → Tidy → Tests → Conventions
 
-```
-Step 완료 시:
-1. session.json 업데이트:
-   Write: .caw/session.json
-   {
-     "session_id": "[unique-id]",
-     "task_id": "[task-name]",
-     "last_updated": "[timestamp]",
-     "current_phase": [N],
-     "current_step": "[X.Y]",
-     "progress_percentage": [N],
-     "context_snapshot": {
-       "active_files": [...],
-       "completed_steps": [...]
-     }
-   }
-
-2. 완료 보고에 저장 확인 포함:
-   ✅ Step 2.1 Complete
-   💾 Session saved (checkpoint)
-```
-
-### 체크포인트 형식
-
-```
-매 30분 또는 중요 시점:
-  💾 Checkpoint saved: 2026-01-11 14:30
-     Progress: Phase 2, Step 2.3 (45%)
-```
-
-## Progress Tracking - Metrics Update
-
-Step 실행 시 **진행 상황을 `.caw/metrics.json`에 기록**합니다.
-
-### 메트릭 업데이트 시점
-
-| 시점 | 업데이트 내용 |
-|------|--------------|
-| **Step 시작** | status: in_progress, started 시간 |
-| **Step 완료** | status: completed, duration 계산 |
-| **Phase 완료** | phase 완료 시간, 다음 phase 시작 |
-
-### 메트릭 업데이트 워크플로우
-
-```
-Step 시작 시:
-1. metrics.json 읽기 (없으면 생성)
-2. 현재 step 상태 업데이트:
-   - phases[N].steps.in_progress++
-   - phases[N].steps.pending--
-   - timeline에 이벤트 추가
-3. metrics.json 저장
-
-Step 완료 시:
-1. metrics.json 읽기
-2. step 상태 업데이트:
-   - phases[N].steps.completed++
-   - phases[N].steps.in_progress--
-   - duration 계산
-   - progress_percentage 재계산
-3. metrics.json 저장
-4. 진행률 표시:
-   📊 [45%] Phase 2/3 | Step 5/11 | ETA: 14:00
-```
-
-### 보고 형식
-
-```
-🔨 Building Step 2.1: Create JWT utility
-📊 Progress: [40%] Phase 2/3 | Step 4/11
-
-... (구현 작업) ...
-
-✅ Step 2.1 Complete
-📊 Progress: [45%] Phase 2/3 | Step 5/11
-💾 Session saved
-```
-
-## Context Helper - Load Context
-
-Step 시작 시 **관련 컨텍스트를 효율적으로 로드**합니다.
-
-### 컨텍스트 로드 워크플로우
-
-```
-Step 시작 전:
-1. task_plan.md에서 현재 step 파악
-2. context_manifest.json에서 우선순위 파일 확인
-3. 이전 step 출력물 확인
-4. 관련 insights 로드
-
-컨텍스트 우선순위:
-  critical: Step에 직접 언급된 파일
-  important: 같은 Phase의 다른 step 출력물
-  reference: 프로젝트 컨텍스트 (types, configs)
-```
-
-### 컨텍스트 요약 표시
-
-```
-📋 Context for Step 2.3: Auth Middleware
-
-Required Files:
-  1. src/auth/jwt.ts (Step 2.1 output)
-  2. src/auth/types.ts (type definitions)
-  3. src/middleware/index.ts (target file)
-
-Previous Steps:
-  • 2.1: JWT utilities implemented
-  • 2.2: Token validation added
-
-💡 Related: JWT Token Refresh Pattern (insight)
-```
-
-### 컨텍스트 로드 최적화
-
-```
-# 항상 로드
-- task_plan.md (현재 section만)
-- step에서 참조하는 파일
-
-# 필요 시 로드
-- 이전 step 출력물 요약
-- 관련 insights
-
-# 로드하지 않음
-- 완료된 다른 phase 상세
-- 오래된 insights (>7일)
-```
-
-## Quality Gate - Pre-Completion Validation
-
-Step 완료 전 **품질 검증을 자동 실행**합니다.
-
-### 검증 항목
-
-| 카테고리 | 필수 | 검증 내용 |
-|----------|------|----------|
-| **Code Changes** | ✅ | 파일 변경 존재 확인 |
-| **Compilation** | ✅ | 문법/타입 오류 없음 |
-| **Linting** | ⚠️ | 스타일 규칙 준수 |
-| **Tests** | ✅ | 관련 테스트 통과 |
-
-### 검증 워크플로우
-
-```
-Step 구현 완료 후:
-1. 코드 변경 확인: git diff 또는 파일 체크
-2. 컴파일 체크: tsc --noEmit / python -m py_compile
-3. 린트 체크: eslint / ruff (경고 허용)
-4. 테스트 실행: npm test / pytest
-
-모두 통과:
-  ✅ Quality Gate: PASSED
-  → Step 완료로 표시
-
-경고 있음:
-  ⚠️ Quality Gate: PASSED (with warnings)
-  → 경고 표시 후 진행 여부 확인
-
-실패:
-  ❌ Quality Gate: FAILED
-  → 오류 분석 및 수정 시도 (최대 3회)
-```
-
-### 검증 결과 표시
-
-**성공:**
-```
-🔒 Quality Gate Check
-  ✅ Code changes: 3 files modified
-  ✅ TypeScript: Compiled successfully
-  ✅ ESLint: No errors
-  ✅ Tests: 5 passed, 0 failed
-
-✅ Quality Gate: PASSED
-```
-
-**경고:**
-```
-🔒 Quality Gate Check
-  ✅ Code changes: 3 files modified
-  ✅ TypeScript: Compiled
-  ⚠️ ESLint: 2 warnings
-     └─ src/auth/jwt.ts:45 - Unused variable
-  ✅ Tests: 5 passed
-
-⚠️ Quality Gate: PASSED (with warnings)
-   진행하시겠습니까? [Y/n]
-```
-
-**실패:**
-```
-🔒 Quality Gate Check
-  ✅ Code changes: 3 files modified
-  ✅ TypeScript: Compiled
-  ❌ Tests: 3 passed, 2 failed
-     └─ auth.test.ts:23 - Expected token valid
-
-❌ Quality Gate: FAILED
-   테스트 실패를 수정합니다... (1/3)
-```
-
-### Quality Gate 재시도 정책
-
-```yaml
-retry_policy:
-  max_retries: 3
-  retry_on:
-    - test_failure
-    - lint_error
-  no_retry_on:
-    - compilation_error
-    - missing_files
-
-  after_max_retries:
-    - Mark step as 🔄 In Progress
-    - Add error details to notes
-    - Report to user for assistance
-```
+> **Note**: For full details, see individual skill documentation.

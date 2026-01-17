@@ -11,13 +11,12 @@ Automatically proceed with the next pending step from the task plan, invoking th
 ```bash
 # Basic - Auto Parallel (DEFAULT)
 /caw:next                      # 병렬 가능 step ≥2개 → 자동 background 병렬 실행
-/caw:next --sequential         # 강제 순차 실행 (병렬 가능해도 단일 step만)
+/caw:next --sequential         # 강제 순차 실행
 /caw:next --step 2.3           # Execute specific step
 
 # Phase-based execution
 /caw:next phase 1              # Phase 1 실행 (자동 병렬 적용)
-/caw:next --sequential phase 1 # Phase 1 순차 실행
-/caw:next --parallel phase 1   # Phase 1 강제 병렬 (1개여도 background)
+/caw:next --parallel phase 1   # Phase 1 강제 병렬
 /caw:next --worktree phase 2   # Create worktree for Phase 2
 
 # Batch control
@@ -30,428 +29,71 @@ Automatically proceed with the next pending step from the task plan, invoking th
 | Flag | Description |
 |------|-------------|
 | (none) | **자동 병렬**: 실행 가능 step ≥2개면 background agent 병렬 실행 |
-| `--sequential` | 강제 순차 실행 (병렬 가능해도 단일 step만 실행) |
-| `--parallel` | 강제 병렬 실행 (1개여도 background agent 사용) |
-| `--all` | 현재 phase 전체 순차 실행 (가벼운 작업용) |
+| `--sequential` | 강제 순차 실행 |
+| `--parallel` | 강제 병렬 실행 |
+| `--all` | 현재 phase 전체 순차 실행 |
 | `--worktree` | Phase 단위 worktree 생성 |
 | `--step N.M` | 특정 step 실행 |
 | `--batch N` | 최대 N개 병렬 실행 (default: 5) |
-| `phase N` | Phase 번호 지정 (positional argument) |
+| `phase N` | Phase 번호 지정 |
 
-## Auto-Parallel Behavior (NEW)
-
-기본 동작이 **자동 병렬 실행**으로 변경되었습니다:
-
-```
-/caw:next 실행 시:
-
-1. dependency-analyzer로 실행 가능한 step 분석
-2. 병렬 가능 step 개수 확인:
-   - 0개: "No runnable steps" 메시지
-   - 1개: 단일 step 실행 (blocking)
-   - ≥2개: 자동 background agent 병렬 실행
-3. 병렬 실행 시 진행 상황 안내
-```
-
-**Example Output (Auto-Parallel)**:
-```
-🚀 Analyzing runnable steps...
-
-Found 3 parallelizable steps:
-  ⚡ 2.1 - Create Module A interface (Deps: -)
-  ⚡ 3.1 - Create Module B interface (Deps: -)
-  ⚡ 3.2 - Implement core logic (Deps: 3.1) [blocked]
-
-Launching 2 background agents:
-  → Step 2.1 (task_id: abc123)
-  → Step 3.1 (task_id: def456)
-
-📋 Monitor progress:
-  /caw:status --agents    # Check agent status
-  TaskOutput abc123       # Get specific output
-
-💡 Use --sequential to run one step at a time
-```
-
-## Behavior
+## Execution Flow
 
 ### Step 1: Validate Task Plan
-
-1. Check for `.caw/task_plan.md`
-2. If not found, display error:
-
-```
-❌ No active workflow
-
-.caw/task_plan.md not found.
-
-💡 Start a workflow first:
-   /caw:start "your task description"
-   /caw:start --from-plan
-```
+Check for `.caw/task_plan.md`. Error if not found.
 
 ### Step 2: Parse Current State
-
-Read `.caw/task_plan.md` and identify:
-- Current Phase being worked on
-- Phase Deps for dependency validation
-- Next actionable step based on mode
+Identify current Phase, Phase Deps, and next actionable step.
 
 ### Step 3: Validate Dependencies
-
-**Phase Dependency Check** (for phase-based execution):
-
-```
-Checking Phase 2 dependencies...
-
-**Phase Deps**: phase 1
-
-Phase 1 status:
-├─ Step 1.1: ✅ Complete
-├─ Step 1.2: ✅ Complete
-└─ Step 1.3: ✅ Complete
-
-✅ All dependencies satisfied. Proceeding with Phase 2.
-```
-
-If dependencies not met:
-```
-⚠️ Phase 3 cannot start
-
-Dependencies not satisfied:
-  Phase 2: 🔄 In Progress (3/5 steps complete)
-
-Options:
-  [1] Wait for Phase 2 to complete
-  [2] Start anyway (may cause issues)
-  [3] View Phase 2 status
-```
+Check Phase Deps are satisfied before proceeding.
 
 ### Step 4: Execute Based on Mode
 
----
+**Auto-Parallel (Default):**
+1. Analyze runnable steps with `dependency-analyzer`
+2. If 0 steps: "No runnable steps"
+3. If 1 step: Execute blocking
+4. If ≥2 steps: Launch background agents
 
-## Execution Modes
-
-### Mode 1: Default (Auto-Parallel)
-
+**Phase Execution:**
 ```bash
-/caw:next
+/caw:next phase 2  # Sequential phase execution
 ```
-
-**자동 병렬 실행 로직**:
-1. `dependency-analyzer`로 실행 가능한 step 분석
-2. 병렬 가능 step 개수에 따라:
-   - **0개**: "No runnable steps" 출력
-   - **1개**: 단일 step 실행 (blocking)
-   - **≥2개**: Background agent로 병렬 실행
-
-**단일 Step 실행 (1개일 때)**:
-- Finds first ⏳ Pending step
-- Invokes Builder agent (blocking)
-- Updates task_plan.md status
-- Reports result and suggests next action
-
-### Mode 2: Sequential All (Lightweight)
-
-```bash
-/caw:next --all
-```
-
-- Identifies current phase (first phase with pending steps)
-- Executes all pending steps sequentially
-- Stops on first failure
-- **Best for**: Simple tasks, few steps
-
-**Output**:
-```
-🚀 Executing Phase 2: Core Implementation
-
-Step 2.1: Create JWT utility...
-  ✅ Complete (tests: 3/3 passed)
-
-Step 2.2: Add auth middleware...
-  ✅ Complete (tests: 5/5 passed)
-
-Step 2.3: Implement login endpoint...
-  ❌ Failed (tests: 2/4 passed)
-
-──────────────────────────────────────────
-📊 Phase 2 Progress: 66% (2/3 steps)
-⚠️ Stopped at step 2.3 due to test failure
-
-💡 Fix the issue and run /caw:next to continue
-```
-
-### Mode 3: Phase Sequential
-
-```bash
-/caw:next phase 2
-```
-
-1. Validate Phase 2 dependencies (Phase Deps)
-2. Execute all pending steps in Phase 2 sequentially
+1. Validate Phase 2 dependencies
+2. Execute all pending steps sequentially
 3. Stop on failure
 
-**Output**:
-```
-🚀 Phase 2: Core Implementation
-
-Checking dependencies...
-  Phase Deps: phase 1 ✅
-
-Executing steps:
-  2.1 Create JWT utility... ✅
-  2.2 Implement middleware... ✅
-  2.3 Add login endpoint... ✅
-
-──────────────────────────────────────────
-📊 Phase 2: Complete (3/3 steps)
-
-💡 Next: /caw:next phase 3
-```
-
-### Mode 4: Phase Parallel (Background Agents)
-
+**Parallel Phase:**
 ```bash
 /caw:next --parallel phase 1
 ```
+- Groups steps into waves based on dependencies
+- Launches background Builder agents per wave
 
-1. Validate Phase 1 dependencies
-2. Analyze step dependencies within phase
-3. Group steps into parallel batches
-4. Launch Builder agents with `run_in_background=true`
-5. Return immediately with monitoring info
-
-**Step Grouping Logic**:
-```
-Phase 1 Steps:
-  1.1 (Deps: -)     ─┐
-  1.2 (Deps: -)     ─┼─ Wave 1: All parallel (no deps)
-  1.3 (Deps: -)     ─┘
-  1.4 (Deps: 1.1)   ─── Wave 2: After 1.1
-  1.5 (Deps: 1.2,1.3)── Wave 3: After 1.2, 1.3
-```
-
-**Output**:
-```
-🚀 Phase 1: Background Parallel Execution
-
-Analyzing dependencies...
-  Wave 1: [1.1, 1.2, 1.3] - All independent
-  Wave 2: [1.4] - After 1.1
-  Wave 3: [1.5] - After 1.2, 1.3
-
-Launching Wave 1 (3 background agents):
-  ⚡ Step 1.1 - Install dependencies (task_id: abc123)
-  ⚡ Step 1.2 - Add type definitions (task_id: def456)
-  ⚡ Step 1.3 - Setup test fixtures (task_id: ghi789)
-
-📋 Monitor progress:
-  /caw:status --agents     # Check all agent status
-  TaskOutput abc123        # Get specific agent output
-
-⏳ Wave 2, 3 will execute after Wave 1 completes.
-   Run /caw:next --parallel phase 1 again to continue.
-```
-
-**Technical Implementation**:
-```
-For each step in parallel group:
-  Task tool:
-    subagent_type: "caw:builder"
-    prompt: "Execute step N.M from .caw/task_plan.md"
-    run_in_background: true
-```
-
-### Mode 5: Worktree (Phase Isolation)
-
+**Worktree:**
 ```bash
 /caw:next --worktree phase 2
 ```
+- Creates `.worktrees/phase-2/` with `caw/phase-2` branch
+- Outputs terminal commands for execution
 
-1. Validate Phase 2 dependencies
-2. Create `.worktrees/phase-2/` directory
-3. Create git branch `caw/phase-2`
-4. Copy `.caw/` state to worktree
-5. Output terminal commands
-
-**Output**:
-```
-🌳 Worktree Created for Phase 2
-
-Checking dependencies...
-  Phase Deps: phase 1 ✅
-
-Creating worktree:
-  ✓ Directory: .worktrees/phase-2/
-  ✓ Branch: caw/phase-2
-  ✓ Copied: .caw/task_plan.md
-
-📋 Execute in new terminal:
-
-  cd .worktrees/phase-2 && claude
-  /caw:next phase 2              # Sequential execution
-  # or
-  /caw:next --parallel phase 2   # Parallel execution
-
-After complete, return to main and run:
-  /caw:merge
-```
-
-### Mode 6: Worktree + Parallel Hint
-
-```bash
-/caw:next --parallel --worktree phase 2
-```
-
-Same as Mode 5, but with parallel execution hint:
-
-**Output**:
-```
-🌳 Worktree Created for Phase 2 (Parallel Mode)
-
-Checking dependencies...
-  Phase Deps: phase 1 ✅
-
-Creating worktree:
-  ✓ Directory: .worktrees/phase-2/
-  ✓ Branch: caw/phase-2
-  ✓ Copied: .caw/task_plan.md
-
-📋 Execute in new terminal:
-
-  cd .worktrees/phase-2 && claude
-  /caw:next --parallel phase 2   # Background parallel execution
-
-After complete, return to main and run:
-  /caw:merge
-```
-
-### Mode 7: Specific Step
-
-```bash
-/caw:next --step 2.3
-```
-
-- Executes the specified step regardless of order
-- Warns if dependencies are incomplete
-- Updates status for that specific step
-
----
-
-## Multi-Terminal Parallel Workflow
-
-여러 터미널에서 동시에 다른 Phase 작업:
-
-```bash
-# 메인 터미널: Phase 1 완료 확인
-/caw:status
-
-# 터미널 1
-/caw:next --worktree phase 2
-cd .worktrees/phase-2 && claude
-/caw:next --parallel phase 2
-
-# 터미널 2
-/caw:next --worktree phase 3
-cd .worktrees/phase-3 && claude
-/caw:next --parallel phase 3
-
-# 터미널 3
-/caw:next --worktree phase 4
-cd .worktrees/phase-4 && claude
-/caw:next phase 4  # Sequential if preferred
-
-# 모든 작업 완료 후 메인 터미널에서
-/caw:merge --all
-```
-
-**Prerequisites for Multi-Phase Parallel**:
-- Phase들이 동일한 Phase Deps를 가져야 함
-- 또는 각 Phase의 dependencies가 이미 완료됨
-
----
-
-## Edge Cases
-
-### All Steps Complete
-
-```
-🎉 Workflow Complete!
-
-All steps in .caw/task_plan.md are finished.
-
-📊 Final Progress: 100% (10/10 steps)
-
-💡 Suggested actions:
-   • /caw:review - Review implementation
-   • Run full test suite: npm test
-   • /caw:start "next task" - Start new workflow
-```
-
-### Blocked Steps
-
-```
-⚠️ Cannot proceed
-
-Step 2.3 is blocked by incomplete dependencies:
-  ❌ 2.1: In Progress
-  ❌ 2.2: Depends on 2.1
-
-💡 Options:
-   • Wait for 2.1 to complete
-   • /caw:next --step 2.1 to work on blocker
-   • Update task_plan.md to skip
-```
-
-### Phase Already in Worktree
-
-```
-⚠️ Phase 2 already has an active worktree
-
-Existing worktree:
-  Directory: .worktrees/phase-2/
-  Branch: caw/phase-2
-  Status: In Progress (2/5 steps)
-
-💡 Options:
-  [1] Continue in existing worktree
-  [2] Delete and recreate (⚠️ loses progress)
-  [3] View worktree status
-```
-
----
-
-## Builder Agent Integration
-
-```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   /caw:next     │────▶│  Builder Agent  │────▶│.caw/task_plan.md│
-│   (Command)     │     │  (Implementer)  │     │  (State Store)   │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-        │                       │                       │
-        │  1. Parse plan        │  2. TDD implement    │
-        │  2. Validate deps     │  3. Run tests        │
-        │  3. Invoke Builder    │  4. Update status    │
-        │  4. Report results    │                       │
-        ▼                       ▼                       ▼
-```
-
----
-
-## Status Icons Reference
+## Status Icons
 
 | Icon | Status | Action |
 |------|--------|--------|
 | ⏳ | Pending | Ready to execute |
-| 🔄 | In Progress | Currently being worked on |
-| ✅ | Complete | Skip, already done |
-| ❌ | Blocked | Cannot proceed, show warning |
-| ⏭️ | Skipped | Skip, intentionally bypassed |
-| 🌳 | In Worktree | Being worked in separate worktree |
+| 🔄 | In Progress | Currently working |
+| ✅ | Complete | Done |
+| ❌ | Blocked | Cannot proceed |
+| ⏭️ | Skipped | Bypassed |
+| 🌳 | In Worktree | In separate worktree |
 
----
+## Edge Cases
+
+- **All Complete**: Shows completion message with suggested actions
+- **Blocked Steps**: Lists incomplete dependencies with options
+- **Worktree Exists**: Offers continue, recreate, or view status
 
 ## Integration
 
@@ -459,4 +101,3 @@ Existing worktree:
 - **Invokes**: Builder agent via Task tool
 - **Updates**: `.caw/task_plan.md` (via Builder)
 - **Creates**: `.worktrees/phase-N/` (with --worktree)
-- **Suggests**: `/caw:status`, `/caw:merge`, `/caw:next`
