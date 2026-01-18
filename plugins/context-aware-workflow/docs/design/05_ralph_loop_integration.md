@@ -515,6 +515,232 @@ Running /cw:reflect for continuous improvement...
 /cw:loop "정기 리팩토링" --schedule "weekly"
 ```
 
+## 10. 활용 사례
+
+### 10.1 Review-Fix 루프
+
+코드 리뷰에서 High 이상 심각도 이슈가 없을 때까지 자동으로 리뷰와 수정을 반복합니다.
+
+#### 사용법
+
+```bash
+/cw:loop "코드 리뷰 후 High 이상 이슈 수정. 이슈 없으면 REVIEW_PASSED 출력" \
+  --completion-promise "REVIEW_PASSED" \
+  --max-iterations 10
+```
+
+#### 내부 동작 흐름
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Iteration N                               │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+        ┌─────────────────────────────┐
+        │  [1] /cw:review 실행        │
+        │  → .caw/review_result.json  │
+        └─────────────┬───────────────┘
+                      │
+                      ▼
+        ┌─────────────────────────────┐
+        │  [2] 결과 분석              │
+        │  ├─ Critical 이슈?          │
+        │  └─ High 이슈?              │
+        └─────────────┬───────────────┘
+                      │
+              ┌───────┴───────┐
+              │               │
+        있음 (≥1)         없음 (0)
+              │               │
+              ▼               ▼
+   ┌──────────────────┐  ┌──────────────────┐
+   │ [3a] /cw:fix     │  │ [3b] 출력:       │
+   │ → 이슈 수정      │  │ "REVIEW_PASSED"  │
+   │ → 다음 iteration │  │ → 루프 종료      │
+   └──────────────────┘  └──────────────────┘
+```
+
+#### 리뷰 결과 스키마 확장
+
+```json
+// .caw/review_result.json
+{
+  "review_id": "review_20240115_150000",
+  "timestamp": "2024-01-15T15:00:00Z",
+  "issues": {
+    "critical": 0,
+    "high": 2,
+    "medium": 5,
+    "low": 12,
+    "info": 8
+  },
+  "details": [
+    {
+      "severity": "high",
+      "category": "security",
+      "file": "src/auth/jwt.ts",
+      "line": 42,
+      "message": "JWT secret is hardcoded",
+      "suggestion": "Use environment variable"
+    }
+  ],
+  "pass_threshold": {
+    "critical": 0,
+    "high": 0
+  },
+  "passed": false
+}
+```
+
+#### 출력 예시
+
+```
+🔄 /cw:loop "Review-Fix until clean"
+
+══════════════════════════════════════════════════════════════
+📍 Iteration 1/10
+══════════════════════════════════════════════════════════════
+🔍 Running /cw:review...
+
+📊 Review Results:
+   Critical: 0 | High: 2 | Medium: 5 | Low: 12
+
+⚠️ High severity issues found:
+   [1] src/auth/jwt.ts:42 - JWT secret is hardcoded
+   [2] src/api/user.ts:88 - SQL injection vulnerability
+
+🔧 Running /cw:fix...
+   → Fixing issue 1/2: JWT secret...     ✓
+   → Fixing issue 2/2: SQL injection...  ✓
+
+Continuing to next iteration...
+
+══════════════════════════════════════════════════════════════
+📍 Iteration 2/10
+══════════════════════════════════════════════════════════════
+🔍 Running /cw:review...
+
+📊 Review Results:
+   Critical: 0 | High: 0 | Medium: 4 | Low: 12
+
+✅ No Critical or High severity issues!
+
+🎯 Output: "REVIEW_PASSED"
+
+══════════════════════════════════════════════════════════════
+✅ Completion promise "REVIEW_PASSED" detected!
+══════════════════════════════════════════════════════════════
+
+📊 Loop Summary
+──────────────────────────────────────────────────────────────
+• Iterations: 2/10
+• Issues fixed: 2 High
+• Remaining: 4 Medium, 12 Low (below threshold)
+• Duration: 1m 45s
+
+💡 To fix remaining issues:
+   /cw:loop "Medium 이슈까지 수정. 완료시 ALL_CLEAN" \
+     --completion-promise "ALL_CLEAN"
+```
+
+#### 확장: 조건 기반 종료 (Phase 2)
+
+Phase 2에서 `--until` 파라미터를 추가하면 더 유연한 조건 지정 가능:
+
+```bash
+# 표현식 기반 종료 조건
+/cw:loop review-fix \
+  --until "review.issues.high == 0 && review.issues.critical == 0" \
+  --max-iterations 10
+
+# 특정 임계값 기반
+/cw:loop review-fix \
+  --severity-threshold medium \
+  --max-iterations 15
+```
+
+#### loop_state.json 확장
+
+```json
+{
+  "loop_id": "loop_20240115_150000",
+  "mode": "review-fix",
+  "config": {
+    "completion_promise": "REVIEW_PASSED",
+    "max_iterations": 10,
+    "exit_condition": {
+      "type": "review_threshold",
+      "max_severity": "medium",
+      "data_source": ".caw/review_result.json"
+    }
+  },
+  "iterations": [
+    {
+      "number": 1,
+      "review_result": {
+        "critical": 0,
+        "high": 2,
+        "medium": 5
+      },
+      "issues_fixed": ["jwt_secret", "sql_injection"],
+      "passed": false
+    },
+    {
+      "number": 2,
+      "review_result": {
+        "critical": 0,
+        "high": 0,
+        "medium": 4
+      },
+      "issues_fixed": [],
+      "passed": true
+    }
+  ],
+  "completion_detected": true
+}
+```
+
+### 10.2 Test-Fix 루프
+
+모든 테스트가 통과할 때까지 반복:
+
+```bash
+/cw:loop "테스트 실행 후 실패 수정. 전체 통과시 ALL_TESTS_PASS" \
+  --completion-promise "ALL_TESTS_PASS" \
+  --max-iterations 15
+```
+
+### 10.3 Build-Fix 루프
+
+빌드 에러가 없을 때까지 반복:
+
+```bash
+/cw:loop "빌드 실행 후 에러 수정. 성공시 BUILD_SUCCESS" \
+  --completion-promise "BUILD_SUCCESS" \
+  --max-iterations 10
+```
+
+### 10.4 복합 품질 루프
+
+여러 품질 게이트를 순차 통과:
+
+```bash
+/cw:loop "빌드, 테스트, 린트, 리뷰 모두 통과까지. 완료시 QUALITY_GATE_PASSED" \
+  --completion-promise "QUALITY_GATE_PASSED" \
+  --max-iterations 20
+```
+
+내부 동작:
+```
+FOR each iteration:
+  1. npm run build     → 실패시 수정
+  2. npm test          → 실패시 수정
+  3. npm run lint      → 실패시 수정
+  4. /cw:review        → High 이상시 수정
+  5. 모두 통과 → "QUALITY_GATE_PASSED"
+```
+
 ---
 
 ## 부록: 참고 자료
