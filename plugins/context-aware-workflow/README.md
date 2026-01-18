@@ -176,6 +176,49 @@ CAW includes a continuous improvement cycle inspired by systematic learning prac
 - **Learnings File**: `.caw/learnings.md` accumulates insights
 - **Status Command**: `/cw:status` suggests reflection when appropriate
 
+## Auto Mode - Full Workflow Automation
+
+For simple, well-defined tasks, run the entire workflow with a single command:
+
+```bash
+/cw:auto "Add a logout button to the header"
+```
+
+### Workflow Stages
+
+```
+[1/7] init     → Initialize .caw/ if needed
+[2/7] start    → Generate task plan (minimal questions)
+[3/7] next     → Execute all steps
+[4/7] review   → Code review
+[5/7] fix      → Auto-fix issues
+[6/7] check    → Compliance validation
+[7/7] reflect  → Ralph Loop learning
+```
+
+### Options
+
+```bash
+/cw:auto "task" --skip-review    # Skip stages 4-6
+/cw:auto "task" --skip-reflect   # Skip stage 7
+/cw:auto "task" --verbose        # Detailed progress output
+```
+
+### Error Handling
+
+- **On error**: Workflow pauses, state saved to `.caw/session.json`
+- **Resume**: Use `/cw:next` to continue from where it stopped
+- **Critical issues**: Workflow pauses for manual intervention
+
+### When to Use Auto Mode
+
+| Use Auto Mode | Use Manual Workflow |
+|---------------|---------------------|
+| Simple, well-defined tasks | Complex multi-module changes |
+| "Add X", "Fix Y" tasks | Architecture decisions |
+| Prototyping | Production-critical code |
+| Learning the workflow | Full control needed |
+
 ## Model Routing System
 
 CAW automatically selects the optimal model tier based on task complexity:
@@ -246,6 +289,7 @@ Each agent has tier-specific implementations:
 
 | Command | Description |
 |---------|-------------|
+| `/cw:auto` | **Run full workflow automatically** - init → start → next → review → fix → check → reflect |
 | `/cw:init` | Initialize CAW environment (creates `.caw/` directory) |
 | `/cw:start` | Start a new workflow with task description or import Plan Mode plans |
 | `/cw:status` | Display current workflow status with visual progress bar |
@@ -273,6 +317,12 @@ Schemas are located in `schemas/` and `_shared/schemas/`:
 | `manifest.schema.md` | `_shared/schemas/` | Context manifest file format |
 
 ## Roadmap
+
+### Completed (v1.6.0)
+- [x] `/cw:auto` command for full workflow automation
+- [x] Auto-mode behavior modifications for agents
+- [x] Error handling with state persistence and resumability
+- [x] Skip flags (--skip-review, --skip-reflect)
 
 ### Completed (v1.5.0)
 - [x] Ralph Loop continuous improvement cycle (RALPH: Reflect-Analyze-Learn-Plan-Habituate)
