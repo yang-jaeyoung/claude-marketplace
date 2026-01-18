@@ -741,6 +741,229 @@ FOR each iteration:
   5. 모두 통과 → "QUALITY_GATE_PASSED"
 ```
 
+## 11. /cw:auto 통합 방안
+
+기존 `/cw:auto`의 review → fix 단계에 loop 패턴을 통합하는 방안입니다.
+
+### 11.1 현재 /cw:auto 워크플로우
+
+```
+[1/7] init     → 환경 초기화
+[2/7] start    → 계획 생성
+[3/7] next     → 단계 실행
+[4/7] review   → 코드 리뷰 (1회)
+[5/7] fix      → 이슈 수정 (1회)
+[6/7] check    → 컴플라이언스 체크
+[7/7] reflect  → 회고
+```
+
+**문제점**: review-fix가 1회만 실행되어 High 이슈가 남을 수 있음
+
+### 11.2 제안: --review-loop 플래그 추가
+
+```bash
+# 기존 동작 (1회 review-fix) - 하위 호환성 유지
+/cw:auto "task"
+
+# Review-Fix Loop 모드 활성화
+/cw:auto "task" --review-loop
+
+# 옵션 지정
+/cw:auto "task" --review-loop --max-review-iterations 5 --review-threshold high
+```
+
+### 11.3 새 파라미터
+
+| 파라미터 | 기본값 | 설명 |
+|----------|--------|------|
+| `--review-loop` | false | Review-Fix를 반복 실행 |
+| `--max-review-iterations` | 5 | 최대 Review-Fix 반복 횟수 |
+| `--review-threshold` | high | 이 심각도 이상 이슈 시 반복 (critical, high, medium) |
+
+### 11.4 수정된 워크플로우
+
+```
+[1/6] init
+[2/6] start
+[3/6] next
+[4/6] review-fix-loop  ← 조건부 반복
+      │
+      ├─► review
+      │     ↓
+      │   High 이슈?
+      │     ├─ YES → fix → 다음 iteration
+      │     └─ NO  → 루프 종료
+      │
+      └─► 안전장치: max-review-iterations 도달 시 종료
+[5/6] check
+[6/6] reflect
+```
+
+### 11.5 종료 조건
+
+```
+Review-Fix Loop 종료 조건:
+  1. review-threshold 이상 이슈가 0개
+  2. max-review-iterations 도달
+  3. 연속 2회 동일 이슈 (수정 불가 판단)
+```
+
+### 11.6 출력 예시
+
+```
+🚀 /cw:auto "Add logout button" --review-loop
+
+[1/6] Initializing...     ✓
+[2/6] Planning...         ✓ (2 phases, 5 steps)
+[3/6] Executing...        ✓ (5/5 steps complete)
+[4/6] Review-Fix Loop...
+      ├─ Iteration 1/5: 2 High issues found
+      │   🔧 Fixing: JWT secret hardcoded... ✓
+      │   🔧 Fixing: SQL injection risk... ✓
+      ├─ Iteration 2/5: 1 High issue found
+      │   🔧 Fixing: Missing input validation... ✓
+      └─ Iteration 3/5: 0 High issues ✓
+[5/6] Checking...         ✓ (compliant)
+[6/6] Reflecting...       ✓
+
+✅ Workflow Complete
+
+📊 Summary:
+  • Steps executed: 5
+  • Review-Fix iterations: 3
+  • Issues fixed: 3 High, 2 Medium (auto)
+  • Remaining: 4 Low (below threshold)
+  • Compliance: Pass
+```
+
+### 11.7 에러 처리
+
+#### 최대 반복 도달
+
+```
+[4/6] Review-Fix Loop...
+      ├─ Iteration 1/5: 3 High issues → fixed 2
+      ├─ Iteration 2/5: 2 High issues → fixed 1
+      ├─ Iteration 3/5: 2 High issues → fixed 1
+      ├─ Iteration 4/5: 2 High issues → fixed 0 ⚠️
+      └─ Iteration 5/5: 2 High issues → MAX REACHED
+
+⚠️ Review-Fix Loop: Max iterations reached
+
+📋 Remaining High Issues (2):
+  1. src/auth/oauth.ts:88 - Complex refactoring needed
+  2. src/api/upload.ts:156 - Architecture change required
+
+💡 Options:
+  1. Fix manually and run: /cw:review
+  2. Continue without fixing: /cw:check
+  3. Increase limit: /cw:auto --continue --max-review-iterations 10
+```
+
+#### 수정 불가 이슈 감지
+
+```
+[4/6] Review-Fix Loop...
+      ├─ Iteration 1/5: 2 High issues → fixed 1
+      ├─ Iteration 2/5: 1 High issue → fixed 0
+      └─ Iteration 3/5: 1 High issue → same issue detected ⚠️
+
+⚠️ Review-Fix Loop: Unfixable issue detected
+
+📋 Unfixable Issue:
+  src/legacy/parser.ts:234
+  "Deprecated API usage requires manual migration"
+
+💡 This issue cannot be auto-fixed. Options:
+  1. Fix manually and resume: /cw:auto --continue
+  2. Skip and continue: /cw:check
+  3. Add to tech debt: /cw:defer
+```
+
+### 11.8 session.json 확장
+
+```json
+{
+  "auto_mode": {
+    "active": true,
+    "current_stage": 4,
+    "options": {
+      "review_loop": true,
+      "max_review_iterations": 5,
+      "review_threshold": "high"
+    }
+  },
+  "review_loop_state": {
+    "current_iteration": 3,
+    "iterations": [
+      {
+        "number": 1,
+        "issues_found": { "high": 2, "medium": 3 },
+        "issues_fixed": { "high": 2, "medium": 1 },
+        "unfixable": []
+      },
+      {
+        "number": 2,
+        "issues_found": { "high": 1, "medium": 2 },
+        "issues_fixed": { "high": 1, "medium": 0 },
+        "unfixable": []
+      },
+      {
+        "number": 3,
+        "issues_found": { "high": 0, "medium": 2 },
+        "issues_fixed": {},
+        "passed": true
+      }
+    ],
+    "total_fixed": { "high": 3, "medium": 1 },
+    "completion_reason": "threshold_met"
+  }
+}
+```
+
+### 11.9 구현 우선순위
+
+```
+Phase 1 (MVP):
+  □ --review-loop 플래그 파싱
+  □ 기본 반복 로직 (max-review-iterations)
+  □ High 이슈 기준 종료 조건
+
+Phase 2 (Enhanced):
+  □ --review-threshold 파라미터
+  □ 수정 불가 이슈 감지
+  □ session.json 상태 저장
+
+Phase 3 (Polish):
+  □ 상세 출력 포맷
+  □ --continue 재개 지원
+  □ 테스트 작성
+```
+
+### 11.10 /cw:loop 와의 관계
+
+| 명령어 | 용도 | Review-Fix |
+|--------|------|------------|
+| `/cw:auto` | 전체 워크플로우 | 1회 (기본) |
+| `/cw:auto --review-loop` | 전체 워크플로우 | N회 (loop) |
+| `/cw:loop` | 범용 반복 실행 | 커스텀 가능 |
+
+**차이점**:
+- `/cw:auto --review-loop`: 전체 워크플로우 내에서 review-fix만 반복
+- `/cw:loop`: 독립적인 반복 실행 (review-fix 외 다양한 패턴)
+
+**사용 시나리오**:
+```bash
+# 전체 작업 자동화 + 품질 보장
+/cw:auto "feature 구현" --review-loop
+
+# review-fix만 별도 실행
+/cw:loop "리뷰 후 High 이상 수정. 완료시 DONE" --max-iterations 10
+
+# 기존 코드 품질 개선 (전체 워크플로우 없이)
+/cw:loop "전체 코드베이스 리뷰 및 수정" --completion-promise "ALL_CLEAN"
+```
+
 ---
 
 ## 부록: 참고 자료
