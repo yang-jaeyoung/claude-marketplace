@@ -5,9 +5,8 @@
         "matcher": "*",
         "hooks": [
           {
-            "type": "command",
-            "command": "echo CAW plugin loaded",
-            "timeout": 5
+            "type": "prompt",
+            "prompt": "CAW (Context-Aware Workflow) plugin is active. Use /caw:status to check workflow state or /caw:start to begin a new task."
           }
         ]
       }
