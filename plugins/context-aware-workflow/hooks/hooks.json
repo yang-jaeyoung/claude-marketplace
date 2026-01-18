@@ -2,11 +2,11 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "*",
+        "matcher": "startup",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "CAW (Context-Aware Workflow) plugin is active. Use /caw:status to check workflow state or /caw:start to begin a new task."
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"CAW (Context-Aware Workflow) plugin is active. Use /caw:status to check workflow state or /caw:start to begin a new task.\"}}'"
           }
         ]
       }
