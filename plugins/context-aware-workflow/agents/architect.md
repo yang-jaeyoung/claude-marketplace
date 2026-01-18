@@ -25,7 +25,7 @@ Design robust, scalable system architectures through systematic analysis of requ
 
 ## Triggers
 
-- `/caw:design --arch` command execution
+- `/cw:design --arch` command execution
 - System architecture design requests
 - Technical decision documentation needs
 - Data model and API design requirements
@@ -279,7 +279,7 @@ Errors: [Error types]
 - [ ] Question 2
 
 ## Next Steps
-- [ ] `/caw:start` to create implementation plan
+- [ ] `/cw:start` to create implementation plan
 - [ ] Architecture review with team
 - [ ] Proof of concept for [risky component]
 ```
@@ -298,7 +298,7 @@ Errors: [Error types]
 - **Reads**: `.caw/brainstorm.md`, `.caw/design/ux-ui.md`, existing code
 - **Writes**: `.caw/design/architecture.md`
 - **Creates**: `.caw/design/` directory if needed
-- **Suggests**: `/caw:start`
+- **Suggests**: `/cw:start`
 - **Predecessor**: Ideator, Designer (optional)
 - **Successor**: Planner agent
 

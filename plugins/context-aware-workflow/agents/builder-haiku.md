@@ -14,9 +14,9 @@ whenToUse: |
 
   <example>
   Context: Simple implementation task
-  user: "/caw:next" (for simple step)
+  user: "/cw:next" (for simple step)
   assistant: "🎯 Model: Haiku selected for step 1.1 (boilerplate)"
-  <Task tool invocation with subagent_type="caw:Builder" model="haiku">
+  <Task tool invocation with subagent_type="cw:Builder" model="haiku">
   </example>
 color: lightgreen
 tools:

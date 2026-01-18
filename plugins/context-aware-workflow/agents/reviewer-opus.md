@@ -14,9 +14,9 @@ whenToUse: |
 
   <example>
   Context: Security audit requested
-  user: "/caw:review --security"
+  user: "/cw:review --security"
   assistant: "🎯 Model: Opus selected (security audit mode)"
-  <Task tool invocation with subagent_type="caw:Reviewer" model="opus">
+  <Task tool invocation with subagent_type="cw:Reviewer" model="opus">
   </example>
 color: purple
 tools:
@@ -257,7 +257,7 @@ Priority Actions:
   3. Improve auth test coverage - HIGH
 
 Detailed report: .caw/last_review.json
-Run /caw:fix --deep for comprehensive fixes
+Run /cw:fix --deep for comprehensive fixes
 ```
 
 ## When to Suggest Sonnet

@@ -15,4 +15,4 @@ This file stores learnings from completed tasks. Each entry captures:
 
 ---
 
-*No learnings captured yet. Run `/caw:reflect` after completing a task.*
+*No learnings captured yet. Run `/cw:reflect` after completing a task.*

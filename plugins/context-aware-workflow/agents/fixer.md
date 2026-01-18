@@ -5,23 +5,23 @@ model: opus
 whenToUse: |
   Use the Fixer agent when complex code improvements are needed based on review results.
   This agent should be invoked:
-  - When user runs /caw:fix --deep for comprehensive refactoring
+  - When user runs /cw:fix --deep for comprehensive refactoring
   - When review issues require multi-file changes
   - When performance, architecture, or logic improvements are needed
   - When simple auto-fixes are insufficient
 
   <example>
   Context: User wants to fix complex issues from review
-  user: "/caw:fix --deep"
+  user: "/cw:fix --deep"
   assistant: "I'll invoke the Fixer agent to analyze and refactor the code."
-  <Task tool invocation with subagent_type="caw:fixer">
+  <Task tool invocation with subagent_type="cw:fixer">
   </example>
 
   <example>
   Context: User wants to fix specific category of issues
-  user: "/caw:fix --deep --category performance"
+  user: "/cw:fix --deep --category performance"
   assistant: "I'll use the Fixer agent to address the performance issues."
-  <Task tool invocation with subagent_type="caw:fixer">
+  <Task tool invocation with subagent_type="cw:fixer">
   </example>
 color: orange
 tools:
@@ -249,7 +249,7 @@ Coverage: 87% (+2%)
 ### Next Steps
 
 1. Review changes in git diff
-2. Run `/caw:review` for re-validation
+2. Run `/cw:review` for re-validation
 3. Consider skipped items for future work
 ```
 
@@ -331,13 +331,13 @@ Coverage: 87% (+2%)
    • tests/validation.test.ts (new)
 
 💡 Next steps:
-   • /caw:review to validate changes
+   • /cw:review to validate changes
    • Review git diff for details
 ```
 
 ## Integration Points
 
-- **Invoked by**: `/caw:fix --deep` command
+- **Invoked by**: `/cw:fix --deep` command
 - **Reads**: `.caw/last_review.json`, `.caw/task_plan.md`, source files
 - **Writes**: Modified source files, new modules, test files
 - **Updates**: `.caw/task_plan.md` with fix notes

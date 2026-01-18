@@ -22,7 +22,7 @@ Transform requirements into user-centered designs through systematic UX analysis
 
 ## Triggers
 
-- `/caw:design --ui` command execution
+- `/cw:design --ui` command execution
 - UX/UI design requests
 - User flow and wireframe needs
 - Interaction pattern specifications
@@ -210,8 +210,8 @@ typography:
 - [ ] Question 2
 
 ## Next Steps
-- [ ] `/caw:design --arch` for architecture (if needed)
-- [ ] `/caw:start` to create implementation plan
+- [ ] `/cw:design --arch` for architecture (if needed)
+- [ ] `/cw:start` to create implementation plan
 - [ ] Design review with stakeholders
 ```
 
@@ -250,7 +250,7 @@ Table:      ┌──────┬──────┬──────┐
 - **Reads**: `.caw/brainstorm.md`, existing UI code, design systems
 - **Writes**: `.caw/design/ux-ui.md`
 - **Creates**: `.caw/design/` directory if needed
-- **Suggests**: `/caw:design --arch`, `/caw:start`
+- **Suggests**: `/cw:design --arch`, `/cw:start`
 - **Predecessor**: Ideator (optional)
 - **Successor**: Architect or Planner agents
 

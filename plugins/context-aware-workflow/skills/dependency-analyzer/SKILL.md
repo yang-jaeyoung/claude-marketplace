@@ -11,8 +11,8 @@ Analyzes `.caw/task_plan.md` to identify which phases and steps can run in paral
 
 ## When to Use
 
-- Before executing `--parallel` or `--worktree` modes in `/caw:next`
-- When `/caw:status` needs to show parallel execution opportunities
+- Before executing `--parallel` or `--worktree` modes in `/cw:next`
+- When `/cw:status` needs to show parallel execution opportunities
 - When planning worktree creation for isolated parallel execution
 - **When analyzing Phase-level dependencies for multi-terminal parallel work**
 
@@ -171,7 +171,7 @@ For worktree isolation, recommend when:
 
 ## Output Format
 
-### Summary Output (for /caw:status)
+### Summary Output (for /cw:status)
 
 ```
 📊 Dependency Analysis
@@ -183,14 +183,14 @@ Phases with same Phase Deps can run in parallel worktrees:
     → Phase 2 ⏳ (5 steps)
     → Phase 3 ⏳ (4 steps)
 
-  💡 /caw:worktree create phase 2,3
+  💡 /cw:worktree create phase 2,3
 
 ## Step-Level Parallel
 Runnable Steps (can execute now):
   ⚡ 2.2 - Implement token generation
   ⚡ 2.3 - Implement token validation
 
-  💡 /caw:next --parallel phase 2
+  💡 /cw:next --parallel phase 2
 
 Blocked:
   ❌ Phase 4 - waiting for: Phase 2, Phase 3
@@ -346,10 +346,10 @@ Example:
 
 ## Integration Points
 
-- **`/caw:next --parallel`**: Uses runnable steps and parallel groups
-- **`/caw:next --worktree`**: Uses worktree suggestions
-- **`/caw:status`**: Displays dependency summary
-- **`/caw:merge`**: Uses merge points for ordering
+- **`/cw:next --parallel`**: Uses runnable steps and parallel groups
+- **`/cw:next --worktree`**: Uses worktree suggestions
+- **`/cw:status`**: Displays dependency summary
+- **`/cw:merge`**: Uses merge points for ordering
 
 ## Error Handling
 

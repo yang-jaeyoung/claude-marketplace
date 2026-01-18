@@ -19,7 +19,7 @@ Agent를 강화하는 자동화 Skill 설계 문서.
 | 속성 | 값 |
 |------|-----|
 | **트리거** | Plan Mode 완료 감지 |
-| **출력** | `/caw:start --from-plan` 자동 제안 |
+| **출력** | `/cw:start --from-plan` 자동 제안 |
 | **연동** | PostToolUse Hook (ExitPlanMode) |
 
 **동작 흐름:**
@@ -39,7 +39,7 @@ Agent를 강화하는 자동화 Skill 설계 문서.
 - 예상 파일: 8개 수정, 3개 생성
 
 자동으로 CAW 워크플로우를 시작할까요?
-[1] 예, /caw:start --from-plan 실행
+[1] 예, /cw:start --from-plan 실행
 [2] 아니오, 나중에 수동으로 시작
 ```
 
@@ -148,7 +148,7 @@ skills/context-helper/
 
 | 속성 | 값 |
 |------|-----|
-| **트리거** | /caw:start 시 자동, Agent 요청 시 |
+| **트리거** | /cw:start 시 자동, Agent 요청 시 |
 | **출력** | `.caw/patterns/` 에 패턴 문서화 |
 | **연동** | Planner, Builder Agent |
 
@@ -257,7 +257,7 @@ skills/decision-logger/
 |------|-----|
 | **트리거** | Step 완료, Phase 전환 |
 | **출력** | `.caw/metrics.json` 업데이트 |
-| **연동** | PostToolUse Hook, /caw:status |
+| **연동** | PostToolUse Hook, /cw:status |
 
 **추적 메트릭:**
 ```json
@@ -404,7 +404,7 @@ skills/knowledge-base/
 |------|-----|
 | **트리거** | 세션 시작, 수동 요청 |
 | **출력** | `.caw/session.json` 세션 데이터 |
-| **연동** | `/caw:status`, `/caw:start` |
+| **연동** | `/cw:status`, `/cw:start` |
 
 **저장 데이터:**
 ```json
@@ -455,7 +455,7 @@ skills/session-persister/
 
 | 속성 | 값 |
 |------|-----|
-| **트리거** | /caw:review 실행 시 |
+| **트리거** | /cw:review 실행 시 |
 | **출력** | 컨텍스트 기반 리뷰 체크리스트 |
 | **연동** | Reviewer Agent |
 

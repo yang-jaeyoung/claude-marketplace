@@ -95,7 +95,7 @@ class TestPluginStructure(unittest.TestCase):
 
     def test_required_directories_exist(self):
         """Required plugin directories must exist."""
-        # commands/ contains the slash commands (e.g., /caw:start)
+        # commands/ contains the slash commands (e.g., /cw:start)
         required_dirs = ["agents", "hooks", "commands", "docs"]
 
         for dir_name in required_dirs:

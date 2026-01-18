@@ -3,7 +3,7 @@ description: Analyze and apply structural improvements following Kent Beck's Tid
 argument-hint: "[--scope <path>] [--preview] [--apply]"
 ---
 
-# /caw:tidy - Tidy First Preparation
+# /cw:tidy - Tidy First Preparation
 
 Analyze target code for structural improvements and apply tidying before implementing new features. Following Kent Beck's Tidy First methodology.
 
@@ -11,22 +11,22 @@ Analyze target code for structural improvements and apply tidying before impleme
 
 ```bash
 # Analyze current step target
-/caw:tidy
+/cw:tidy
 
 # Analyze specific directory or file
-/caw:tidy --scope src/auth/
+/cw:tidy --scope src/auth/
 
 # Preview suggestions without applying
-/caw:tidy --preview
+/cw:tidy --preview
 
 # Apply suggested tidying automatically
-/caw:tidy --apply
+/cw:tidy --apply
 
 # Add tidy step to task plan
-/caw:tidy --add-step
+/cw:tidy --add-step
 
 # Split mixed changes into separate commits
-/caw:tidy --split
+/cw:tidy --split
 ```
 
 ## Flags
@@ -45,7 +45,7 @@ Analyze target code for structural improvements and apply tidying before impleme
 ### Default Behavior (No Flags)
 
 ```
-/caw:tidy
+/cw:tidy
 
 1. Read current pending step from task_plan.md
 2. Identify target files for that step
@@ -82,15 +82,15 @@ Analyze target code for structural improvements and apply tidying before impleme
 ## Recommended Actions
 
 Option 1: Add Tidy Step (Recommended)
-  → `/caw:tidy --add-step`
+  → `/cw:tidy --add-step`
   → Creates Step 2.0 with tidy tasks
 
 Option 2: Apply Now
-  → `/caw:tidy --apply`
+  → `/cw:tidy --apply`
   → Apply changes immediately
 
 Option 3: Skip
-  → `/caw:next`
+  → `/cw:next`
   → Proceed without tidying (not recommended)
 ```
 
@@ -166,7 +166,7 @@ suggestions:
 
 ## Adding Tidy Steps
 
-### /caw:tidy --add-step
+### /cw:tidy --add-step
 
 Inserts a Tidy step before the current pending step:
 
@@ -187,7 +187,7 @@ Inserts a Tidy step before the current pending step:
 
 ## Apply Mode
 
-### /caw:tidy --apply
+### /cw:tidy --apply
 
 Executes tidy changes automatically:
 
@@ -219,7 +219,7 @@ Proceed with commit? [Y/n]
 
 ## Split Mode
 
-### /caw:tidy --split
+### /cw:tidy --split
 
 Automatically separates mixed changes into separate Tidy and Build commits:
 
@@ -291,7 +291,7 @@ split_process:
 ### With Builder Agent
 
 - Builder checks for tidy suggestions before Build steps
-- Can invoke `/caw:tidy --preview` automatically
+- Can invoke `/cw:tidy --preview` automatically
 - Suggests running tidy when issues found
 
 ### With commit-discipline Skill
@@ -331,7 +331,7 @@ Target files are already clean:
 
 Proceeding directly to Build step is recommended.
 
-Run: /caw:next
+Run: /cw:next
 ```
 
 ### Many Issues Found
@@ -342,10 +342,10 @@ Run: /caw:next
 Found 15+ structural issues. Consider:
 
 1. Create multiple Tidy steps:
-   /caw:tidy --add-step --split
+   /cw:tidy --add-step --split
 
 2. Prioritize critical issues:
-   /caw:tidy --apply --priority high
+   /cw:tidy --apply --priority high
 
 3. Discuss scope with team first
 ```

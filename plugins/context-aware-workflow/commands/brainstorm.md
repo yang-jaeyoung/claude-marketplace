@@ -2,16 +2,16 @@
 description: Interactive requirements discovery through Socratic dialogue and brainstorming
 ---
 
-# /caw:brainstorm - Requirements Discovery
+# /cw:brainstorm - Requirements Discovery
 
 Start an interactive brainstorming session to transform vague ideas into structured requirements using the Ideator agent.
 
 ## Usage
 
 ```bash
-/caw:brainstorm "your idea or feature description"
-/caw:brainstorm                      # Resume or review existing brainstorm
-/caw:brainstorm --reset              # Start fresh, archive existing
+/cw:brainstorm "your idea or feature description"
+/cw:brainstorm                      # Resume or review existing brainstorm
+/cw:brainstorm --reset              # Start fresh, archive existing
 ```
 
 ## Behavior
@@ -31,7 +31,7 @@ Last Updated: [timestamp]
 [1] Continue refining
 [2] View summary
 [3] Start fresh (archive existing)
-[4] Proceed to design (/caw:design)
+[4] Proceed to design (/cw:design)
 ```
 
 ### Step 2: Invoke Ideator Agent
@@ -83,9 +83,9 @@ Created: .caw/brainstorm.md
 ## Confidence: [Low/Medium/High]
 
 💡 Next Steps:
-   • /caw:design --ui for UX/UI design
-   • /caw:design --arch for architecture design
-   • /caw:start to begin implementation planning
+   • /cw:design --ui for UX/UI design
+   • /cw:design --arch for architecture design
+   • /cw:start to begin implementation planning
 ```
 
 ## Output Format
@@ -109,7 +109,7 @@ Created: .caw/brainstorm.md
 ## Example
 
 ```bash
-/caw:brainstorm "사용자 알림 시스템"
+/cw:brainstorm "사용자 알림 시스템"
 ```
 
 **Ideator Process**: Problem Understanding → Scope Definition → Success Criteria
@@ -135,8 +135,8 @@ Created: .caw/brainstorm.md
 Provide an idea or feature to explore:
 
 Example:
-  /caw:brainstorm "사용자 인증 시스템 개선"
-  /caw:brainstorm "실시간 협업 기능 추가"
+  /cw:brainstorm "사용자 인증 시스템 개선"
+  /cw:brainstorm "실시간 협업 기능 추가"
 
 Or describe what you're thinking about, and I'll help
 structure your thoughts through guided questions.
@@ -148,9 +148,9 @@ structure your thoughts through guided questions.
 ℹ️ Brainstorming is Optional
 
 You can skip directly to:
-  • /caw:design --ui for UX/UI design
-  • /caw:design --arch for architecture design
-  • /caw:start for implementation planning
+  • /cw:design --ui for UX/UI design
+  • /cw:design --arch for architecture design
+  • /cw:start for implementation planning
 
 Brainstorming is recommended for:
   - Vague or complex requirements
@@ -172,7 +172,7 @@ Open Questions (High Priority):
 
 Recommendations:
   • Answer open questions before proceeding
-  • Run /caw:brainstorm to continue discovery
+  • Run /cw:brainstorm to continue discovery
   • Consider stakeholder interviews
 ```
 
@@ -181,5 +181,5 @@ Recommendations:
 - **Creates**: `.caw/brainstorm.md`
 - **Invokes**: Ideator agent via Task tool
 - **Uses**: AskUserQuestion for interactive discovery
-- **Suggests**: `/caw:design`, `/caw:start`
+- **Suggests**: `/cw:design`, `/cw:start`
 - **Standalone**: Can be used without other CAW commands

@@ -2,7 +2,7 @@
 description: Execute the next pending step from task_plan.md using the Builder agent
 ---
 
-# /caw:next - Execute Next Step
+# /cw:next - Execute Next Step
 
 Automatically proceed with the next pending step from the task plan, invoking the Builder agent for TDD-based implementation.
 
@@ -10,18 +10,18 @@ Automatically proceed with the next pending step from the task plan, invoking th
 
 ```bash
 # Basic - Auto Parallel (DEFAULT)
-/caw:next                      # 병렬 가능 step ≥2개 → 자동 background 병렬 실행
-/caw:next --sequential         # 강제 순차 실행
-/caw:next --step 2.3           # Execute specific step
+/cw:next                      # 병렬 가능 step ≥2개 → 자동 background 병렬 실행
+/cw:next --sequential         # 강제 순차 실행
+/cw:next --step 2.3           # Execute specific step
 
 # Phase-based execution
-/caw:next phase 1              # Phase 1 실행 (자동 병렬 적용)
-/caw:next --parallel phase 1   # Phase 1 강제 병렬
-/caw:next --worktree phase 2   # Create worktree for Phase 2
+/cw:next phase 1              # Phase 1 실행 (자동 병렬 적용)
+/cw:next --parallel phase 1   # Phase 1 강제 병렬
+/cw:next --worktree phase 2   # Create worktree for Phase 2
 
 # Batch control
-/caw:next --batch 3            # Execute up to 3 steps in parallel
-/caw:next --all                # Execute all steps in current phase (sequential)
+/cw:next --batch 3            # Execute up to 3 steps in parallel
+/cw:next --all                # Execute all steps in current phase (sequential)
 ```
 
 ## Flags
@@ -58,7 +58,7 @@ Check Phase Deps are satisfied before proceeding.
 
 **Phase Execution:**
 ```bash
-/caw:next phase 2  # Sequential phase execution
+/cw:next phase 2  # Sequential phase execution
 ```
 1. Validate Phase 2 dependencies
 2. Execute all pending steps sequentially
@@ -66,14 +66,14 @@ Check Phase Deps are satisfied before proceeding.
 
 **Parallel Phase:**
 ```bash
-/caw:next --parallel phase 1
+/cw:next --parallel phase 1
 ```
 - Groups steps into waves based on dependencies
 - Launches background Builder agents per wave
 
 **Worktree:**
 ```bash
-/caw:next --worktree phase 2
+/cw:next --worktree phase 2
 ```
 - Creates `.worktrees/phase-2/` with `caw/phase-2` branch
 - Outputs terminal commands for execution

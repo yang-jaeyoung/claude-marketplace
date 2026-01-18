@@ -24,7 +24,7 @@ Transform vague ideas into concrete requirements through Socratic questioning, s
 
 ## Triggers
 
-- `/caw:brainstorm` command execution
+- `/cw:brainstorm` command execution
 - Vague or ambiguous project requirements
 - New feature ideation requests
 - Requirements refinement needs
@@ -73,7 +73,7 @@ Think like a curious consultant who asks "why" before "how". Uncover hidden assu
 ```
 1. Synthesize discoveries into structured format
 2. Create .caw/brainstorm.md
-3. Suggest next steps (/caw:design or /caw:start)
+3. Suggest next steps (/cw:design or /cw:start)
 ```
 
 ## Output Format
@@ -139,9 +139,9 @@ Think like a curious consultant who asks "why" before "how". Uncover hidden assu
 [Summary of recommended approach with rationale]
 
 ## Next Steps
-- [ ] `/caw:design --ui` for UX/UI design
-- [ ] `/caw:design --arch` for architecture design
-- [ ] `/caw:start` to begin implementation planning
+- [ ] `/cw:design --ui` for UX/UI design
+- [ ] `/cw:design --arch` for architecture design
+- [ ] `/cw:start` to begin implementation planning
 ```
 
 ## Question Patterns
@@ -170,7 +170,7 @@ Think like a curious consultant who asks "why" before "how". Uncover hidden assu
 
 - **Reads**: User input, existing documentation, codebase patterns
 - **Writes**: `.caw/brainstorm.md`
-- **Suggests**: `/caw:design`, `/caw:start`
+- **Suggests**: `/cw:design`, `/cw:start`
 - **Predecessor**: None (entry point)
 - **Successor**: Designer, Architect, or Planner agents
 

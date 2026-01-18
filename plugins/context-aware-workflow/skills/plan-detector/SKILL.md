@@ -66,8 +66,8 @@ Use AskUserQuestion to offer workflow options:
   [✅/⚠️] 기술 결정: [documented/not found]
 
 CAW 워크플로우 옵션:
-[1] 자동 시작 - /caw:start --from-plan 실행
-[2] 설계 먼저 - /caw:design 로 상세 설계 후 시작
+[1] 자동 시작 - /cw:start --from-plan 실행
+[2] 설계 먼저 - /cw:design 로 상세 설계 후 시작
 [3] 수동 진행 - 나중에 직접 시작
 [4] 계획 수정 - Plan Mode로 돌아가기
 ```
@@ -78,8 +78,8 @@ Based on user selection:
 
 | Option | Action |
 |--------|--------|
-| 1 | Invoke `/caw:start --from-plan` |
-| 2 | Invoke `/caw:design --all` |
+| 1 | Invoke `/cw:start --from-plan` |
+| 2 | Invoke `/cw:design --all` |
 | 3 | Display reminder message |
 | 4 | Suggest re-entering Plan Mode |
 
@@ -88,7 +88,7 @@ Based on user selection:
 - **Hook Trigger**: PostToolUse (ExitPlanMode)
 - **Pattern Reference**: `patterns.md` for plan file recognition
 - **Output**: User decision → appropriate command invocation
-- **Next Steps**: `/caw:start`, `/caw:design`, or manual workflow
+- **Next Steps**: `/cw:start`, `/cw:design`, or manual workflow
 
 ## Output Messages
 
@@ -116,7 +116,7 @@ Based on user selection:
 
 권장 사항:
   • Plan Mode에서 구현 단계를 더 상세히 작성
-  • 또는 /caw:start "task description" 으로 새로 시작
+  • 또는 /cw:start "task description" 으로 새로 시작
 ```
 
 ## Directory Structure

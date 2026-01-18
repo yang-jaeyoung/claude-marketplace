@@ -2,7 +2,7 @@
 description: Initialize CAW environment without starting a task. Sets up .caw/ workspace, detects project context, and prepares for workflow.
 ---
 
-# /caw:init - Environment Initialization
+# /cw:init - Environment Initialization
 
 Initialize the CAW environment without starting a planning workflow.
 
@@ -10,24 +10,24 @@ Initialize the CAW environment without starting a planning workflow.
 
 ```bash
 # Basic initialization
-/caw:init
+/cw:init
 
 # Force reset and reinitialize
-/caw:init --reset
+/cw:init --reset
 
 # Initialize with specific project type hint
-/caw:init --type nodejs
+/cw:init --type nodejs
 
 # Verbose mode for debugging
-/caw:init --verbose
-/caw:init -v
+/cw:init --verbose
+/cw:init -v
 
 # Quiet mode (errors only)
-/caw:init --quiet
-/caw:init -q
+/cw:init --quiet
+/cw:init -q
 
 # Machine-readable JSON output
-/caw:init --json
+/cw:init --json
 ```
 
 ## Flags
@@ -49,7 +49,7 @@ Initialize the CAW environment without starting a planning workflow.
 
 When invoked:
 
-1. **Invoke Bootstrapper Agent** using Task tool with `subagent_type="caw:bootstrapper"`
+1. **Invoke Bootstrapper Agent** using Task tool with `subagent_type="cw:bootstrapper"`
 2. Bootstrapper will:
    - Check if `.caw/` already exists
    - Create directory structure if needed
@@ -112,7 +112,7 @@ Current Status:
 - Last Updated: 2024-01-15
 - Serena Onboarding: ✅ Saved
 
-Use /caw:init --reset to reinitialize.
+Use /cw:init --reset to reinitialize.
 ```
 
 ## Output
@@ -130,25 +130,25 @@ After successful initialization:
 | Existing Plans | Found `.claude/plan.md` |
 
 ### Next Steps
-- `/caw:start "task description"` - Start planning a task
-- `/caw:start --from-plan` - Import existing plan
-- `/caw:context` - View current context
+- `/cw:start "task description"` - Start planning a task
+- `/cw:start --from-plan` - Import existing plan
+- `/cw:context` - View current context
 ```
 
 ## When to Use
 
 | Scenario | Command |
 |----------|---------|
-| New project, just want to set up CAW | `/caw:init` |
-| Want to start working on a task | `/caw:start "task"` (auto-inits) |
-| Reset after major project changes | `/caw:init --reset` |
-| Check if initialized | `/caw:status` |
-| Debug initialization issues | `/caw:init --verbose` |
-| CI/CD automation | `/caw:init --json` |
-| Minimal output in scripts | `/caw:init --quiet` |
+| New project, just want to set up CAW | `/cw:init` |
+| Want to start working on a task | `/cw:start "task"` (auto-inits) |
+| Reset after major project changes | `/cw:init --reset` |
+| Check if initialized | `/cw:status` |
+| Debug initialization issues | `/cw:init --verbose` |
+| CI/CD automation | `/cw:init --json` |
+| Minimal output in scripts | `/cw:init --quiet` |
 
 ## Integration
 
 - **Bootstrapper Agent**: This command directly invokes the Bootstrapper
-- **/caw:start**: Automatically calls init if not initialized
-- **/caw:status**: Shows initialization state
+- **/cw:start**: Automatically calls init if not initialized
+- **/cw:status**: Shows initialization state

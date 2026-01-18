@@ -73,26 +73,26 @@ If user_override detected:
 ### Automatic Routing
 ```bash
 # Simple task → Haiku
-/caw:start "fix typo in README"
+/cw:start "fix typo in README"
 # → Builder-Haiku selected (complexity: 0.15)
 
 # Standard task → Sonnet
-/caw:start "implement user profile page"
+/cw:start "implement user profile page"
 # → Builder-Sonnet selected (complexity: 0.55)
 
 # Complex task → Opus
-/caw:start "redesign authentication architecture"
+/cw:start "redesign authentication architecture"
 # → Builder-Opus selected (complexity: 0.85)
 ```
 
 ### Manual Override
 ```bash
 # Force fast execution
-/caw:start "quick fix the login bug"
+/cw:start "quick fix the login bug"
 # → Haiku forced via "quick" keyword
 
 # Force thorough analysis
-/caw:review --deep security audit
+/cw:review --deep security audit
 # → Opus forced via "deep" keyword
 ```
 

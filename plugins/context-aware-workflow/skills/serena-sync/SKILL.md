@@ -96,7 +96,7 @@ Report current sync state:
 | Lessons Learned | 2024-01-14 09:00 | 2024-01-15 16:00 | Serena newer |
 | Workflow Patterns | Not found | 2024-01-10 08:00 | Serena only |
 
-**Recommendation**: Run `/caw:sync` to synchronize
+**Recommendation**: Run `/cw:sync` to synchronize
 ```
 
 ## Conflict Resolution
@@ -269,19 +269,19 @@ Which version should be used?
 
 ```bash
 # Full bidirectional sync
-/caw:sync
+/cw:sync
 
 # Upload CAW knowledge to Serena
-/caw:sync --to-serena
+/cw:sync --to-serena
 
 # Restore from Serena memory
-/caw:sync --from-serena
+/cw:sync --from-serena
 
 # Check sync status
-/caw:sync --status
+/cw:sync --status
 
 # Force overwrite (no merge)
-/caw:sync --to-serena --force
+/cw:sync --to-serena --force
 ```
 
 ## Output Format

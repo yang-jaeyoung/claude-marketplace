@@ -12,9 +12,9 @@ whenToUse: |
 
   <example>
   Context: User wants to verify compliance before commit
-  user: "/caw:check"
+  user: "/cw:check"
   assistant: "I'll invoke the ComplianceChecker agent to validate compliance."
-  <Task tool invocation with subagent_type="caw:compliance-checker">
+  <Task tool invocation with subagent_type="cw:compliance-checker">
   </example>
 color: yellow
 tools:
@@ -204,10 +204,10 @@ Some issues can be fixed automatically:
 
 ```bash
 # Generate JSDoc templates
-/caw:fix --docs
+/cw:fix --docs
 
 # Update task_plan.md notes
-/caw:fix --workflow
+/cw:fix --workflow
 ```
 ```
 
@@ -253,7 +253,7 @@ def detect_rules():
 
 ## Integration Points
 
-- **Invoked by**: Pre-commit hook, `/caw:check` command
+- **Invoked by**: Pre-commit hook, `/cw:check` command
 - **Reads**: CLAUDE.md, task_plan.md, lint configs, source files
 - **Outputs**: Compliance report with actionable items
 - **Suggests**: Auto-fix commands, manual fix instructions
@@ -286,10 +286,10 @@ def detect_rules():
 For fast validation, support focused checks:
 
 ```bash
-/caw:check --workflow    # Only task_plan.md
-/caw:check --rules       # Only CLAUDE.md rules
-/caw:check --docs        # Only documentation
-/caw:check --conventions # Only code patterns
+/cw:check --workflow    # Only task_plan.md
+/cw:check --rules       # Only CLAUDE.md rules
+/cw:check --docs        # Only documentation
+/cw:check --conventions # Only code patterns
 ```
 
 ## Auto-Fix Capabilities

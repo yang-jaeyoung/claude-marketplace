@@ -5,44 +5,44 @@ model: haiku
 whenToUse: |
   Use the Bootstrapper agent when initializing a CAW workflow environment.
   This agent should be invoked:
-  - When user runs /caw:init to initialize environment only
-  - When /caw:start is called and .caw/ directory doesn't exist
+  - When user runs /cw:init to initialize environment only
+  - When /cw:start is called and .caw/ directory doesn't exist
   - When resetting or reinitializing the workflow environment
   - Before Planner agent on first-time project setup
 
   <example>
   Context: New project without .caw/ directory
-  user: "/caw:start Implement user authentication"
+  user: "/cw:start Implement user authentication"
   assistant: "I'll first invoke Bootstrapper to initialize the environment, then Planner for task planning."
-  <Task tool invocation with subagent_type="caw:bootstrapper">
+  <Task tool invocation with subagent_type="cw:bootstrapper">
   </example>
 
   <example>
   Context: User wants to initialize environment only
-  user: "/caw:init"
+  user: "/cw:init"
   assistant: "I'll invoke Bootstrapper to set up the CAW environment."
-  <Task tool invocation with subagent_type="caw:bootstrapper">
+  <Task tool invocation with subagent_type="cw:bootstrapper">
   </example>
 
   <example>
   Context: Reset existing environment
-  user: "/caw:init --reset"
+  user: "/cw:init --reset"
   assistant: "I'll archive existing state and reinitialize the environment."
-  <Task tool invocation with subagent_type="caw:bootstrapper">
+  <Task tool invocation with subagent_type="cw:bootstrapper">
   </example>
 
   <example>
   Context: Verbose initialization for debugging
-  user: "/caw:init --verbose"
+  user: "/cw:init --verbose"
   assistant: "I'll initialize with detailed logging output."
-  <Task tool invocation with subagent_type="caw:bootstrapper">
+  <Task tool invocation with subagent_type="cw:bootstrapper">
   </example>
 
   <example>
   Context: Machine-readable output for automation
-  user: "/caw:init --json"
+  user: "/cw:init --json"
   assistant: "I'll initialize and return JSON output."
-  <Task tool invocation with subagent_type="caw:bootstrapper">
+  <Task tool invocation with subagent_type="cw:bootstrapper">
   </example>
 color: green
 tools:
@@ -304,9 +304,9 @@ Provide summary to user:
 | `lessons_learned` | ⚠️ Not found |
 
 ### Next Steps
-- Run `/caw:start "task"` to begin planning
-- Run `/caw:start --from-plan` to import existing plan
-- Run `/caw:sync --status` to view Serena sync status
+- Run `/cw:start "task"` to begin planning
+- Run `/cw:start --from-plan` to import existing plan
+- Run `/cw:sync --status` to view Serena sync status
 ```
 
 ## Reset Mode (--reset flag)
@@ -357,9 +357,9 @@ If Serena memories exist, Planner should:
 2. Call `read_memory("lessons_learned")` for known gotchas
 3. Incorporate this knowledge into task planning
 
-### Invocation by /caw:start
+### Invocation by /cw:start
 
-The `/caw:start` command should:
+The `/cw:start` command should:
 1. Check if `.caw/context_manifest.json` exists
 2. If NOT exists → Invoke Bootstrapper first
 3. Then invoke Planner with initialized context
@@ -382,7 +382,7 @@ Cannot create `.caw/` directory. Please run:
 \`\`\`bash
 chmod 755 .
 \`\`\`
-Then retry `/caw:init`
+Then retry `/cw:init`
 
 # Disk Full Error
 ❌ **Disk Full**

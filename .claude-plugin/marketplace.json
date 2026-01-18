@@ -16,7 +16,7 @@
       "source": "./plugins/mssql"
     },
     {
-      "name": "caw",
+      "name": "cw",
       "description": "Context-aware workflow orchestration plugin with Plan Mode integration, intelligent context management, and structured task planning",
       "source": "./plugins/context-aware-workflow",
       "version": "1.0.0",

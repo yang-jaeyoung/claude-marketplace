@@ -59,5 +59,5 @@ Defines the structure for `.caw/mode.json` - tracks the active workflow mode.
 ## Integration
 
 - **Magic keywords**: Detected keywords set the active mode
-- **/caw:status**: Displays active mode in status output
+- **/cw:status**: Displays active mode in status output
 - **Agents**: Check mode.json to adapt behavior accordingly

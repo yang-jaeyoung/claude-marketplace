@@ -3,7 +3,7 @@ description: Synchronize CAW workflow state with Serena memory for cross-session
 argument-hint: "[--to-serena | --from-serena | --status]"
 ---
 
-# /caw:sync - Serena Memory Synchronization
+# /cw:sync - Serena Memory Synchronization
 
 Synchronize CAW workflow knowledge with Serena MCP memory system for cross-session persistence.
 
@@ -11,24 +11,24 @@ Synchronize CAW workflow knowledge with Serena MCP memory system for cross-sessi
 
 ```bash
 # Bidirectional sync (default)
-/caw:sync
+/cw:sync
 
 # Upload CAW knowledge to Serena
-/caw:sync --to-serena
+/cw:sync --to-serena
 
 # Restore knowledge from Serena
-/caw:sync --from-serena
+/cw:sync --from-serena
 
 # Check current sync status
-/caw:sync --status
+/cw:sync --status
 
 # Force overwrite without merge
-/caw:sync --to-serena --force
-/caw:sync --from-serena --force
+/cw:sync --to-serena --force
+/cw:sync --from-serena --force
 
 # Sync specific category only
-/caw:sync --category domain_knowledge
-/caw:sync --category lessons_learned
+/cw:sync --category domain_knowledge
+/cw:sync --category lessons_learned
 ```
 
 ## Flags
@@ -115,8 +115,8 @@ When invoked without flags:
 | project_onboarding | 2024-01-15 08:00 | 2024-01-15 08:00 | In sync |
 
 **Recommendation**:
-- Run `/caw:sync` to synchronize all
-- Or `/caw:sync --from-serena --category workflow_patterns` for specific
+- Run `/cw:sync` to synchronize all
+- Or `/cw:sync --from-serena --category workflow_patterns` for specific
 ```
 
 ### Successful Sync
@@ -158,25 +158,25 @@ When invoked without flags:
 
 **Recommendation**:
 - Check `.caw/learnings.md` format
-- Retry with `/caw:sync --category lessons_learned`
+- Retry with `/cw:sync --category lessons_learned`
 ```
 
 ## When to Use
 
 | Scenario | Command |
 |----------|---------|
-| End of work session | `/caw:sync --to-serena` |
-| Start of new session | `/caw:sync --from-serena` |
-| Regular sync check | `/caw:sync --status` |
-| Full bidirectional sync | `/caw:sync` |
-| After major discoveries | `/caw:sync --to-serena` |
-| Team knowledge share | `/caw:sync --to-serena` |
+| End of work session | `/cw:sync --to-serena` |
+| Start of new session | `/cw:sync --from-serena` |
+| Regular sync check | `/cw:sync --status` |
+| Full bidirectional sync | `/cw:sync` |
+| After major discoveries | `/cw:sync --to-serena` |
+| Team knowledge share | `/cw:sync --to-serena` |
 
 ## Integration
 
 - **serena-sync skill**: This command invokes the serena-sync skill
-- **/caw:init**: Automatically checks Serena for onboarding
-- **/caw:reflect**: Can trigger sync after Ralph Loop completion
+- **/cw:init**: Automatically checks Serena for onboarding
+- **/cw:reflect**: Can trigger sync after Ralph Loop completion
 - **SessionEnd hook**: Can auto-sync on session end (if configured)
 
 ## Error Handling
@@ -190,7 +190,7 @@ When invoked without flags:
 
 ## Best Practices
 
-1. **Sync regularly**: Run `/caw:sync --status` to check sync state
+1. **Sync regularly**: Run `/cw:sync --status` to check sync state
 2. **Before major changes**: Sync to Serena as backup
 3. **After learning**: Sync lessons immediately
 4. **New session**: Check for Serena context first

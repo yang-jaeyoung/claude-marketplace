@@ -13,8 +13,8 @@ Context-aware workflow orchestration plugin for Claude Code. Acts as a **Context
 
 ### MVP (v0.1.0)
 
-- `/caw:init` - Initialize CAW environment (standalone setup)
-- `/caw:start` - Initialize workflow with task description or import Plan Mode plans
+- `/cw:init` - Initialize CAW environment (standalone setup)
+- `/cw:start` - Initialize workflow with task description or import Plan Mode plans
 - **Bootstrapper Agent** - Environment initialization and project detection
 - **Planner Agent** - Analyzes requirements and generates structured `task_plan.md`
 - **ContextManager Skill** - Intelligent context file management (pack, prune, search)
@@ -36,23 +36,23 @@ cp -r context-aware-workflow /your/project/.claude-plugin/
 
 ```bash
 # Initialize CAW environment only
-/caw:init
+/cw:init
 
 # Reset and reinitialize
-/caw:init --reset
+/cw:init --reset
 ```
 
 ### Start a New Workflow
 
 ```bash
 # With task description (auto-initializes if needed)
-/caw:start "Implement user authentication with JWT"
+/cw:start "Implement user authentication with JWT"
 
 # Import from Plan Mode
-/caw:start --from-plan
+/cw:start --from-plan
 
 # Specify plan file
-/caw:start --plan-file .claude/plan.md
+/cw:start --plan-file .claude/plan.md
 ```
 
 ### Workflow Loop
@@ -118,7 +118,7 @@ CAW tracks workflow mode to adapt agent behavior:
 - **DEEP_WORK mode**: Agents prioritize thoroughness over speed
 - **MINIMAL_CHANGE mode**: Agents focus on quick, targeted fixes
 
-Use `/caw:status` to see current mode and task progress.
+Use `/cw:status` to see current mode and task progress.
 
 ## Ralph Loop - Continuous Improvement
 
@@ -138,13 +138,13 @@ CAW includes a continuous improvement cycle inspired by systematic learning prac
 
 ```bash
 # Reflect on last completed task
-/caw:reflect
+/cw:reflect
 
 # Reflect on specific step
-/caw:reflect --task 2.3
+/cw:reflect --task 2.3
 
 # Full workflow retrospective
-/caw:reflect --full
+/cw:reflect --full
 ```
 
 ### Output Example
@@ -174,7 +174,7 @@ CAW includes a continuous improvement cycle inspired by systematic learning prac
 
 - **Serena Memory**: Stores learnings for future sessions
 - **Learnings File**: `.caw/learnings.md` accumulates insights
-- **Status Command**: `/caw:status` suggests reflection when appropriate
+- **Status Command**: `/cw:status` suggests reflection when appropriate
 
 ## Model Routing System
 
@@ -201,12 +201,12 @@ CAW automatically selects the optimal model tier based on task complexity:
 
 Force a specific model tier with flags:
 ```bash
-/caw:review --haiku     # Quick review
-/caw:review --sonnet    # Standard review
-/caw:review --security  # Auto-selects Opus
+/cw:review --haiku     # Quick review
+/cw:review --sonnet    # Standard review
+/cw:review --security  # Auto-selects Opus
 
-/caw:fix --deep         # Sonnet-level fixes
-/caw:fix --opus         # Force Opus for complex refactoring
+/cw:fix --deep         # Sonnet-level fixes
+/cw:fix --opus         # Force Opus for complex refactoring
 ```
 
 ### Agent-Specific Routing
@@ -246,17 +246,17 @@ Each agent has tier-specific implementations:
 
 | Command | Description |
 |---------|-------------|
-| `/caw:init` | Initialize CAW environment (creates `.caw/` directory) |
-| `/caw:start` | Start a new workflow with task description or import Plan Mode plans |
-| `/caw:status` | Display current workflow status with visual progress bar |
-| `/caw:next` | Execute the next pending step from task plan |
-| `/caw:review` | Run code review with configurable depth (--haiku/--sonnet/--opus) |
-| `/caw:fix` | Apply fixes from review results (auto-fix or manual) |
-| `/caw:check` | Validate compliance with project rules and conventions |
-| `/caw:context` | Manage context files (add, remove, pack, view) |
-| `/caw:brainstorm` | Interactive requirements discovery through Socratic dialogue |
-| `/caw:design` | Create UX/UI or architecture design documents |
-| `/caw:reflect` | Run Ralph Loop - continuous improvement cycle |
+| `/cw:init` | Initialize CAW environment (creates `.caw/` directory) |
+| `/cw:start` | Start a new workflow with task description or import Plan Mode plans |
+| `/cw:status` | Display current workflow status with visual progress bar |
+| `/cw:next` | Execute the next pending step from task plan |
+| `/cw:review` | Run code review with configurable depth (--haiku/--sonnet/--opus) |
+| `/cw:fix` | Apply fixes from review results (auto-fix or manual) |
+| `/cw:check` | Validate compliance with project rules and conventions |
+| `/cw:context` | Manage context files (add, remove, pack, view) |
+| `/cw:brainstorm` | Interactive requirements discovery through Socratic dialogue |
+| `/cw:design` | Create UX/UI or architecture design documents |
+| `/cw:reflect` | Run Ralph Loop - continuous improvement cycle |
 
 ## Schema Reference
 
@@ -276,7 +276,7 @@ Schemas are located in `schemas/` and `_shared/schemas/`:
 
 ### Completed (v1.5.0)
 - [x] Ralph Loop continuous improvement cycle (RALPH: Reflect-Analyze-Learn-Plan-Habituate)
-- [x] `/caw:reflect` skill for post-task improvement analysis
+- [x] `/cw:reflect` skill for post-task improvement analysis
 - [x] Learnings persistence (`.caw/learnings.md`, Serena memories)
 - [x] Ralph Loop schema for structured improvement data
 
@@ -289,7 +289,7 @@ Schemas are located in `schemas/` and `_shared/schemas/`:
 
 ### Completed (v1.3.0)
 - [x] Magic Keyword detection for workflow modes
-- [x] Visual progress bar in `/caw:status`
+- [x] Visual progress bar in `/cw:status`
 - [x] Mode state persistence (`.caw/mode.json`)
 
 ### Completed (v1.2.1)
@@ -299,17 +299,17 @@ Schemas are located in `schemas/` and `_shared/schemas/`:
 
 ### Completed (v1.2.0)
 - [x] Fixer Agent for intelligent code fixes
-- [x] `/caw:fix` - Review result auto/manual fixing
+- [x] `/cw:fix` - Review result auto/manual fixing
 
 ### Completed (v1.1.0)
 - [x] Bootstrapper Agent for environment initialization
-- [x] `/caw:init` - Environment setup command
+- [x] `/cw:init` - Environment setup command
 
 ### Completed (v1.0.0)
 - [x] Builder Agent for TDD execution
 - [x] Reviewer Agent for code quality review
-- [x] `/caw:status` - Workflow state display
-- [x] `/caw:review` - Plan/code review trigger
+- [x] `/cw:status` - Workflow state display
+- [x] `/cw:review` - Plan/code review trigger
 - [x] ComplianceChecker Agent for guideline compliance
 
 ### Planned

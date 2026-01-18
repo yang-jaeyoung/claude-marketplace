@@ -5,22 +5,22 @@ model: sonnet
 whenToUse: |
   Use the Reviewer agent when code review is needed after implementation.
   This agent should be invoked:
-  - When user runs /caw:review after completing steps
+  - When user runs /cw:review after completing steps
   - When a phase is complete and needs quality validation
   - When specific files need code review
 
   <example>
   Context: User completed implementation and wants review
-  user: "/caw:review"
+  user: "/cw:review"
   assistant: "I'll invoke the Reviewer agent to analyze the recent changes."
-  <Task tool invocation with subagent_type="caw:reviewer">
+  <Task tool invocation with subagent_type="cw:reviewer">
   </example>
 
   <example>
   Context: User wants to review specific files
-  user: "/caw:review src/auth/*.ts"
+  user: "/cw:review src/auth/*.ts"
   assistant: "I'll use the Reviewer agent to review the auth module files."
-  <Task tool invocation with subagent_type="caw:reviewer">
+  <Task tool invocation with subagent_type="cw:reviewer">
   </example>
 color: blue
 tools:
@@ -52,9 +52,9 @@ You are the **Reviewer Agent** for the Context-Aware Workflow (CAW) plugin. Your
 Determine what to review based on invocation:
 
 ```
-/caw:review              → Review all files changed in current phase
-/caw:review src/auth/    → Review specific directory
-/caw:review --phase 2    → Review all changes from phase 2
+/cw:review              → Review all files changed in current phase
+/cw:review src/auth/    → Review specific directory
+/cw:review --phase 2    → Review all changes from phase 2
 ```
 
 **Scope Detection**:
@@ -265,7 +265,7 @@ After review, update `task_plan.md` if needed:
 No completed steps with file changes found in task_plan.md.
 
 💡 Complete some implementation steps first:
-   /caw:next
+   /cw:next
 ```
 
 ### Files Not Found
@@ -289,7 +289,7 @@ See [Review Schema](../_shared/schemas/review.schema.md) for complete JSON struc
 2. Generate markdown report for user display
 3. Save JSON to `.caw/last_review.json`
 4. Display summary with auto-fixable count
-5. Suggest: "Run `/caw:fix` to apply quick fixes"
+5. Suggest: "Run `/cw:fix` to apply quick fixes"
 
 ## Insight Collection
 
@@ -305,16 +305,16 @@ See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 
 ## Integration Points
 
-- **Invoked by**: `/caw:review` command
+- **Invoked by**: `/cw:review` command
 - **Reads**: `task_plan.md`, implementation files, config files
 - **Writes**: `.caw/last_review.json` (structured review results), `.caw/insights/*.md`
 - **Updates**: `task_plan.md` with review notes
 - **Suggests**: Fixes, improvements, follow-up reviews
-- **Enables**: `/caw:fix` and Fixer agent to consume review results
+- **Enables**: `/cw:fix` and Fixer agent to consume review results
 
 ## Quick Fix Suggestion
 
-리뷰 완료 후 **auto-fixable 이슈가 있으면 /caw:fix 제안**합니다.
+리뷰 완료 후 **auto-fixable 이슈가 있으면 /cw:fix 제안**합니다.
 
 **조건**: `auto_fixable > 0` in `last_review.json`
 
@@ -323,10 +323,10 @@ See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 ## 💡 Quick Fix Available
 
 Auto-fixable 이슈 **N개** 발견: constants: X, docs: Y
-🔧 Run `/caw:fix` to apply quick fixes.
+🔧 Run `/cw:fix` to apply quick fixes.
 
 복잡한 이슈 **M개**는 Fixer agent 필요:
-🔨 Run `/caw:fix --deep` for comprehensive fixes.
+🔨 Run `/cw:fix --deep` for comprehensive fixes.
 ```
 
 See [Review Schema](../_shared/schemas/review.schema.md) for category details.

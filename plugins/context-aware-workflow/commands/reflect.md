@@ -2,16 +2,16 @@
 description: Run Ralph Loop - continuous improvement cycle after task completion (Reflect-Analyze-Learn-Plan-Habituate)
 ---
 
-# /caw:reflect - Ralph Loop Improvement Cycle
+# /cw:reflect - Ralph Loop Improvement Cycle
 
 Run the Ralph Loop continuous improvement cycle after completing a task or workflow.
 
 ## Usage
 
 ```bash
-/caw:reflect              # Reflect on last completed task
-/caw:reflect --task 2.3   # Reflect on specific step
-/caw:reflect --full       # Full workflow retrospective
+/cw:reflect              # Reflect on last completed task
+/cw:reflect --task 2.3   # Reflect on specific step
+/cw:reflect --full       # Full workflow retrospective
 ```
 
 ## Behavior
@@ -185,12 +185,12 @@ write_memory("ralph_learning_[date]", insights)
 
 Consider running reflection when tasks complete:
 ```
-💡 Task complete. Consider /caw:reflect for continuous improvement.
+💡 Task complete. Consider /cw:reflect for continuous improvement.
 ```
 
 ## Auto-Reflection Triggers
 
-Consider running `/caw:reflect` when:
+Consider running `/cw:reflect` when:
 - Task took 2x longer than estimated
 - Multiple blockers were encountered
 - User explicitly requested deep work mode
@@ -220,10 +220,10 @@ Insights are accumulated in `.caw/learnings.md`:
 
 Cannot run reflection without context.
 Please start a workflow first:
-   /caw:start "your task description"
+   /cw:start "your task description"
 
 Or specify what to reflect on:
-   /caw:reflect --task "manual task description"
+   /cw:reflect --task "manual task description"
 ```
 
 ### Empty Execution History
@@ -234,5 +234,5 @@ Or specify what to reflect on:
 Proceeding with available context...
 [Partial reflection based on task_plan.md only]
 
-💡 For richer reflections, use /caw:next to execute tasks
+💡 For richer reflections, use /cw:next to execute tasks
 ```

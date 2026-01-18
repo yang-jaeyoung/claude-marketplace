@@ -2,18 +2,18 @@
 description: Display current workflow status, progress, and next actions
 ---
 
-# /caw:status - Workflow Status
+# /cw:status - Workflow Status
 
 Display current state of the context-aware workflow.
 
 ## Usage
 
 ```bash
-/caw:status             # Standard status
-/caw:status --verbose   # Detailed with file lists
-/caw:status --worktrees # Show active worktree status
-/caw:status --agents    # Show background agent status
-/caw:status --all       # Everything (verbose + worktrees + agents)
+/cw:status             # Standard status
+/cw:status --verbose   # Detailed with file lists
+/cw:status --worktrees # Show active worktree status
+/cw:status --agents    # Show background agent status
+/cw:status --all       # Everything (verbose + worktrees + agents)
 ```
 
 ## Behavior

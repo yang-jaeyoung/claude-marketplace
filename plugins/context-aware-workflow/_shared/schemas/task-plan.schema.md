@@ -237,15 +237,15 @@ JWT 기반 사용자 인증 시스템을 구현합니다. Tidy First 방법론�
 # Phase 1 완료 후
 
 # 터미널 1 (메인)
-/caw:next --worktree phase 2
+/cw:next --worktree phase 2
 
 # 터미널 2
-/caw:next --worktree phase 3
+/cw:next --worktree phase 3
 
 # 각 worktree에서
 cd .worktrees/phase-2 && claude
-/caw:next --parallel phase 2  # 2.2, 2.3 병렬 실행
+/cw:next --parallel phase 2  # 2.2, 2.3 병렬 실행
 
 # 완료 후 메인에서
-/caw:merge --all
+/cw:merge --all
 ```

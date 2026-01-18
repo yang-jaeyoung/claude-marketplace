@@ -1,6 +1,6 @@
 ---
 name: pattern-learner
-description: Analyzes codebase to learn project-specific patterns including code style, architecture conventions, and testing approaches. Invoked during /caw:start or when agents need pattern information for consistency.
+description: Analyzes codebase to learn project-specific patterns including code style, architecture conventions, and testing approaches. Invoked during /cw:start or when agents need pattern information for consistency.
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
@@ -18,7 +18,7 @@ Analyzes codebase to learn and document project-specific coding patterns for con
 
 이 Skill은 다음 상황에서 활성화됩니다:
 
-1. **/caw:start 실행**
+1. **/cw:start 실행**
    - 워크플로우 시작 시 자동 분석
    - 프로젝트 패턴 초기 학습
 
@@ -265,7 +265,7 @@ analyze:
 ## Example Flow
 
 ```
-1. 사용자: "/caw:start"
+1. 사용자: "/cw:start"
 
 2. pattern-learner 활성화
    - 설정 파일 탐색

@@ -36,44 +36,44 @@ claude plugin add /path/to/context-aware-workflow
 ### 첫 사용 (2분 완성)
 
 ```bash
-# 1. 환경 초기화 (선택 - /caw:start에서 자동 실행됨)
-/caw:init
+# 1. 환경 초기화 (선택 - /cw:start에서 자동 실행됨)
+/cw:init
 
 # 2. 새 작업 시작
-/caw:start "JWT 인증 시스템 구현"
+/cw:start "JWT 인증 시스템 구현"
 
 # 3. 현재 상태 확인
-/caw:status
+/cw:status
 
 # 4. 다음 단계 자동 실행 (병렬 실행 기본)
-/caw:next
+/cw:next
 
 # 5. 코드 리뷰
-/caw:review
+/cw:review
 
 # 6. 지속적 개선 (Ralph Loop)
-/caw:reflect
+/cw:reflect
 ```
 
 ### 명령어 한눈에 보기
 
 | 명령어 | 단축형 | 설명 |
 |--------|--------|------|
-| `/context-aware-workflow:init` | `/caw:init` | 환경 초기화 (자동 실행) |
-| `/context-aware-workflow:brainstorm` | `/caw:brainstorm` | 요구사항 발굴 (선택) |
-| `/context-aware-workflow:design` | `/caw:design` | UX/UI, 아키텍처 설계 (선택) |
-| `/context-aware-workflow:start` | `/caw:start` | 워크플로우 시작 |
-| `/context-aware-workflow:status` | `/caw:status` | 진행 상태 표시 |
-| `/context-aware-workflow:next` | `/caw:next` | 다음 단계 실행 (자동 병렬) |
-| `/context-aware-workflow:review` | `/caw:review` | 코드 리뷰 |
-| `/context-aware-workflow:fix` | `/caw:fix` | 리뷰 결과 수정 |
-| `/context-aware-workflow:check` | `/caw:check` | 규칙 준수 검증 |
-| `/context-aware-workflow:context` | `/caw:context` | 컨텍스트 관리 |
-| `/context-aware-workflow:tidy` | `/caw:tidy` | Tidy First 분석/적용 (NEW) |
-| `/context-aware-workflow:reflect` | `/caw:reflect` | Ralph Loop 개선 사이클 |
-| `/context-aware-workflow:sync` | `/caw:sync` | Serena 메모리 동기화 |
-| `/context-aware-workflow:worktree` | `/caw:worktree` | Git Worktree 관리 |
-| `/context-aware-workflow:merge` | `/caw:merge` | Worktree 브랜치 병합 |
+| `/context-aware-workflow:init` | `/cw:init` | 환경 초기화 (자동 실행) |
+| `/context-aware-workflow:brainstorm` | `/cw:brainstorm` | 요구사항 발굴 (선택) |
+| `/context-aware-workflow:design` | `/cw:design` | UX/UI, 아키텍처 설계 (선택) |
+| `/context-aware-workflow:start` | `/cw:start` | 워크플로우 시작 |
+| `/context-aware-workflow:status` | `/cw:status` | 진행 상태 표시 |
+| `/context-aware-workflow:next` | `/cw:next` | 다음 단계 실행 (자동 병렬) |
+| `/context-aware-workflow:review` | `/cw:review` | 코드 리뷰 |
+| `/context-aware-workflow:fix` | `/cw:fix` | 리뷰 결과 수정 |
+| `/context-aware-workflow:check` | `/cw:check` | 규칙 준수 검증 |
+| `/context-aware-workflow:context` | `/cw:context` | 컨텍스트 관리 |
+| `/context-aware-workflow:tidy` | `/cw:tidy` | Tidy First 분석/적용 (NEW) |
+| `/context-aware-workflow:reflect` | `/cw:reflect` | Ralph Loop 개선 사이클 |
+| `/context-aware-workflow:sync` | `/cw:sync` | Serena 메모리 동기화 |
+| `/context-aware-workflow:worktree` | `/cw:worktree` | Git Worktree 관리 |
+| `/context-aware-workflow:merge` | `/cw:merge` | Worktree 브랜치 병합 |
 
 ---
 
@@ -134,7 +134,7 @@ claude plugin add /path/to/context-aware-workflow
 CAW는 기본적으로 **자동 병렬 실행**을 지원합니다:
 
 ```
-/caw:next 실행 시:
+/cw:next 실행 시:
 1. dependency-analyzer로 실행 가능한 step 분석
 2. 병렬 가능 step 개수 확인:
    - 0개: "No runnable steps" 메시지
@@ -200,14 +200,14 @@ Kent Beck의 **Tidy First** 방법론을 적용하여 코드 품질을 향상시
 4. Quality Gate가 혼합 변경 검출 시 차단
 ```
 
-#### /caw:tidy 명령어
+#### /cw:tidy 명령어
 
 ```bash
-/caw:tidy                  # 현재 step 대상 분석
-/caw:tidy --scope src/     # 특정 디렉토리 분석
-/caw:tidy --preview        # 미리보기만 (변경 없음)
-/caw:tidy --apply          # 변경 적용
-/caw:tidy --add-step       # Tidy step 추가
+/cw:tidy                  # 현재 step 대상 분석
+/cw:tidy --scope src/     # 특정 디렉토리 분석
+/cw:tidy --preview        # 미리보기만 (변경 없음)
+/cw:tidy --apply          # 변경 적용
+/cw:tidy --add-step       # Tidy step 추가
 ```
 
 ### 6. 에이전트 시스템
@@ -245,7 +245,7 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
       │
       ▼
 ┌─────────────┐
-│ BOOTSTRAPPER│  ◄── /caw:init (자동 또는 수동)
+│ BOOTSTRAPPER│  ◄── /cw:init (자동 또는 수동)
 │   (haiku)   │
 ├─────────────┤
 │ • 환경 체크  │
@@ -262,7 +262,7 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 │  │   IDEATOR     │    │   DESIGNER    │    │   ARCHITECT   │               │
 │  │   (sonnet)    │    │   (sonnet)    │    │   (sonnet)    │               │
 │  ├───────────────┤    ├───────────────┤    ├───────────────┤               │
-│  │/caw:brainstorm│    │/caw:design    │    │/caw:design    │               │
+│  │/cw:brainstorm│    │/cw:design    │    │/cw:design    │               │
 │  │               │    │  --ui         │    │  --arch       │               │
 │  └───────┬───────┘    └───────┬───────┘    └───────┬───────┘               │
 │          │                    │                    │                        │
@@ -275,7 +275,7 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 │                         [핵심 Implementation Phase]                          │
 │                                                                              │
 │  ┌───────────────┐                                                           │
-│  │    PLANNER    │  ◄── /caw:start "작업 설명"                               │
+│  │    PLANNER    │  ◄── /cw:start "작업 설명"                               │
 │  │ (haiku/sonnet │                                                           │
 │  │  /opus 자동)  │                                                           │
 │  ├───────────────┤                                                           │
@@ -288,7 +288,7 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 │          ▼ task_plan.md                                                      │
 │          │                                                                   │
 │  ┌───────────────┐     ┌───────────────┐                                     │
-│  │    BUILDER    │  ◄──│   WORKTREE    │  ◄── /caw:worktree (선택)          │
+│  │    BUILDER    │  ◄──│   WORKTREE    │  ◄── /cw:worktree (선택)          │
 │  │ (자동 병렬)   │     │  (Phase별     │                                     │
 │  │              │     │   격리 실행)  │                                     │
 │  ├───────────────┤     └───────────────┘                                     │
@@ -310,8 +310,8 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 │  │   REVIEWER    │         │    FIXER      │         │  COMPLIANCE   │      │
 │  │ (haiku/sonnet │         │ (haiku/sonnet)│         │   CHECKER     │      │
 │  │  /opus 자동)  │         ├───────────────┤         │   (haiku)     │      │
-│  ├───────────────┤         │/caw:fix       │         ├───────────────┤      │
-│  │/caw:review    │   ────▶ │  --deep       │         │/caw:check     │      │
+│  ├───────────────┤         │/cw:fix       │         ├───────────────┤      │
+│  │/cw:review    │   ────▶ │  --deep       │         │/cw:check     │      │
 │  └───────┬───────┘         └───────┬───────┘         └───────┬───────┘      │
 │          │                         │                         │              │
 │          ▼                         ▼                         ▼              │
@@ -327,7 +327,7 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 │  │  RALPH LOOP   │         │  SERENA SYNC  │                                │
 │  │               │         │               │                                │
 │  ├───────────────┤         ├───────────────┤                                │
-│  │/caw:reflect   │         │/caw:sync      │                                │
+│  │/cw:reflect   │         │/cw:sync      │                                │
 │  │ R-A-L-P-H     │         │ 지식 영속화   │                                │
 │  └───────┬───────┘         └───────┬───────┘                                │
 │          │                         │                                        │
@@ -342,7 +342,7 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 
 **간단 워크플로우**:
 ```
-/caw:init → /caw:brainstorm → /caw:design → /caw:start → /caw:next → /caw:review → /caw:fix → /caw:check → /caw:reflect
+/cw:init → /cw:brainstorm → /cw:design → /cw:start → /cw:next → /cw:review → /cw:fix → /cw:check → /cw:reflect
     ↓            ↓                ↓             ↓            ↓            ↓           ↓          ↓           ↓
   환경설정   brainstorm.md   design/*.md  task_plan.md   구현 코드    리뷰 리포트  수정코드    검증 리포트  learnings
   (자동)       (선택)          (선택)        (필수)      (자동 병렬)   (권장)      (선택)      (권장)       (선택)
@@ -352,21 +352,21 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 
 ## 📌 명령어 상세
 
-### `/caw:init` - 환경 초기화
+### `/cw:init` - 환경 초기화
 
-CAW 환경을 초기화합니다. `/caw:start` 실행 시 자동으로 호출되지만, 수동으로도 실행 가능합니다.
+CAW 환경을 초기화합니다. `/cw:start` 실행 시 자동으로 호출되지만, 수동으로도 실행 가능합니다.
 
 #### 사용법
 
 ```bash
 # 환경 초기화 (자동 탐지)
-/caw:init
+/cw:init
 
 # 환경 리셋 (기존 환경 삭제 후 재생성)
-/caw:init --reset
+/cw:init --reset
 
 # 특정 프로젝트 타입 지정
-/caw:init --type typescript
+/cw:init --type typescript
 ```
 
 #### Bootstrapper 에이전트 동작
@@ -378,7 +378,7 @@ CAW 환경을 초기화합니다. `/caw:start` 실행 시 자동으로 호출되
 
 ---
 
-### `/caw:start` - 워크플로우 시작
+### `/cw:start` - 워크플로우 시작
 
 워크플로우 세션을 시작하고 `.caw/task_plan.md`를 생성합니다.
 
@@ -386,18 +386,18 @@ CAW 환경을 초기화합니다. `/caw:start` 실행 시 자동으로 호출되
 
 ```bash
 # 새 작업 시작 (가장 일반적)
-/caw:start "사용자 인증 시스템 구현"
+/cw:start "사용자 인증 시스템 구현"
 
 # Plan Mode 계획 가져오기
-/caw:start --from-plan
+/cw:start --from-plan
 
 # 특정 계획 파일 지정
-/caw:start --plan-file docs/feature-plan.md
+/cw:start --plan-file docs/feature-plan.md
 ```
 
 ---
 
-### `/caw:next` - 다음 단계 실행 (자동 병렬)
+### `/cw:next` - 다음 단계 실행 (자동 병렬)
 
 Builder 에이전트를 호출하여 다음 Pending 단계를 자동 구현합니다. **v1.5.0부터 자동 병렬 실행이 기본값입니다.**
 
@@ -405,19 +405,19 @@ Builder 에이전트를 호출하여 다음 Pending 단계를 자동 구현합�
 
 ```bash
 # 기본 - 자동 병렬 (DEFAULT)
-/caw:next                      # 병렬 가능 step ≥2개 → 자동 background 병렬 실행
-/caw:next --sequential         # 강제 순차 실행 (병렬 가능해도 단일 step만)
-/caw:next --step 2.3           # 특정 step 실행
+/cw:next                      # 병렬 가능 step ≥2개 → 자동 background 병렬 실행
+/cw:next --sequential         # 강제 순차 실행 (병렬 가능해도 단일 step만)
+/cw:next --step 2.3           # 특정 step 실행
 
 # Phase 기반 실행
-/caw:next phase 1              # Phase 1 실행 (자동 병렬 적용)
-/caw:next --sequential phase 1 # Phase 1 순차 실행
-/caw:next --parallel phase 1   # Phase 1 강제 병렬 (1개여도 background)
-/caw:next --worktree phase 2   # Phase 2용 worktree 생성
+/cw:next phase 1              # Phase 1 실행 (자동 병렬 적용)
+/cw:next --sequential phase 1 # Phase 1 순차 실행
+/cw:next --parallel phase 1   # Phase 1 강제 병렬 (1개여도 background)
+/cw:next --worktree phase 2   # Phase 2용 worktree 생성
 
 # 배치 제어
-/caw:next --batch 3            # 최대 3개 step 병렬 실행
-/caw:next --all                # 현재 phase 전체 순차 실행
+/cw:next --batch 3            # 최대 3개 step 병렬 실행
+/cw:next --all                # 현재 phase 전체 순차 실행
 ```
 
 #### 플래그
@@ -448,12 +448,12 @@ Starting parallel execution...
   🔄 Agent 2: Step 2.2 (background)
   🔄 Agent 3: Step 2.3 (background)
 
-💡 Run /caw:status to check progress
+💡 Run /cw:status to check progress
 ```
 
 ---
 
-### `/caw:review` - 코드 리뷰
+### `/cw:review` - 코드 리뷰
 
 Reviewer 에이전트를 호출하여 코드 품질을 분석합니다.
 
@@ -461,22 +461,22 @@ Reviewer 에이전트를 호출하여 코드 품질을 분석합니다.
 
 ```bash
 # 현재 Phase 리뷰 (기본)
-/caw:review
+/cw:review
 
 # 특정 Phase 리뷰
-/caw:review --phase 2
+/cw:review --phase 2
 
 # 딥 리뷰 (보안/성능 집중)
-/caw:review --deep
+/cw:review --deep
 
 # 특정 영역 집중
-/caw:review --focus security
-/caw:review --focus performance
+/cw:review --focus security
+/cw:review --focus performance
 ```
 
 ---
 
-### `/caw:fix` - 리뷰 결과 수정
+### `/cw:fix` - 리뷰 결과 수정
 
 Reviewer 결과를 기반으로 코드를 자동 또는 대화형으로 수정합니다.
 
@@ -484,23 +484,23 @@ Reviewer 결과를 기반으로 코드를 자동 또는 대화형으로 수정�
 
 ```bash
 # 간단한 이슈 자동 수정 (기본)
-/caw:fix
+/cw:fix
 
 # 대화형 모드 (수정 전 확인)
-/caw:fix --interactive
+/cw:fix --interactive
 
 # 특정 카테고리만 수정
-/caw:fix --category docs       # 문서 (JSDoc 등)
-/caw:fix --category style      # 스타일/린트
-/caw:fix --category constants  # 매직 넘버 상수화
+/cw:fix --category docs       # 문서 (JSDoc 등)
+/cw:fix --category style      # 스타일/린트
+/cw:fix --category constants  # 매직 넘버 상수화
 
 # 복잡한 리팩토링 (Fixer 에이전트 사용)
-/caw:fix --deep
+/cw:fix --deep
 ```
 
 ---
 
-### `/caw:tidy` - Tidy First 분석/적용 (NEW)
+### `/cw:tidy` - Tidy First 분석/적용 (NEW)
 
 Kent Beck의 Tidy First 방법론을 적용하여 구조적 개선을 분석하고 적용합니다.
 
@@ -508,22 +508,22 @@ Kent Beck의 Tidy First 방법론을 적용하여 구조적 개선을 분석하�
 
 ```bash
 # 현재 step 대상 분석 (기본)
-/caw:tidy
+/cw:tidy
 
 # 특정 디렉토리/파일 분석
-/caw:tidy --scope src/auth/
+/cw:tidy --scope src/auth/
 
 # 미리보기만 (변경 없음)
-/caw:tidy --preview
+/cw:tidy --preview
 
 # 분석된 변경 적용
-/caw:tidy --apply
+/cw:tidy --apply
 
 # Tidy step을 task_plan.md에 추가
-/caw:tidy --add-step
+/cw:tidy --add-step
 
 # 변경 적용 후 커밋
-/caw:tidy --commit
+/cw:tidy --commit
 ```
 
 #### 플래그
@@ -570,17 +570,17 @@ Kent Beck의 Tidy First 방법론을 적용하여 구조적 개선을 분석하�
 ## Recommended Actions
 
 Option 1: Add Tidy Step (Recommended)
-  → `/caw:tidy --add-step`
+  → `/cw:tidy --add-step`
   → Creates Step 2.0 with tidy tasks
 
 Option 2: Apply Now
-  → `/caw:tidy --apply`
+  → `/cw:tidy --apply`
   → Apply changes immediately
 ```
 
 #### Tidy Step 추가 결과
 
-`/caw:tidy --add-step` 실행 시 task_plan.md가 다음과 같이 업데이트됩니다:
+`/cw:tidy --add-step` 실행 시 task_plan.md가 다음과 같이 업데이트됩니다:
 
 **Before:**
 ```markdown
@@ -595,7 +595,7 @@ Option 2: Apply Now
 
 ---
 
-### `/caw:reflect` - Ralph Loop 개선 사이클 (NEW)
+### `/cw:reflect` - Ralph Loop 개선 사이클 (NEW)
 
 작업 완료 후 지속적 개선 사이클을 실행합니다.
 
@@ -603,13 +603,13 @@ Option 2: Apply Now
 
 ```bash
 # 마지막 완료 작업 회고
-/caw:reflect
+/cw:reflect
 
 # 특정 step 회고
-/caw:reflect --task 2.3
+/cw:reflect --task 2.3
 
 # 전체 워크플로우 회고
-/caw:reflect --full
+/cw:reflect --full
 ```
 
 #### Ralph Loop 단계
@@ -662,7 +662,7 @@ Option 2: Apply Now
 
 ---
 
-### `/caw:sync` - Serena 메모리 동기화 (NEW)
+### `/cw:sync` - Serena 메모리 동기화 (NEW)
 
 CAW 워크플로우 지식을 Serena MCP 메모리 시스템과 동기화합니다.
 
@@ -670,19 +670,19 @@ CAW 워크플로우 지식을 Serena MCP 메모리 시스템과 동기화합니�
 
 ```bash
 # 양방향 동기화 (기본)
-/caw:sync
+/cw:sync
 
 # CAW → Serena 업로드
-/caw:sync --to-serena
+/cw:sync --to-serena
 
 # Serena → CAW 복원
-/caw:sync --from-serena
+/cw:sync --from-serena
 
 # 동기화 상태 확인
-/caw:sync --status
+/cw:sync --status
 
 # 강제 덮어쓰기
-/caw:sync --to-serena --force
+/cw:sync --to-serena --force
 ```
 
 #### 동기화 카테고리
@@ -696,7 +696,7 @@ CAW 워크플로우 지식을 Serena MCP 메모리 시스템과 동기화합니�
 
 ---
 
-### `/caw:worktree` - Git Worktree 관리 (NEW)
+### `/cw:worktree` - Git Worktree 관리 (NEW)
 
 Phase 단위로 격리된 git worktree를 관리합니다.
 
@@ -704,44 +704,44 @@ Phase 단위로 격리된 git worktree를 관리합니다.
 
 ```bash
 # Phase 기반 (PRIMARY)
-/caw:worktree create phase 2          # Phase 2용 worktree 생성
-/caw:worktree create phase 2,3,4      # 여러 phase worktree 생성
+/cw:worktree create phase 2          # Phase 2용 worktree 생성
+/cw:worktree create phase 2,3,4      # 여러 phase worktree 생성
 
 # 관리
-/caw:worktree list                    # 모든 worktree 상태 표시
-/caw:worktree clean                   # 완료된 worktree 제거
-/caw:worktree clean --all             # 모든 CAW worktree 제거
+/cw:worktree list                    # 모든 worktree 상태 표시
+/cw:worktree clean                   # 완료된 worktree 제거
+/cw:worktree clean --all             # 모든 CAW worktree 제거
 ```
 
 #### 워크플로우 예시
 
 ```bash
 # 1. Phase 1 완료 (main에서)
-/caw:next phase 1
+/cw:next phase 1
 
 # 2. 독립 Phase들을 위한 worktree 생성
-/caw:worktree create phase 2,3,4
+/cw:worktree create phase 2,3,4
 
 # 3. 병렬 터미널에서 작업
 # Terminal 1:
 cd .worktrees/phase-2 && claude
-/caw:next --parallel phase 2
+/cw:next --parallel phase 2
 
 # Terminal 2:
 cd .worktrees/phase-3 && claude
-/caw:next --parallel phase 3
+/cw:next --parallel phase 3
 
 # 4. 완료 후 병합
 cd /path/to/main/project
-/caw:merge --all
+/cw:merge --all
 
 # 5. 정리
-/caw:worktree clean
+/cw:worktree clean
 ```
 
 ---
 
-### `/caw:merge` - Worktree 브랜치 병합 (NEW)
+### `/cw:merge` - Worktree 브랜치 병합 (NEW)
 
 완료된 worktree 브랜치를 main 브랜치로 병합합니다.
 
@@ -749,62 +749,62 @@ cd /path/to/main/project
 
 ```bash
 # 완료된 worktree 자동 감지 및 병합
-/caw:merge
+/cw:merge
 
 # 모든 phase worktree 병합 (의존성 순서)
-/caw:merge --all
+/cw:merge --all
 
 # 특정 phase 병합
-/caw:merge phase 2
+/cw:merge phase 2
 
 # 여러 phase 병합
-/caw:merge phase 2,3
+/cw:merge phase 2,3
 
 # 미리보기
-/caw:merge --dry-run
+/cw:merge --dry-run
 
 # 충돌 해결 후 계속
-/caw:merge --continue
+/cw:merge --continue
 
 # 병합 취소
-/caw:merge --abort
+/cw:merge --abort
 ```
 
 ---
 
-### `/caw:status` - 진행 상태 표시
+### `/cw:status` - 진행 상태 표시
 
 현재 워크플로우 상태와 진행률을 표시합니다.
 
 ```bash
-/caw:status
-/caw:status --worktrees    # Worktree 상태 포함
+/cw:status
+/cw:status --worktrees    # Worktree 상태 포함
 ```
 
 ---
 
-### `/caw:check` - 규칙 준수 검증
+### `/cw:check` - 규칙 준수 검증
 
 ComplianceChecker 에이전트를 호출하여 프로젝트 규칙 준수를 검증합니다.
 
 ```bash
-/caw:check            # 전체 검사
-/caw:check --workflow # 워크플로우 구조 검증
-/caw:check --rules    # CLAUDE.md 규칙 검증
+/cw:check            # 전체 검사
+/cw:check --workflow # 워크플로우 구조 검증
+/cw:check --rules    # CLAUDE.md 규칙 검증
 ```
 
 ---
 
-### `/caw:context` - 컨텍스트 관리
+### `/cw:context` - 컨텍스트 관리
 
 컨텍스트 파일을 관리합니다.
 
 ```bash
-/caw:context show                          # 현재 상태 표시
-/caw:context add src/auth/jwt.ts           # 파일 추가
-/caw:context add package.json --project    # 읽기 전용 추가
-/caw:context pack src/utils/helpers.ts     # 압축 (인터페이스만)
-/caw:context prune                         # 오래된 파일 정리
+/cw:context show                          # 현재 상태 표시
+/cw:context add src/auth/jwt.ts           # 파일 추가
+/cw:context add package.json --project    # 읽기 전용 추가
+/cw:context pack src/utils/helpers.ts     # 압축 (인터페이스만)
+/cw:context prune                         # 오래된 파일 정리
 ```
 
 ---
@@ -830,7 +830,7 @@ ComplianceChecker 에이전트를 호출하여 프로젝트 규칙 준수를 검
 |------|-----|
 | 모델 | haiku |
 | 도구 | Read, Write, Glob, Bash, AskUserQuestion |
-| 트리거 | `/caw:init`, `/caw:start` (자동) |
+| 트리거 | `/cw:init`, `/cw:start` (자동) |
 | 출력 | `.caw/context_manifest.json` |
 
 ### 설계 에이전트
@@ -838,19 +838,19 @@ ComplianceChecker 에이전트를 호출하여 프로젝트 규칙 준수를 검
 #### Ideator 에이전트
 - **역할**: Socratic 대화를 통한 요구사항 발굴
 - **모델**: sonnet
-- **트리거**: `/caw:brainstorm`
+- **트리거**: `/cw:brainstorm`
 - **출력**: `.caw/brainstorm.md`
 
 #### Designer 에이전트
 - **역할**: UX/UI 설계, 와이어프레임 생성
 - **모델**: sonnet
-- **트리거**: `/caw:design --ui`
+- **트리거**: `/cw:design --ui`
 - **출력**: `.caw/design/ux-ui.md`
 
 #### Architect 에이전트
 - **역할**: 시스템 아키텍처 설계
 - **모델**: sonnet
-- **트리거**: `/caw:design --arch`
+- **트리거**: `/cw:design --arch`
 - **출력**: `.caw/design/architecture.md`
 
 ### 구현 에이전트
@@ -858,32 +858,32 @@ ComplianceChecker 에이전트를 호출하여 프로젝트 규칙 준수를 검
 #### Planner 에이전트
 - **역할**: 요구사항 분석 및 계획 생성
 - **모델**: haiku / sonnet (기본) / opus
-- **트리거**: `/caw:start`
+- **트리거**: `/cw:start`
 - **스킬**: context-helper
 
 #### Builder 에이전트
 - **역할**: TDD 구현 및 테스트 실행
 - **모델**: haiku / sonnet / opus (기본)
-- **트리거**: `/caw:next`
+- **트리거**: `/cw:next`
 - **스킬**: quality-gate, context-helper, progress-tracker, pattern-learner
 - **MCP**: serena, context7
 
 #### Reviewer 에이전트
 - **역할**: 코드 품질 분석
 - **모델**: haiku / sonnet (기본) / opus
-- **트리거**: `/caw:review`
+- **트리거**: `/cw:review`
 - **스킬**: review-assistant
 
 #### Fixer 에이전트
 - **역할**: 리뷰 결과 수정 및 리팩토링
 - **모델**: haiku / sonnet (기본)
-- **트리거**: `/caw:fix --deep`
+- **트리거**: `/cw:fix --deep`
 - **출력**: 수정된 코드
 
 #### ComplianceChecker 에이전트
 - **역할**: 규칙 및 컨벤션 준수 검증
 - **모델**: haiku
-- **트리거**: `/caw:check`
+- **트리거**: `/cw:check`
 
 ---
 
@@ -895,12 +895,12 @@ CAW는 16개의 전문 스킬을 포함합니다:
 
 | 스킬 | 설명 | 사용 시점 |
 |------|------|----------|
-| **reflect** | Ralph Loop 개선 사이클 | `/caw:reflect` |
-| **serena-sync** | Serena 메모리 동기화 | `/caw:sync` |
+| **reflect** | Ralph Loop 개선 사이클 | `/cw:reflect` |
+| **serena-sync** | Serena 메모리 동기화 | `/cw:sync` |
 | **plan-detector** | Plan Mode 계획 감지 | 자동 |
-| **context-manager** | 컨텍스트 파일 관리 | `/caw:context` |
+| **context-manager** | 컨텍스트 파일 관리 | `/cw:context` |
 | **context-helper** | 에이전트 컨텍스트 지원 | 에이전트 내부 |
-| **quick-fix** | 간단한 이슈 자동 수정 | `/caw:fix` |
+| **quick-fix** | 간단한 이슈 자동 수정 | `/cw:fix` |
 | **quality-gate** | 품질 기준 검증 (Tidy First 포함) | Builder 완료 시 |
 | **commit-discipline** | Tidy First 커밋 분리 검증 | 커밋 전 (NEW) |
 
@@ -909,7 +909,7 @@ CAW는 16개의 전문 스킬을 포함합니다:
 | 스킬 | 설명 | 사용 시점 |
 |------|------|----------|
 | **knowledge-base** | 프로젝트 지식 저장소 | 에이전트 내부 |
-| **pattern-learner** | 코드베이스 패턴 학습 | `/caw:start`, Builder |
+| **pattern-learner** | 코드베이스 패턴 학습 | `/cw:start`, Builder |
 | **insight-collector** | 인사이트 수집 및 저장 | 자동 |
 | **decision-logger** | 아키텍처 결정 기록 | 자동 |
 
@@ -917,10 +917,10 @@ CAW는 16개의 전문 스킬을 포함합니다:
 
 | 스킬 | 설명 | 사용 시점 |
 |------|------|----------|
-| **progress-tracker** | 진행률 추적 | `/caw:status`, Builder |
+| **progress-tracker** | 진행률 추적 | `/cw:status`, Builder |
 | **session-persister** | 세션 상태 저장/복원 | 세션 시작/종료 |
-| **review-assistant** | 컨텍스트 인식 리뷰 체크리스트 | `/caw:review` |
-| **dependency-analyzer** | Phase/Step 의존성 분석 | `/caw:next` |
+| **review-assistant** | 컨텍스트 인식 리뷰 체크리스트 | `/cw:review` |
+| **dependency-analyzer** | Phase/Step 의존성 분석 | `/cw:next` |
 
 ---
 
@@ -930,47 +930,47 @@ CAW는 16개의 전문 스킬을 포함합니다:
 
 ```bash
 # 1. 워크플로우 시작
-/caw:start "사용자 프로필 API 구현"
+/cw:start "사용자 프로필 API 구현"
 
 # 2. 계획 검토
-/caw:status
+/cw:status
 
 # 3. 자동 병렬 실행 (기본)
-/caw:next          # 병렬 가능한 step 자동 감지 및 실행
+/cw:next          # 병렬 가능한 step 자동 감지 및 실행
 
 # 4. 진행 확인
-/caw:status
+/cw:status
 
 # 5. 완료 후 리뷰
-/caw:review
+/cw:review
 
 # 6. 지속적 개선
-/caw:reflect
+/cw:reflect
 ```
 
 ### 예시 2: Git Worktree 병렬 워크플로우
 
 ```bash
 # 1. Phase 1 완료 (main에서)
-/caw:start "대규모 리팩토링"
-/caw:next phase 1
+/cw:start "대규모 리팩토링"
+/cw:next phase 1
 
 # 2. 독립 Phase들을 위한 worktree 생성
-/caw:worktree create phase 2,3,4
+/cw:worktree create phase 2,3,4
 
 # 3. 각 터미널에서 병렬 작업
-# Terminal 1: cd .worktrees/phase-2 && claude && /caw:next --parallel phase 2
-# Terminal 2: cd .worktrees/phase-3 && claude && /caw:next --parallel phase 3
-# Terminal 3: cd .worktrees/phase-4 && claude && /caw:next --parallel phase 4
+# Terminal 1: cd .worktrees/phase-2 && claude && /cw:next --parallel phase 2
+# Terminal 2: cd .worktrees/phase-3 && claude && /cw:next --parallel phase 3
+# Terminal 3: cd .worktrees/phase-4 && claude && /cw:next --parallel phase 4
 
 # 4. 병합
 cd /project
-/caw:merge --all
+/cw:merge --all
 
 # 5. 정리 및 리뷰
-/caw:worktree clean
-/caw:review
-/caw:reflect --full
+/cw:worktree clean
+/cw:review
+/cw:reflect --full
 ```
 
 ### 예시 3: Plan Mode 연계
@@ -980,13 +980,13 @@ cd /project
 # (Plan Mode 사용)
 
 # 2. CAW로 계획 가져오기
-/caw:start --from-plan
+/cw:start --from-plan
 
 # 3. 자동 병렬 구현 시작
-/caw:next
+/cw:next
 
 # 4. 지식 동기화
-/caw:sync --to-serena
+/cw:sync --to-serena
 ```
 
 ---
@@ -1038,7 +1038,7 @@ git commit 감지
        ▼
   ❌ Block commit
   → 분리 필요
-  → /caw:tidy --split
+  → /cw:tidy --split
 ```
 
 **검증 기준** (commit-discipline 스킬 참조):
@@ -1099,17 +1099,17 @@ Step 구현 완료
 
 ```bash
 # 기본값이 자동 병렬이므로 그대로 사용
-/caw:next
+/cw:next
 
 # 단순 작업에만 순차 실행
-/caw:next --sequential
+/cw:next --sequential
 ```
 
 ### 2. 대규모 작업은 Worktree 사용
 
 ```bash
 # Phase가 3개 이상인 대규모 작업
-/caw:worktree create phase 2,3,4
+/cw:worktree create phase 2,3,4
 # 각 터미널에서 병렬 작업
 ```
 
@@ -1117,20 +1117,20 @@ Step 구현 완료
 
 ```bash
 # 모든 작업 완료 후 회고
-/caw:reflect --full
+/cw:reflect --full
 
 # 주요 학습 내용 영속화
-/caw:sync --to-serena
+/cw:sync --to-serena
 ```
 
 ### 4. 정기적 동기화
 
 ```bash
 # 세션 종료 전
-/caw:sync --to-serena
+/cw:sync --to-serena
 
 # 새 세션 시작 시
-/caw:sync --from-serena
+/cw:sync --from-serena
 ```
 
 ---
@@ -1141,10 +1141,10 @@ Step 구현 완료
 
 ```bash
 # 의존성 확인
-/caw:status
+/cw:status
 
 # 강제 병렬 실행
-/caw:next --parallel
+/cw:next --parallel
 ```
 
 ### Q: Worktree 충돌이 발생해요
@@ -1152,10 +1152,10 @@ Step 구현 완료
 ```bash
 # 충돌 파일 수정 후
 git add <resolved-files>
-/caw:merge --continue
+/cw:merge --continue
 
 # 또는 병합 취소
-/caw:merge --abort
+/cw:merge --abort
 ```
 
 ### Q: Serena 연결이 안 돼요
@@ -1166,10 +1166,10 @@ MCP 서버 설정을 확인하세요. Serena MCP가 실행 중인지 확인합�
 
 ```bash
 # Serena에 동기화
-/caw:sync --to-serena
+/cw:sync --to-serena
 
 # 복원
-/caw:sync --from-serena
+/cw:sync --from-serena
 ```
 
 ---

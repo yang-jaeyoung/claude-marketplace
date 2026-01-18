@@ -3,7 +3,7 @@ description: Manage git worktrees for parallel step execution in isolated enviro
 argument-hint: "<subcommand> [options]"
 ---
 
-# /caw:worktree - Git Worktree Management
+# /cw:worktree - Git Worktree Management
 
 Manage git worktrees for parallel execution of CAW phases/steps in fully isolated environments.
 
@@ -11,16 +11,16 @@ Manage git worktrees for parallel execution of CAW phases/steps in fully isolate
 
 ```bash
 # Phase-based (PRIMARY)
-/caw:worktree create phase 2          # Create worktree for Phase 2
-/caw:worktree create phase 2,3,4      # Create worktrees for multiple phases
+/cw:worktree create phase 2          # Create worktree for Phase 2
+/cw:worktree create phase 2,3,4      # Create worktrees for multiple phases
 
 # Step-based (Legacy)
-/caw:worktree create --steps 2.2,2.3  # Create for specific steps
+/cw:worktree create --steps 2.2,2.3  # Create for specific steps
 
 # Management
-/caw:worktree list                    # Show all worktree status
-/caw:worktree clean                   # Remove completed/merged worktrees
-/caw:worktree clean --all             # Remove all CAW worktrees
+/cw:worktree list                    # Show all worktree status
+/cw:worktree clean                   # Remove completed/merged worktrees
+/cw:worktree clean --all             # Remove all CAW worktrees
 ```
 
 ## Subcommands
@@ -31,8 +31,8 @@ Creates isolated git worktree for an entire phase.
 
 **Usage**:
 ```bash
-/caw:worktree create phase 2          # Single phase
-/caw:worktree create phase 2,3,4      # Multiple phases at once
+/cw:worktree create phase 2          # Single phase
+/cw:worktree create phase 2,3,4      # Multiple phases at once
 ```
 
 **Workflow**:
@@ -57,12 +57,12 @@ Creating worktree:
 📋 Execute in new terminal:
 
   cd .worktrees/phase-2 && claude
-  /caw:next phase 2              # Sequential
+  /cw:next phase 2              # Sequential
   # or
-  /caw:next --parallel phase 2   # Parallel
+  /cw:next --parallel phase 2   # Parallel
 
 After complete, return to main and run:
-  /caw:merge
+  /cw:merge
 ```
 
 **Output (Multiple Phases)**:
@@ -83,18 +83,18 @@ Creating worktrees:
 
 # Terminal 1 (Phase 2)
 cd .worktrees/phase-2 && claude
-/caw:next --parallel phase 2
+/cw:next --parallel phase 2
 
 # Terminal 2 (Phase 3)
 cd .worktrees/phase-3 && claude
-/caw:next --parallel phase 3
+/cw:next --parallel phase 3
 
 # Terminal 3 (Phase 4)
 cd .worktrees/phase-4 && claude
-/caw:next phase 4
+/cw:next phase 4
 
 💡 After all complete, run in main directory:
-   /caw:merge --all
+   /cw:merge --all
 ```
 
 **Git Commands Executed**:
@@ -114,7 +114,7 @@ cp -r .caw .worktrees/phase-2/
 Creates worktrees for specific steps. Maintained for backward compatibility.
 
 ```bash
-/caw:worktree create --steps 2.2,2.3
+/cw:worktree create --steps 2.2,2.3
 ```
 
 **Directory Structure**:
@@ -145,9 +145,9 @@ Shows status of all CAW worktrees (both phase and step-based).
 | (none) |
 
 💡 Commands:
-  /caw:merge --all          # Merge all completed
-  /caw:merge phase 3        # Merge specific phase
-  /caw:worktree clean       # Clean completed
+  /cw:merge --all          # Merge all completed
+  /cw:merge phase 3        # Merge specific phase
+  /cw:worktree clean       # Clean completed
 ```
 
 **Status Detection**:
@@ -159,12 +159,12 @@ Shows status of all CAW worktrees (both phase and step-based).
 
 Removes worktrees that have been merged or are no longer needed.
 
-**Default Behavior** (`/caw:worktree clean`):
+**Default Behavior** (`/cw:worktree clean`):
 - Only removes worktrees where all steps are ✅ Complete
 - Removes corresponding branch if merged
 - Preserves in-progress worktrees
 
-**Force All** (`/caw:worktree clean --all`):
+**Force All** (`/cw:worktree clean --all`):
 - Removes all `.worktrees/phase-*` and `.worktrees/caw-step-*` directories
 - Removes all corresponding branches
 - Confirmation required
@@ -214,14 +214,14 @@ project/
 
 ```
 1. CREATE
-   /caw:worktree create phase 2
+   /cw:worktree create phase 2
    → Creates .worktrees/phase-2/
    → Creates branch caw/phase-2
    → Copies .caw/ state
 
 2. WORK (in separate terminal)
    cd .worktrees/phase-2 && claude
-   /caw:next --parallel phase 2
+   /cw:next --parallel phase 2
    → Builder executes steps
    → Updates local task_plan.md
 
@@ -230,12 +230,12 @@ project/
    User returns to main directory
 
 4. MERGE
-   /caw:merge [--all | phase N]
+   /cw:merge [--all | phase N]
    → Merges caw/phase-N into main
    → Syncs main task_plan.md
 
 5. CLEAN
-   /caw:worktree clean
+   /cw:worktree clean
    → Removes worktree directory
    → Deletes merged branch
 ```
@@ -244,30 +244,30 @@ project/
 
 ```bash
 # Step 1: Complete Phase 1 in main
-/caw:next phase 1
+/cw:next phase 1
 
 # Step 2: Create worktrees for independent phases
-/caw:worktree create phase 2,3,4
+/cw:worktree create phase 2,3,4
 
 # Step 3: Work in parallel terminals
 # Terminal 1:
 cd .worktrees/phase-2 && claude
-/caw:next --parallel phase 2
+/cw:next --parallel phase 2
 
 # Terminal 2:
 cd .worktrees/phase-3 && claude
-/caw:next --parallel phase 3
+/cw:next --parallel phase 3
 
 # Terminal 3:
 cd .worktrees/phase-4 && claude
-/caw:next phase 4
+/cw:next phase 4
 
 # Step 4: Merge all back
 cd /path/to/main/project
-/caw:merge --all
+/cw:merge --all
 
 # Step 5: Continue with dependent phases
-/caw:next phase 5
+/cw:next phase 5
 ```
 
 ## Edge Cases
@@ -309,7 +309,7 @@ Status: 🔄 In Progress (3/5 steps)
 
 Please commit or stash your changes first:
   git stash
-  /caw:worktree create phase 2
+  /cw:worktree create phase 2
   git stash pop
 ```
 
@@ -324,14 +324,14 @@ Phase 4 Deps: phase 2, phase 3 (phase 3 not complete)
 Cannot create worktrees for both simultaneously.
 
 💡 Create worktree for Phase 3 first:
-  /caw:worktree create phase 3
+  /cw:worktree create phase 3
 ```
 
 ## Integration
 
-- **`/caw:next --worktree phase N`**: Shortcut that calls `worktree create phase N`
-- **`/caw:merge`**: Merges completed worktrees back
-- **`/caw:status --worktrees`**: Shows worktree status
+- **`/cw:next --worktree phase N`**: Shortcut that calls `worktree create phase N`
+- **`/cw:merge`**: Merges completed worktrees back
+- **`/cw:status --worktrees`**: Shows worktree status
 - **`dependency-analyzer`**: Validates phase dependencies
 
 ## .gitignore Recommendation

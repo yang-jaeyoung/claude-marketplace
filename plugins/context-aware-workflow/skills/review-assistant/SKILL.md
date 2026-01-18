@@ -1,6 +1,6 @@
 ---
 name: review-assistant
-description: Generates context-aware review checklists based on learned patterns, recorded decisions, and collected insights. Enhances the Reviewer agent with project-specific checks. Invoked during /caw:review or code review requests.
+description: Generates context-aware review checklists based on learned patterns, recorded decisions, and collected insights. Enhances the Reviewer agent with project-specific checks. Invoked during /cw:review or code review requests.
 allowed-tools: Read, Glob, Grep
 ---
 
@@ -18,7 +18,7 @@ Generates context-aware review checklists by aggregating patterns, decisions, an
 
 이 Skill은 다음 상황에서 활성화됩니다:
 
-1. **/caw:review 실행**
+1. **/cw:review 실행**
    - Reviewer Agent와 함께 활성화
    - 컨텍스트 기반 체크리스트 생성
 
@@ -54,9 +54,9 @@ Generates context-aware review checklists by aggregating patterns, decisions, an
 ```yaml
 scope_detection:
   from_command:
-    "/caw:review": All files in current phase
-    "/caw:review src/auth/": Specific directory
-    "/caw:review --phase 2": Specific phase
+    "/cw:review": All files in current phase
+    "/cw:review src/auth/": Specific directory
+    "/cw:review --phase 2": Specific phase
 
   from_git:
     - Changed files (git diff)
@@ -279,7 +279,7 @@ gotchas:
 ## Example Flow
 
 ```
-1. 사용자: "/caw:review"
+1. 사용자: "/cw:review"
 
 2. review-assistant 활성화
    Scope: src/auth/*.ts (Phase 2 파일)
@@ -323,7 +323,7 @@ gotchas:
 ```yaml
 integration:
   workflow:
-    1. /caw:review 호출
+    1. /cw:review 호출
     2. review-assistant가 체크리스트 생성
     3. Reviewer Agent가 체크리스트 기반 리뷰
     4. 각 항목 확인 및 피드백 제공

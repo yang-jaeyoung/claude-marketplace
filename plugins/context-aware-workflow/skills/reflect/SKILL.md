@@ -4,16 +4,16 @@ description: "Run Ralph Loop - continuous improvement cycle after task completio
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
-# /caw:reflect - Ralph Loop Skill
+# /cw:reflect - Ralph Loop Skill
 
 Run the Ralph Loop continuous improvement cycle after completing a task or workflow.
 
 ## Usage
 
 ```bash
-/caw:reflect              # Reflect on last completed task
-/caw:reflect --task 2.3   # Reflect on specific step
-/caw:reflect --full       # Full workflow retrospective
+/cw:reflect              # Reflect on last completed task
+/cw:reflect --task 2.3   # Reflect on specific step
+/cw:reflect --full       # Full workflow retrospective
 ```
 
 ## Ralph Loop Phases
@@ -146,7 +146,7 @@ write_memory("ralph_learning_YYYYMMDD", """
 
 **저장 시점**:
 - Ralph Loop 완료 직후 자동 저장
-- `/caw:sync --to-serena` 명시적 실행 시
+- `/cw:sync --to-serena` 명시적 실행 시
 
 **메모리 명명 규칙**:
 | Memory | Content | Retention |
@@ -210,7 +210,7 @@ write_memory("ralph_learning_YYYYMMDD", """
 
 ### After Task Completion
 When a workflow step completes:
-1. Optionally prompt: "Run /caw:reflect for improvement insights?"
+1. Optionally prompt: "Run /cw:reflect for improvement insights?"
 2. User can run manually anytime
 
 ### With Serena Memory
@@ -222,7 +222,7 @@ write_memory("ralph_learning_[date]", insights)
 ### After Task Completion
 Consider running reflection after completing tasks:
 ```
-💡 Task complete. Consider /caw:reflect for continuous improvement.
+💡 Task complete. Consider /cw:reflect for continuous improvement.
 ```
 
 ## Learnings Storage

@@ -2,19 +2,19 @@
 description: Validate compliance with project rules, conventions, and workflow requirements
 ---
 
-# /caw:check - Compliance Check
+# /cw:check - Compliance Check
 
 Validate adherence to project rules, workflow requirements, and code conventions using the ComplianceChecker agent.
 
 ## Usage
 
 ```bash
-/caw:check                # Quick check (workflow + rules)
-/caw:check --workflow     # Only task_plan.md structure
-/caw:check --rules        # Only CLAUDE.md rules
-/caw:check --docs         # Only documentation requirements
-/caw:check --conventions  # Only code patterns
-/caw:check --all          # Full compliance audit
+/cw:check                # Quick check (workflow + rules)
+/cw:check --workflow     # Only task_plan.md structure
+/cw:check --rules        # Only CLAUDE.md rules
+/cw:check --docs         # Only documentation requirements
+/cw:check --conventions  # Only code patterns
+/cw:check --all          # Full compliance audit
 ```
 
 ## Behavior
@@ -111,8 +111,8 @@ Status: 🟡 Minor Issues (2 warnings)
   2. Add JSDoc to generateToken(), validateToken()
 
 💡 Quick fixes available:
-   /caw:fix --workflow   # Fix task_plan.md issues
-   /caw:fix --docs       # Generate JSDoc templates
+   /cw:fix --workflow   # Fix task_plan.md issues
+   /cw:fix --docs       # Generate JSDoc templates
 ```
 
 ## Check Modes
@@ -120,7 +120,7 @@ Status: 🟡 Minor Issues (2 warnings)
 ### Quick Check (Default)
 
 ```bash
-/caw:check
+/cw:check
 ```
 
 - Workflow structure validation
@@ -130,7 +130,7 @@ Status: 🟡 Minor Issues (2 warnings)
 ### Workflow Only
 
 ```bash
-/caw:check --workflow
+/cw:check --workflow
 ```
 
 Validates .caw/task_plan.md:
@@ -143,7 +143,7 @@ Validates .caw/task_plan.md:
 ### Rules Only
 
 ```bash
-/caw:check --rules
+/cw:check --rules
 ```
 
 Checks CLAUDE.md compliance:
@@ -155,7 +155,7 @@ Checks CLAUDE.md compliance:
 ### Documentation Only
 
 ```bash
-/caw:check --docs
+/cw:check --docs
 ```
 
 Validates documentation:
@@ -167,7 +167,7 @@ Validates documentation:
 ### Conventions Only
 
 ```bash
-/caw:check --conventions
+/cw:check --conventions
 ```
 
 Checks code patterns:
@@ -179,7 +179,7 @@ Checks code patterns:
 ### Full Audit
 
 ```bash
-/caw:check --all
+/cw:check --all
 ```
 
 Complete compliance check:
@@ -256,8 +256,8 @@ No CLAUDE.md, lint configs, or .caw/task_plan.md found.
 
 💡 Options:
    • Create CLAUDE.md with project rules
-   • /caw:start to create .caw/task_plan.md
-   • Run /caw:check --conventions for pattern detection
+   • /cw:start to create .caw/task_plan.md
+   • Run /cw:check --conventions for pattern detection
 ```
 
 ### All Checks Pass
@@ -292,7 +292,7 @@ Cannot proceed until fixed:
    Steps: 2.1, 2.3, 2.4 missing notes in .caw/task_plan.md
 
 💡 Fix violations and re-run:
-   /caw:check
+   /cw:check
 ```
 
 ## Pre-Commit Integration
@@ -302,7 +302,7 @@ Add to git hooks for automatic checking:
 ```bash
 # .git/hooks/pre-commit
 #!/bin/bash
-claude "/caw:check --quick"
+claude "/cw:check --quick"
 if [ $? -ne 0 ]; then
   echo "Compliance check failed. Fix issues before committing."
   exit 1
@@ -314,4 +314,4 @@ fi
 - **Reads**: CLAUDE.md, .caw/task_plan.md, lint configs, source files
 - **Invokes**: ComplianceChecker agent via Task tool
 - **Outputs**: Compliance report with severity levels
-- **Suggests**: `/caw:fix`, manual fixes, re-check
+- **Suggests**: `/cw:fix`, manual fixes, re-check

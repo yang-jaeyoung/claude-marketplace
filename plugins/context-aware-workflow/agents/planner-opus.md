@@ -14,9 +14,9 @@ whenToUse: |
 
   <example>
   Context: Complex architectural task
-  user: "/caw:start redesign the authentication system for microservices"
+  user: "/cw:start redesign the authentication system for microservices"
   assistant: "🎯 Model: Opus selected (complexity: 0.88)"
-  <Task tool invocation with subagent_type="caw:Planner" model="opus">
+  <Task tool invocation with subagent_type="cw:Planner" model="opus">
   </example>
 color: purple
 tools:

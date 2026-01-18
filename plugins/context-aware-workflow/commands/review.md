@@ -2,19 +2,19 @@
 description: Review implemented code for quality, best practices, and potential issues
 ---
 
-# /caw:review - Code Review
+# /cw:review - Code Review
 
 Analyze implemented code for quality, adherence to best practices, and potential issues using the Reviewer agent.
 
 ## Usage
 
 ```bash
-/caw:review                    # Review recent changes (current phase)
-/caw:review src/auth/          # Review specific directory
-/caw:review src/auth/jwt.ts    # Review specific file
-/caw:review --phase 2          # Review all changes from phase 2
-/caw:review --step 2.3         # Review changes from specific step
-/caw:review --all              # Review entire implementation
+/cw:review                    # Review recent changes (current phase)
+/cw:review src/auth/          # Review specific directory
+/cw:review src/auth/jwt.ts    # Review specific file
+/cw:review --phase 2          # Review all changes from phase 2
+/cw:review --step 2.3         # Review changes from specific step
+/cw:review --all              # Review entire implementation
 ```
 
 ## Behavior
@@ -42,8 +42,8 @@ Based on arguments, identify files to review:
 .caw/task_plan.md not found. Cannot determine review scope.
 
 💡 Options:
-   • /caw:review <path> to review specific files
-   • /caw:start to begin a workflow first
+   • /cw:review <path> to review specific files
+   • /cw:start to begin a workflow first
 ```
 
 3. Verify files exist and are readable
@@ -127,8 +127,8 @@ Overall: 🟢 Approved with suggestions
   4. Add JSDoc comments to public API
 
 💡 Next steps:
-   • Fix issues and run /caw:review again
-   • Or proceed with /caw:next
+   • Fix issues and run /cw:review again
+   • Or proceed with /cw:next
 ```
 
 ## Review Modes
@@ -136,7 +136,7 @@ Overall: 🟢 Approved with suggestions
 ### Quick Review (Default)
 
 ```bash
-/caw:review
+/cw:review
 ```
 
 - Reviews current phase files
@@ -146,7 +146,7 @@ Overall: 🟢 Approved with suggestions
 ### Deep Review
 
 ```bash
-/caw:review --deep
+/cw:review --deep
 ```
 
 - More thorough analysis
@@ -157,9 +157,9 @@ Overall: 🟢 Approved with suggestions
 ### Focused Review
 
 ```bash
-/caw:review --focus security
-/caw:review --focus performance
-/caw:review --focus tests
+/cw:review --focus security
+/cw:review --focus performance
+/cw:review --focus tests
 ```
 
 - Specialized analysis for specific concern
@@ -227,7 +227,7 @@ Overall: 🟢 Approved with suggestions
 No completed steps found in .caw/task_plan.md.
 
 💡 Complete some steps first:
-   /caw:next
+   /cw:next
 ```
 
 ### All Issues Fixed
@@ -243,8 +243,8 @@ All files passed review with no issues.
   • Test coverage: 92%
 
 💡 Ready to proceed:
-   /caw:next for next step
-   /caw:status to see progress
+   /cw:next for next step
+   /cw:status to see progress
 ```
 
 ### Critical Issues Found
@@ -263,19 +263,19 @@ Review cannot be approved until fixed:
    Endpoint accessible without token
 
 💡 Fix critical issues and run:
-   /caw:review --step 2.3
+   /cw:review --step 2.3
 ```
 
 ## Integration with Workflow
 
 ```
 ┌─────────────────┐
-│   /caw:next     │ ──── Implement step
+│   /cw:next     │ ──── Implement step
 └────────┬────────┘
          │
          ▼
 ┌─────────────────┐
-│  /caw:review    │ ──── Quality check
+│  /cw:review    │ ──── Quality check
 └────────┬────────┘
          │
     ┌────┴────┐
@@ -311,4 +311,4 @@ review:
 - **Reads**: `.caw/task_plan.md`, source files, config files
 - **Invokes**: Reviewer agent via Task tool
 - **Updates**: `.caw/task_plan.md` with review notes
-- **Suggests**: `/caw:next`, re-review after fixes
+- **Suggests**: `/cw:next`, re-review after fixes

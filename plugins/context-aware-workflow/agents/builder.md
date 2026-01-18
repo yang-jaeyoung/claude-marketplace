@@ -5,22 +5,22 @@ model: opus
 whenToUse: |
   Use the Builder agent when executing implementation steps from a task_plan.md.
   This agent should be invoked:
-  - When user runs /caw:next to proceed with implementation
+  - When user runs /cw:next to proceed with implementation
   - When a specific step needs to be implemented from the plan
   - When code changes need to be made following TDD approach
 
   <example>
   Context: User wants to proceed with the next step
-  user: "/caw:next"
+  user: "/cw:next"
   assistant: "I'll invoke the Builder agent to implement the next pending step."
-  <Task tool invocation with subagent_type="caw:builder">
+  <Task tool invocation with subagent_type="cw:builder">
   </example>
 
   <example>
   Context: User wants to implement a specific step
-  user: "/caw:next --step 2.3"
+  user: "/cw:next --step 2.3"
   assistant: "I'll use the Builder agent to implement step 2.3 from the task plan."
-  <Task tool invocation with subagent_type="caw:builder">
+  <Task tool invocation with subagent_type="cw:builder">
   </example>
 color: green
 tools:
@@ -353,7 +353,7 @@ Key: ⏳ Pending | 🔄 In Progress | ✅ Complete | ❌ Blocked | ⏭️ Skippe
 
 ## Integration Points
 
-- **Invoked by**: `/caw:next` command
+- **Invoked by**: `/cw:next` command
 - **Reads**: `.caw/task_plan.md`, context files
 - **Writes**: Implementation code, test files, `.caw/insights/*.md`
 - **Updates**: `.caw/task_plan.md` status, `CLAUDE.md` (Lessons Learned)
@@ -526,7 +526,7 @@ write_memory("lessons_learned", """
 
 **동기화 시점**:
 - 새 교훈 CLAUDE.md에 추가 직후
-- `/caw:sync --to-serena` 명시적 실행 시
+- `/cw:sync --to-serena` 명시적 실행 시
 - 세션 종료 전 (설정된 경우)
 
 **메모리 형식**:

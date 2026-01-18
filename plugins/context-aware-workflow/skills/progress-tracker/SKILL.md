@@ -29,7 +29,7 @@ Track and visualize workflow progress with detailed metrics.
 This skill activates when:
 1. Step status changes (pending → in_progress → completed)
 2. Phase transitions
-3. `/caw:status` command runs
+3. `/cw:status` command runs
 4. Periodic updates (every 10 minutes)
 
 ## Metrics Data
@@ -221,7 +221,7 @@ def estimate_completion(metrics):
 
 ## Visualization
 
-### Progress Bar (for /caw:status)
+### Progress Bar (for /cw:status)
 
 ```
 📊 Workflow Progress
@@ -329,7 +329,7 @@ output:
 
 ### Post-Merge Metrics Update
 
-After `/caw:merge`:
+After `/cw:merge`:
 
 ```yaml
 action: merge_completed
@@ -392,7 +392,7 @@ quality:
 
 ## Integration
 
-### With /caw:status
+### With /cw:status
 
 Progress tracker provides data for status command:
 

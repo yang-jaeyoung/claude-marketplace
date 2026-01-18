@@ -5,22 +5,22 @@ model: sonnet
 whenToUse: |
   Use the Planner agent when starting a new development task that requires structured planning.
   This agent should be invoked:
-  - When user runs /caw:start with a task description
+  - When user runs /cw:start with a task description
   - When converting a Plan Mode output to task_plan.md
   - When a complex task needs breakdown into phases and steps
 
   <example>
   Context: User wants to add a new feature
-  user: "/caw:start Implement user authentication with JWT"
+  user: "/cw:start Implement user authentication with JWT"
   assistant: "I'll invoke the Planner agent to analyze this task and create a structured plan."
-  <Task tool invocation with subagent_type="caw:planner">
+  <Task tool invocation with subagent_type="cw:planner">
   </example>
 
   <example>
   Context: User has an existing Plan Mode plan
-  user: "/caw:start --from-plan"
+  user: "/cw:start --from-plan"
   assistant: "I'll use the Planner agent to convert your Plan Mode output into a task_plan.md."
-  <Task tool invocation with subagent_type="caw:planner">
+  <Task tool invocation with subagent_type="cw:planner">
   </example>
 color: blue
 tools:
@@ -370,8 +370,8 @@ Phase 3 (Deps: phase 1) ─┴─ 3.1 ─┬─ 3.2 ⚡    │
 Phase 4 (Deps: phase 2, 3) ────────────────────┘
 
 실행 가능:
-  터미널 1: /caw:next --worktree phase 2  # 2.2, 2.3 병렬
-  터미널 2: /caw:next --worktree phase 3  # 3.2, 3.3 병렬
+  터미널 1: /cw:next --worktree phase 2  # 2.2, 2.3 병렬
+  터미널 2: /cw:next --worktree phase 3  # 3.2, 3.3 병렬
 ```
 
 ## Prerequisites
@@ -382,7 +382,7 @@ Before Planner runs:
 - `.caw/` directory must exist
 - `.caw/context_manifest.json` must exist with project context
 
-If not initialized, the `/caw:start` command will invoke Bootstrapper first.
+If not initialized, the `/cw:start` command will invoke Bootstrapper first.
 
 ## CRITICAL: File Writing Requirements
 

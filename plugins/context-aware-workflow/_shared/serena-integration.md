@@ -203,7 +203,7 @@ SessionStart Hook triggered
 
 ### Session End
 ```
-Before session ends (or via /caw:sync)
+Before session ends (or via /cw:sync)
   │
   ├─ Collect CAW knowledge
   │   ├─ .caw/knowledge/**
@@ -217,7 +217,7 @@ Before session ends (or via /caw:sync)
 
 ### On-Demand Sync
 ```
-/caw:sync
+/cw:sync
   │
   ├─ Compare timestamps (CAW vs Serena)
   │

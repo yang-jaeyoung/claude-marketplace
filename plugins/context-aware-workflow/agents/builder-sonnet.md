@@ -14,9 +14,9 @@ whenToUse: |
 
   <example>
   Context: Standard implementation task
-  user: "/caw:next"
+  user: "/cw:next"
   assistant: "🎯 Model: Sonnet selected for step 2.1 (standard complexity)"
-  <Task tool invocation with subagent_type="caw:Builder" model="sonnet">
+  <Task tool invocation with subagent_type="cw:Builder" model="sonnet">
   </example>
 color: green
 tools:

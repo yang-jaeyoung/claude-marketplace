@@ -33,7 +33,7 @@ Automated quality validation before step completion to ensure consistent code qu
 
 This skill activates when:
 1. Builder agent marks a step as complete
-2. User runs `/caw:next` and step finishes
+2. User runs `/cw:next` and step finishes
 3. Manual quality check request
 4. Before phase transition
 
@@ -309,7 +309,7 @@ Action Required:
    [tidy] Rename variables and extract method
    [feat] Add token refresh functionality
 
-2. Or run: /caw:tidy --split
+2. Or run: /cw:tidy --split
 
 Step을 완료할 수 없습니다.
 ```

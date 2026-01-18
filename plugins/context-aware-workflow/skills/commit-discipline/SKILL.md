@@ -25,7 +25,7 @@ This skill activates when:
 1. Builder agent is about to commit changes
 2. Before git commit execution via hook
 3. Manual validation request
-4. During `/caw:review` to check commit history
+4. During `/cw:review` to check commit history
 
 ## Commit Types
 

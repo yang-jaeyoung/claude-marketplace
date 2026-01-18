@@ -14,9 +14,9 @@ whenToUse: |
 
   <example>
   Context: Simple task with low complexity
-  user: "/caw:start fix typo in README"
+  user: "/cw:start fix typo in README"
   assistant: "🎯 Model: Haiku selected (complexity: 0.15)"
-  <Task tool invocation with subagent_type="caw:Planner" model="haiku">
+  <Task tool invocation with subagent_type="cw:Planner" model="haiku">
   </example>
 color: cyan
 tools:

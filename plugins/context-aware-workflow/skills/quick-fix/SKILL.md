@@ -1,6 +1,6 @@
 ---
 name: quick-fix
-description: Auto-fixes simple review issues like magic numbers, missing docs, style violations, and import ordering. Invoked automatically after review or manually via /caw:fix.
+description: Auto-fixes simple review issues like magic numbers, missing docs, style violations, and import ordering. Invoked automatically after review or manually via /cw:fix.
 allowed-tools: Read, Edit, Bash, Glob, Grep
 forked-context: true
 forked-context-returns: |
@@ -11,7 +11,7 @@ forked-context-returns: |
 hooks:
   ReviewComplete:
     action: suggest
-    message: "Auto-fixable issues found. Run /caw:fix to apply."
+    message: "Auto-fixable issues found. Run /cw:fix to apply."
     condition: "last_review.json has auto_fixable > 0"
 ---
 
@@ -22,8 +22,8 @@ Automated quick fixes for simple, auto-fixable code issues identified by the Rev
 ## Triggers
 
 This skill activates when:
-1. User runs `/caw:fix` (without --deep flag)
-2. User runs `/caw:fix --category <type>`
+1. User runs `/cw:fix` (without --deep flag)
+2. User runs `/cw:fix --category <type>`
 3. Reviewer completes and finds auto-fixable issues
 4. Manual quick-fix request for specific files
 
@@ -235,7 +235,7 @@ Applied Fixes:
 
 Summary: 10 fixed, 3 skipped, 0 failed
 
-💡 For complex fixes: /caw:fix --deep
+💡 For complex fixes: /cw:fix --deep
 ```
 
 ## Interactive Mode
@@ -330,10 +330,10 @@ flow:
   1. Reviewer completes code analysis
   2. Reviewer writes .caw/last_review.json
   3. If auto_fixable issues exist:
-     - Show suggestion: "Run /caw:fix to apply quick fixes"
-  4. User runs /caw:fix
+     - Show suggestion: "Run /cw:fix to apply quick fixes"
+  4. User runs /cw:fix
   5. Quick Fix skill processes auto_fixable issues
-  6. Complex issues remain for /caw:fix --deep
+  6. Complex issues remain for /cw:fix --deep
 ```
 
 ### With Fixer Agent
@@ -353,7 +353,7 @@ handoff:
     - architecture
 
   trigger_fixer:
-    - /caw:fix --deep
+    - /cw:fix --deep
     - Complex issues detected
     - Quick fix insufficient
 ```

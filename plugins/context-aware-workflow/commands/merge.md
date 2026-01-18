@@ -3,7 +3,7 @@ description: Merge completed worktree branches back to main and synchronize task
 argument-hint: "[options]"
 ---
 
-# /caw:merge - Merge Worktree Branches
+# /cw:merge - Merge Worktree Branches
 
 Merges completed worktree branches back to the main branch and synchronizes task plan state.
 
@@ -11,23 +11,23 @@ Merges completed worktree branches back to the main branch and synchronizes task
 
 ```bash
 # Phase-based (PRIMARY)
-/caw:merge                     # Auto-detect and merge completed worktrees
-/caw:merge --all               # Merge all phase worktrees (dependency order)
-/caw:merge phase 2             # Merge specific phase's worktree
-/caw:merge phase 2,3           # Merge multiple phases
+/cw:merge                     # Auto-detect and merge completed worktrees
+/cw:merge --all               # Merge all phase worktrees (dependency order)
+/cw:merge phase 2             # Merge specific phase's worktree
+/cw:merge phase 2,3           # Merge multiple phases
 
 # Step-based (Legacy)
-/caw:merge --step 2.2          # Merge specific step's worktree
+/cw:merge --step 2.2          # Merge specific step's worktree
 
 # Control
-/caw:merge --dry-run           # Preview without executing
-/caw:merge --abort             # Abort current merge
-/caw:merge --continue          # Continue after conflict resolution
+/cw:merge --dry-run           # Preview without executing
+/cw:merge --abort             # Abort current merge
+/cw:merge --continue          # Continue after conflict resolution
 ```
 
 ## Behavior
 
-### Default Merge (`/caw:merge`)
+### Default Merge (`/cw:merge`)
 
 Auto-detects and merges all completed worktrees (both phase and step-based).
 
@@ -37,7 +37,7 @@ Auto-detects and merges all completed worktrees (both phase and step-based).
 3. **Order by Dependencies**: Merge in Phase Deps order
 4. **Sequential Merge**: Merge each branch one at a time
 5. **Sync Task Plan**: Update main `.caw/task_plan.md`
-6. **Suggest Cleanup**: Recommend `/caw:worktree clean`
+6. **Suggest Cleanup**: Recommend `/cw:worktree clean`
 
 **Output**:
 ```
@@ -69,10 +69,10 @@ Updating task_plan.md...
   Skipped: 1 (in progress)
   Conflicts: 0
 
-💡 Run /caw:worktree clean to remove merged worktrees
+💡 Run /cw:worktree clean to remove merged worktrees
 ```
 
-### Merge All (`/caw:merge --all`)
+### Merge All (`/cw:merge --all`)
 
 Merges all phase worktrees in dependency order, regardless of completion status warning.
 
@@ -107,11 +107,11 @@ Merging...
   Phase 3: ✅ Complete
   Phase 4: ✅ Complete
 
-💡 Next: /caw:next phase 5 (if exists)
-   Or: /caw:worktree clean to remove worktrees
+💡 Next: /cw:next phase 5 (if exists)
+   Or: /cw:worktree clean to remove worktrees
 ```
 
-### Specific Phase Merge (`/caw:merge phase 2`)
+### Specific Phase Merge (`/cw:merge phase 2`)
 
 Merges only the specified phase's worktree.
 
@@ -137,11 +137,11 @@ Updating task_plan.md...
 ✅ Phase 2 merged successfully
 
 💡 Next steps:
-  /caw:merge phase 3          # Merge next phase
-  /caw:worktree clean         # Clean up
+  /cw:merge phase 3          # Merge next phase
+  /cw:worktree clean         # Clean up
 ```
 
-### Multiple Phases (`/caw:merge phase 2,3`)
+### Multiple Phases (`/cw:merge phase 2,3`)
 
 Merges multiple phases in dependency order.
 
@@ -163,7 +163,7 @@ Merging...
 📊 Summary: 2 phases merged
 ```
 
-### Dry Run (`/caw:merge --dry-run`)
+### Dry Run (`/cw:merge --dry-run`)
 
 Shows what would be merged without actually merging.
 
@@ -184,8 +184,8 @@ Would merge (in order):
 Would skip:
   - caw/phase-4 (In Progress: 2/3 steps)
 
-💡 Run /caw:merge to execute
-   Or /caw:merge --all to include all
+💡 Run /cw:merge to execute
+   Or /cw:merge --all to include all
 ```
 
 ## Conflict Handling
@@ -211,14 +211,14 @@ Conflicting files:
 To resolve:
   1. Edit conflicting files to resolve
   2. Run: git add <resolved-files>
-  3. Run: /caw:merge --continue
+  3. Run: /cw:merge --continue
 
-Or abort with: /caw:merge --abort
+Or abort with: /cw:merge --abort
 
 💡 Tip: Use VS Code or your preferred merge tool
 ```
 
-### Continue After Resolution (`/caw:merge --continue`)
+### Continue After Resolution (`/cw:merge --continue`)
 
 ```
 🔀 Continuing Merge
@@ -236,7 +236,7 @@ Continuing with remaining phases...
 📊 All merges complete
 ```
 
-### Abort Merge (`/caw:merge --abort`)
+### Abort Merge (`/cw:merge --abort`)
 
 ```
 ⏹️ Aborting Merge
@@ -245,7 +245,7 @@ Reverting merge state...
   ✓ Merge aborted
   ✓ Working directory restored
 
-💡 Fix issues and try /caw:merge again
+💡 Fix issues and try /cw:merge again
 ```
 
 ## Merge Order Strategy
@@ -314,13 +314,13 @@ After merge, the main `.caw/task_plan.md` is updated:
 git merge caw/phase-2 --no-edit
 
 # If conflict occurs
-git merge --abort  # For /caw:merge --abort
+git merge --abort  # For /cw:merge --abort
 
 # After conflict resolution
 git add <resolved-files>
 git merge --continue
 
-# Clean up after merge (done by /caw:worktree clean)
+# Clean up after merge (done by /cw:worktree clean)
 git worktree remove .worktrees/phase-2
 git branch -d caw/phase-2
 ```
@@ -336,7 +336,7 @@ Worktree status:
   .worktrees/phase-2: 🔄 In Progress (3/5)
   .worktrees/phase-3: ⏳ Pending (0/4)
 
-💡 Complete work in worktrees first, then run /caw:merge
+💡 Complete work in worktrees first, then run /cw:merge
 ```
 
 ### No Worktrees Exist
@@ -347,8 +347,8 @@ Worktree status:
 No .worktrees/phase-* or .worktrees/caw-step-* directories exist.
 
 💡 Create worktrees with:
-   /caw:next --worktree phase N
-   /caw:worktree create phase N
+   /cw:next --worktree phase N
+   /cw:worktree create phase N
 ```
 
 ### Worktree Modified but Not Committed
@@ -385,10 +385,10 @@ Options:
 
 ## Integration
 
-- **`/caw:worktree create`**: Creates worktrees that will be merged
-- **`/caw:worktree clean`**: Removes worktrees after merge
-- **`/caw:status --worktrees`**: Shows pending merge status
-- **`/caw:next`**: Continues work after merge
+- **`/cw:worktree create`**: Creates worktrees that will be merged
+- **`/cw:worktree clean`**: Removes worktrees after merge
+- **`/cw:status --worktrees`**: Shows pending merge status
+- **`/cw:next`**: Continues work after merge
 
 ## Best Practices
 
@@ -396,4 +396,4 @@ Options:
 2. **Commit frequently** in worktrees to preserve progress
 3. **Use `--dry-run`** before merging to preview changes
 4. **Merge in order** when phases have dependencies
-5. **Clean up** after merging with `/caw:worktree clean`
+5. **Clean up** after merging with `/cw:worktree clean`

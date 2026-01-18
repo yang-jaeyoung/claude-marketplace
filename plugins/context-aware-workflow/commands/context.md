@@ -2,19 +2,19 @@
 description: Manage context files - add, remove, pack, or view current context
 ---
 
-# /caw:context - Context Management
+# /cw:context - Context Management
 
 Manage the context files tracked by the workflow. Add, remove, pack, or view files in the current context.
 
 ## Usage
 
 ```bash
-/caw:context show                    # Display current context
-/caw:context add src/auth/*.ts       # Add files to active context
-/caw:context remove src/old.ts       # Remove from context
-/caw:context pack src/utils/         # Compress to interface-only
-/caw:context prune                   # Remove stale files
-/caw:context prune --threshold 3     # Custom staleness threshold
+/cw:context show                    # Display current context
+/cw:context add src/auth/*.ts       # Add files to active context
+/cw:context remove src/old.ts       # Remove from context
+/cw:context pack src/utils/         # Compress to interface-only
+/cw:context prune                   # Remove stale files
+/cw:context prune --threshold 3     # Custom staleness threshold
 ```
 
 ## Context Tiers
@@ -31,7 +31,7 @@ Manage the context files tracked by the workflow. Add, remove, pack, or view fil
 ### show - Display Current Context
 
 ```bash
-/caw:context show
+/cw:context show
 ```
 
 **Output**:
@@ -73,16 +73,16 @@ Manage the context files tracked by the workflow. Add, remove, pack, or view fil
 ══════════════════════════════════════════
 
 💡 Tips:
-   • /caw:context pack <file> to reduce token usage
-   • /caw:context prune to remove stale files
+   • /cw:context pack <file> to reduce token usage
+   • /cw:context prune to remove stale files
 ```
 
 ### add - Add Files to Context
 
 ```bash
-/caw:context add src/auth/jwt.ts           # Single file
-/caw:context add src/auth/*.ts             # Glob pattern
-/caw:context add src/auth/ --tier project  # Specific tier
+/cw:context add src/auth/jwt.ts           # Single file
+/cw:context add src/auth/*.ts             # Glob pattern
+/cw:context add src/auth/ --tier project  # Specific tier
 ```
 
 **Options**:
@@ -99,14 +99,14 @@ Manage the context files tracked by the workflow. Add, remove, pack, or view fil
 📊 Context updated: 8.1KB → 11.7KB (+3.6KB)
 
 💡 Consider packing large utility files:
-   /caw:context pack src/utils/
+   /cw:context pack src/utils/
 ```
 
 ### remove - Remove Files from Context
 
 ```bash
-/caw:context remove src/old.ts
-/caw:context remove src/deprecated/
+/cw:context remove src/old.ts
+/cw:context remove src/deprecated/
 ```
 
 **Output**:
@@ -122,8 +122,8 @@ Manage the context files tracked by the workflow. Add, remove, pack, or view fil
 ### pack - Compress to Interface-Only
 
 ```bash
-/caw:context pack src/utils/helpers.ts
-/caw:context pack src/utils/          # Directory
+/cw:context pack src/utils/helpers.ts
+/cw:context pack src/utils/          # Directory
 ```
 
 **What Gets Packed**:
@@ -151,9 +151,9 @@ Extracted:
 ### prune - Remove Stale Files
 
 ```bash
-/caw:context prune                  # Default: 5 turns unused
-/caw:context prune --threshold 3    # Custom threshold
-/caw:context prune --dry-run        # Preview only
+/cw:context prune                  # Default: 5 turns unused
+/cw:context prune --threshold 3    # Custom threshold
+/cw:context prune --dry-run        # Preview only
 ```
 
 **Staleness Detection**:
@@ -248,8 +248,8 @@ Context is automatically updated when:
 ## Token Budget Management
 
 ```bash
-/caw:context budget              # Show token usage
-/caw:context budget --limit 5000 # Set token limit
+/cw:context budget              # Show token usage
+/cw:context budget --limit 5000 # Set token limit
 ```
 
 **Output**:
@@ -295,4 +295,4 @@ By tier:
 - **Manifest**: `.caw/context_manifest.json`
 - **Scripts**: `pack_context.py`, `prune_context.py`
 - **Hooks**: PostToolUse updates context automatically
-- **Commands**: Works with `/caw:status`, `/caw:next`
+- **Commands**: Works with `/cw:status`, `/cw:next`

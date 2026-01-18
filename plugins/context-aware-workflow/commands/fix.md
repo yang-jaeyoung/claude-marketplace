@@ -2,21 +2,21 @@
 description: Fix issues identified by Reviewer agent - quick auto-fixes or comprehensive refactoring
 ---
 
-# /caw:fix - Fix Review Issues
+# /cw:fix - Fix Review Issues
 
 Automatically fix or interactively resolve issues identified by the Reviewer agent.
 
 ## Usage
 
 ```bash
-/caw:fix                        # Auto-fix simple issues from last review
-/caw:fix --interactive          # Review each fix before applying
-/caw:fix --category docs        # Fix only documentation issues
-/caw:fix --category style       # Fix only style/lint issues
-/caw:fix --category constants   # Fix only magic numbers
-/caw:fix --priority high        # Fix only high priority issues
-/caw:fix --deep                 # Use Fixer agent for complex refactoring
-/caw:fix --dry-run              # Show what would be fixed without applying
+/cw:fix                        # Auto-fix simple issues from last review
+/cw:fix --interactive          # Review each fix before applying
+/cw:fix --category docs        # Fix only documentation issues
+/cw:fix --category style       # Fix only style/lint issues
+/cw:fix --category constants   # Fix only magic numbers
+/cw:fix --priority high        # Fix only high priority issues
+/cw:fix --deep                 # Use Fixer agent for complex refactoring
+/cw:fix --dry-run              # Show what would be fixed without applying
 ```
 
 ## Behavior
@@ -36,10 +36,10 @@ Automatically fix or interactively resolve issues identified by the Reviewer age
 ⚠️ No review results found
 
 Run a review first to identify issues:
-   /caw:review
+   /cw:review
 
 Or specify files directly:
-   /caw:fix src/auth/jwt.ts
+   /cw:fix src/auth/jwt.ts
 ```
 
 ### Step 2: Categorize Issues
@@ -93,13 +93,13 @@ Applying fixes...
    Skipped: 3 (needs --deep)
 
 💡 For complex fixes:
-   /caw:fix --deep
+   /cw:fix --deep
 ```
 
 #### Interactive Mode
 
 ```bash
-/caw:fix --interactive
+/cw:fix --interactive
 ```
 
 ```
@@ -128,7 +128,7 @@ Applying fixes...
 #### Deep Fix Mode (Fixer Agent)
 
 ```bash
-/caw:fix --deep
+/cw:fix --deep
 ```
 
 Invokes the Fixer agent for comprehensive refactoring:
@@ -181,8 +181,8 @@ Running quality checks:
 ✅ All fixes verified successfully
 
 💡 Next steps:
-   • /caw:review to re-check
-   • /caw:next to continue workflow
+   • /cw:review to re-check
+   • /cw:next to continue workflow
 ```
 
 ## Fix Categories
@@ -213,7 +213,7 @@ Running quality checks:
 
 ## Integration
 
-**Flow**: `/caw:review` → `/caw:fix` → Quality Gate → `/caw:review` (optional re-check)
+**Flow**: `/cw:review` → `/cw:fix` → Quality Gate → `/cw:review` (optional re-check)
 
 **Routing**: Simple issues → Quick Fix skill | Complex issues → Fixer Agent (`--deep`)
 
@@ -229,7 +229,7 @@ Review results contain only complex issues:
   • 1 architecture recommendation
 
 Use Fixer agent for these:
-   /caw:fix --deep
+   /cw:fix --deep
 ```
 
 ### Conflicting Fixes
@@ -259,7 +259,7 @@ Rolling back changes...
 ✅ Rollback complete
 
 💡 This fix needs manual intervention or use:
-   /caw:fix --deep for intelligent refactoring
+   /cw:fix --deep for intelligent refactoring
 ```
 
 ## Configuration
@@ -288,4 +288,4 @@ fix:
 - **Reads**: `.caw/last_review.json`, `.caw/task_plan.md`, source files
 - **Invokes**: Fixer agent (--deep mode), linters, quality-gate skill
 - **Writes**: Fixed source files, `.caw/fix_history.json`
-- **Suggests**: `/caw:review`, `/caw:next`
+- **Suggests**: `/cw:review`, `/cw:next`

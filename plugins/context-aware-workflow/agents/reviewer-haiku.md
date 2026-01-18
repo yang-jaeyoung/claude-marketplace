@@ -14,9 +14,9 @@ whenToUse: |
 
   <example>
   Context: Quick review needed
-  user: "/caw:review --quick"
+  user: "/cw:review --quick"
   assistant: "🎯 Model: Haiku selected (quick review mode)"
-  <Task tool invocation with subagent_type="caw:Reviewer" model="haiku">
+  <Task tool invocation with subagent_type="cw:Reviewer" model="haiku">
   </example>
 color: lightblue
 tools:
@@ -106,7 +106,7 @@ Issues:
   • Line 45: console.log (remove)
 
 Verdict: 🟢 Minor issues - OK to proceed
-Auto-fixable: 2 → Run /caw:fix
+Auto-fixable: 2 → Run /cw:fix
 ```
 
 ## Escalation Triggers
@@ -117,4 +117,4 @@ Suggest Sonnet if:
 - Multiple interdependent files
 - Deep review requested
 
-→ "ℹ️ Full review recommended. Use `/caw:review` without --quick."
+→ "ℹ️ Full review recommended. Use `/cw:review` without --quick."

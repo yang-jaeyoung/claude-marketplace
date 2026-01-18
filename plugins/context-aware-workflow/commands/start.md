@@ -2,7 +2,7 @@
 description: Start a context-aware workflow session. Initializes environment if needed, analyzes task requirements, imports Plan Mode plans, and generates structured task_plan.md.
 ---
 
-# /caw:start - Workflow Initialization
+# /cw:start - Workflow Initialization
 
 Initialize a context-aware workflow session for structured task execution.
 
@@ -13,7 +13,7 @@ Initialize a context-aware workflow session for structured task execution.
 ```
 Check: Does .caw/context_manifest.json exist?
 ├─ NO  → MUST invoke Bootstrapper Agent using Task tool:
-│        Task(subagent_type="caw:bootstrapper", prompt="Initialize CAW environment")
+│        Task(subagent_type="cw:bootstrapper", prompt="Initialize CAW environment")
 │        WAIT for Task to complete before proceeding
 │        Verify .caw/context_manifest.json was created
 │        Then proceed to planning
@@ -27,7 +27,7 @@ When environment is NOT initialized, you MUST:
 1. **Invoke Bootstrapper as separate Task agent**:
    ```
    Task tool:
-     subagent_type: "caw:bootstrapper"
+     subagent_type: "cw:bootstrapper"
      prompt: "Initialize CAW environment. Create .caw/ directory structure, detect project context, and generate context_manifest.json"
    ```
 
@@ -47,15 +47,15 @@ When environment is NOT initialized, you MUST:
 ### Mode 1: New Task with Description
 When invoked with a task description:
 ```
-/caw:start "Implement user authentication with JWT"
+/cw:start "Implement user authentication with JWT"
 ```
 
 1. **Check environment**: Verify `.caw/context_manifest.json` exists
 2. **If not initialized**:
-   - Use Task tool with `subagent_type="caw:bootstrapper"` to initialize
+   - Use Task tool with `subagent_type="cw:bootstrapper"` to initialize
    - Wait for bootstrapper Task to complete
    - Verify `.caw/context_manifest.json` was created
-3. **Invoke Planner Agent** using Task tool with `subagent_type="caw:planner"`
+3. **Invoke Planner Agent** using Task tool with `subagent_type="cw:planner"`
 4. Planner will:
    - Ask clarifying questions if needed
    - Explore codebase for context
@@ -78,7 +78,7 @@ After Bootstrapper Task completes (if invoked):
    - Expected: .caw/context_manifest.json
    - Status: NOT_FOUND
 
-   Please run /caw:init manually to debug initialization.
+   Please run /cw:init manually to debug initialization.
    ```
 
 3. **If verification succeeds**:
@@ -88,7 +88,7 @@ After Bootstrapper Task completes (if invoked):
 ### Mode 2: Import from Plan Mode
 When invoked with `--from-plan`:
 ```
-/caw:start --from-plan
+/cw:start --from-plan
 ```
 
 1. **Detect** existing Plan Mode output:
@@ -105,7 +105,7 @@ When invoked with `--from-plan`:
 ### Mode 3: Specific Plan File
 When invoked with `--plan-file <path>`:
 ```
-/caw:start --plan-file docs/my-plan.md
+/cw:start --plan-file docs/my-plan.md
 ```
 
 1. **Read** the specified plan file
@@ -254,10 +254,10 @@ Mark parallel opportunities in Notes column:
 
 This enables:
 ```bash
-/caw:next --worktree phase 2   # Terminal 1
-/caw:next --worktree phase 3   # Terminal 2
+/cw:next --worktree phase 2   # Terminal 1
+/cw:next --worktree phase 3   # Terminal 2
 # ... work in parallel ...
-/caw:merge --all               # Merge both when done
+/cw:merge --all               # Merge both when done
 ```
 
 ## Tips
@@ -275,7 +275,7 @@ This enables:
 ### 자동 감지 워크플로우
 
 ```
-/caw:start 실행 시:
+/cw:start 실행 시:
 1. Plan Mode 파일 확인:
    - .claude/plan.md
    - .claude/plans/current.md
@@ -310,7 +310,7 @@ This enables:
 ### 변환 프로세스
 
 ```yaml
-plan_mode_to_caw:
+plan_mode_to_cw:
   source_patterns:
     - ".claude/plan.md"
     - ".claude/plans/*.md"

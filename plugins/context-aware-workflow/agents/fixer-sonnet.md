@@ -10,13 +10,13 @@ whenToUse: |
   - Standard refactoring patterns
   - Performance improvements
   - Code organization changes
-  - Default for /caw:fix --deep when no security issues
+  - Default for /cw:fix --deep when no security issues
 
   <example>
   Context: Standard refactoring needed
-  user: "/caw:fix --deep"
+  user: "/cw:fix --deep"
   assistant: "🎯 Model: Sonnet selected (standard refactoring)"
-  <Task tool invocation with subagent_type="caw:Fixer" model="sonnet">
+  <Task tool invocation with subagent_type="cw:Fixer" model="sonnet">
   </example>
 color: orange
 tools:
@@ -174,7 +174,7 @@ Progress-oriented, comprehensive:
    Tests: 20/20 passed
    Coverage: +3%
 
-⚠️ Security fixes skipped: /caw:fix --security
+⚠️ Security fixes skipped: /cw:fix --security
 ```
 
 ## Escalation to Opus
@@ -185,4 +185,4 @@ When review contains:
 - Cross-cutting concerns
 - Complex dependency untangling
 
-→ "⚠️ Security/Architecture fixes require Opus. Run `/caw:fix --security`"
+→ "⚠️ Security/Architecture fixes require Opus. Run `/cw:fix --security`"

@@ -22,7 +22,7 @@ Maintain workflow continuity across Claude Code sessions by persisting and resto
 
 This skill activates:
 1. **SessionStart**: Check for existing session to restore
-2. **Manual**: User requests save/restore via `/caw:status`
+2. **Manual**: User requests save/restore via `/cw:status`
 
 ## Session Data Structure
 
@@ -87,7 +87,7 @@ Last Activity: 2시간 전
   • src/auth/middleware.ts - 검증 미들웨어 수정
 
 [1] 이전 세션 이어서 진행
-[2] 세션 상태 확인만 (/caw:status)
+[2] 세션 상태 확인만 (/cw:status)
 [3] 새로 시작 (이전 세션 아카이브)
 ```
 
@@ -110,7 +110,7 @@ Progress: Phase 2, Step 2.3 (45%)
 Files tracked: 4개
 Insights captured: 3개
 
-다음 세션에서 /caw:status 또는 자동 복구로 이어서 진행할 수 있습니다.
+다음 세션에서 /cw:status 또는 자동 복구로 이어서 진행할 수 있습니다.
 ```
 
 ## Directory Structure
@@ -198,8 +198,8 @@ Multiple .caw/ directories found (monorepo)
 
 ### With Commands
 
-- `/caw:status` - Shows current session state and offers save option
-- `/caw:start` - Checks for existing session on workflow start
+- `/cw:status` - Shows current session state and offers save option
+- `/cw:start` - Checks for existing session on workflow start
 
 ## User Commands
 

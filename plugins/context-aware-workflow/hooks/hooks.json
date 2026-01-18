@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"CAW (Context-Aware Workflow) plugin is active. Use /caw:status to check workflow state or /caw:start to begin a new task.\"}}'"
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"CAW (Context-Aware Workflow) plugin is active. Use /cw:status to check workflow state or /cw:start to begin a new task.\"}}'"
           }
         ]
       }
@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "## Tidy First Commit Validation (Kent Beck)\n\nBefore allowing this commit, apply the commit-discipline skill logic:\n\n1. **Analyze staged changes**: Run `git diff --staged` to examine what's being committed\n\n2. **Classify change types**:\n   - Structural (Tidy): Renames, extracts, moves, formatting, dead code removal\n   - Behavioral (Build): New functions, logic changes, bug fixes, new tests\n\n3. **Decision matrix**:\n   | Detection | Action |\n   |-----------|--------|\n   | All structural | ✅ Allow with [tidy] prefix |\n   | All behavioral | ✅ Allow with [feat]/[fix]/[test] prefix |\n   | Mixed changes | ❌ Block and suggest splitting |\n\n4. **If mixed changes detected**:\n   - List structural changes found\n   - List behavioral changes found\n   - Suggest: Use `/caw:tidy --split` or manually separate commits\n   - Block the commit until resolved\n\nReference: See `skills/commit-discipline/SKILL.md` for detailed classification rules."
+            "prompt": "## Tidy First Commit Validation (Kent Beck)\n\nBefore allowing this commit, apply the commit-discipline skill logic:\n\n1. **Analyze staged changes**: Run `git diff --staged` to examine what's being committed\n\n2. **Classify change types**:\n   - Structural (Tidy): Renames, extracts, moves, formatting, dead code removal\n   - Behavioral (Build): New functions, logic changes, bug fixes, new tests\n\n3. **Decision matrix**:\n   | Detection | Action |\n   |-----------|--------|\n   | All structural | ✅ Allow with [tidy] prefix |\n   | All behavioral | ✅ Allow with [feat]/[fix]/[test] prefix |\n   | Mixed changes | ❌ Block and suggest splitting |\n\n4. **If mixed changes detected**:\n   - List structural changes found\n   - List behavioral changes found\n   - Suggest: Use `/cw:tidy --split` or manually separate commits\n   - Block the commit until resolved\n\nReference: See `skills/commit-discipline/SKILL.md` for detailed classification rules."
           }
         ]
       }

@@ -81,7 +81,7 @@ When a keyword is detected, mode state is stored in `.caw/mode.json`:
 ## Integration
 
 Magic Keywords work with:
-- `/caw:start` - Sets initial mode for workflow
-- `/caw:next` - Maintains mode through execution
-- `/caw:status` - Shows current active mode
+- `/cw:start` - Sets initial mode for workflow
+- `/cw:next` - Maintains mode through execution
+- `/cw:status` - Shows current active mode
 - Model Routing - Influences tier selection

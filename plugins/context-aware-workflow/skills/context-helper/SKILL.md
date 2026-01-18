@@ -219,11 +219,11 @@ When a phase completes, create summary for next phase:
 ```markdown
 ## User Context Commands
 
-/caw:context                    # Show current step context
-/caw:context --step 2.1         # Show specific step context
-/caw:context --phase 1          # Show phase summary
-/caw:context --insights         # Show related insights
-/caw:context --minimal          # Compact context view
+/cw:context                    # Show current step context
+/cw:context --step 2.1         # Show specific step context
+/cw:context --phase 1          # Show phase summary
+/cw:context --insights         # Show related insights
+/cw:context --minimal          # Compact context view
 ```
 
 ## Context Manifest Enhancement

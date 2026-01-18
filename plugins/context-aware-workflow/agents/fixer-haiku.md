@@ -9,13 +9,13 @@ whenToUse: |
   - Auto-fixable issues only (constants, imports, formatting)
   - Single-file changes
   - No complex refactoring needed
-  - User runs /caw:fix without --deep flag
+  - User runs /cw:fix without --deep flag
 
   <example>
   Context: Simple auto-fixes available
-  user: "/caw:fix"
+  user: "/cw:fix"
   assistant: "🎯 Model: Haiku selected (auto-fix mode)"
-  <Task tool invocation with subagent_type="caw:Fixer" model="haiku">
+  <Task tool invocation with subagent_type="cw:Fixer" model="haiku">
   </example>
 color: lightorange
 tools:
@@ -117,7 +117,7 @@ Skipped: 2 (complex - use --deep)
 ✅ Lint: Pass
 ✅ Types: Pass
 
-For complex fixes: /caw:fix --deep
+For complex fixes: /cw:fix --deep
 ```
 
 ## Escalation to Sonnet/Opus
@@ -128,4 +128,4 @@ When issues require:
 - Security fixes
 - Architectural refactoring
 
-→ "ℹ️ Complex fixes skipped. Run `/caw:fix --deep` for comprehensive fixes."
+→ "ℹ️ Complex fixes skipped. Run `/cw:fix --deep` for comprehensive fixes."
