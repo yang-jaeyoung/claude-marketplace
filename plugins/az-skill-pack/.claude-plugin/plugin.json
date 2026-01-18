@@ -1,0 +1,16 @@
+{
+  "name": "az",
+  "version": "1.0.0",
+  "description": "Collection of specialized skills for brainstorming, code conventions, security audits, documentation generation, and project analysis",
+  "author": {
+    "name": "urd"
+  },
+  "keywords": [
+    "brainstorming",
+    "csharp",
+    "security",
+    "documentation",
+    "vue",
+    "audit"
+  ]
+}

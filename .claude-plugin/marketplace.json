@@ -31,6 +31,24 @@
         "task-management"
       ],
       "category": "productivity"
+    },
+    {
+      "name": "az",
+      "description": "Collection of specialized skills for brainstorming, code conventions, security audits, documentation generation, and project analysis",
+      "source": "./plugins/az-skill-pack",
+      "version": "1.0.0",
+      "author": {
+        "name": "urd"
+      },
+      "keywords": [
+        "brainstorming",
+        "csharp",
+        "security",
+        "documentation",
+        "vue",
+        "audit"
+      ],
+      "category": "productivity"
     }
   ]
 }
