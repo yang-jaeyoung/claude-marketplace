@@ -119,15 +119,20 @@ Before starting the standard initialization workflow, check if Serena has existi
 
 ### Step 1: Environment Check
 
-Check current environment state:
+Check current environment state using cross-platform compatible commands:
 
 ```bash
-# Check if .caw/ exists
-ls -la .caw/ 2>/dev/null || echo "NOT_INITIALIZED"
+# Check if .caw/ exists (cross-platform via Glob tool preferred)
+# Unix: ls -la .caw/ 2>/dev/null || echo "NOT_INITIALIZED"
+# Windows: dir .caw\ 2>nul || echo NOT_INITIALIZED
+# Recommended: Use Glob tool: .caw/**
 
-# Check for existing plans
-ls -la .claude/plan.md .claude/plans/ 2>/dev/null
+# Check for existing plans (use Glob tool for cross-platform)
+# Glob: .claude/plan.md, .claude/plans/*.md
 ```
+
+**Cross-Platform Note**: Instead of shell commands, prefer using Claude's Glob tool
+for file existence checks. This ensures compatibility across Unix, macOS, and Windows.
 
 **Decision Tree**:
 ```
@@ -143,8 +148,18 @@ ls -la .claude/plan.md .claude/plans/ 2>/dev/null
 Create the CAW workspace:
 
 ```bash
+# Unix/macOS/Git Bash:
 mkdir -p .caw/archives
+
+# Windows PowerShell:
+# New-Item -ItemType Directory -Force -Path .caw\archives
+
+# Windows cmd.exe:
+# if not exist .caw\archives mkdir .caw\archives
 ```
+
+**Cross-Platform Note**: The `mkdir -p` command works in Git Bash on Windows.
+Claude's Bash tool typically runs in a compatible shell environment.
 
 **Directory Structure**:
 ```
@@ -313,16 +328,18 @@ Provide summary to user:
 
 When invoked with reset:
 
-1. **Archive existing state**:
-   ```bash
-   mv .caw/task_plan.md .caw/archives/archived_$(date +%Y%m%d)_$(basename .caw/task_plan.md) 2>/dev/null
-   mv .caw/context_manifest.json .caw/archives/manifest_backup_$(date +%Y%m%d).json 2>/dev/null
-   ```
+1. **Archive existing state** (use file operations for cross-platform compatibility):
+   - Read existing `.caw/task_plan.md` if exists
+   - Write to `.caw/archives/archived_YYYYMMDD_task_plan.md`
+   - Read existing `.caw/context_manifest.json` if exists
+   - Write to `.caw/archives/manifest_backup_YYYYMMDD.json`
+
+   **Implementation Note**: Use Claude's Read/Write tools instead of shell mv
+   for cross-platform compatibility.
 
 2. **Clear session**:
-   ```bash
-   rm -f .caw/session.json
-   ```
+   - Delete `.caw/session.json` using file operations
+   - Or truncate with Write tool (empty content)
 
 3. **Reinitialize**: Run Steps 3-7 again
 
@@ -378,11 +395,12 @@ The `/cw:start` command should:
 ```markdown
 # Permission Error
 ❌ **Permission Denied**
-Cannot create `.caw/` directory. Please run:
-\`\`\`bash
-chmod 755 .
-\`\`\`
-Then retry `/cw:init`
+Cannot create `.caw/` directory.
+
+**Unix/macOS**: Run `chmod 755 .` then retry `/cw:init`
+
+**Windows**: Check folder permissions in Properties > Security,
+or run terminal as Administrator.
 
 # Disk Full Error
 ❌ **Disk Full**

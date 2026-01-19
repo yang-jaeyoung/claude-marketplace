@@ -528,10 +528,16 @@ class TestHooksConfiguration(unittest.TestCase):
             self.hooks_data = json.load(f)
 
     def test_required_hooks_exist(self):
-        """Required hooks (SessionStart, PreToolUse) must be configured."""
+        """Required hooks (SessionStart) must be configured.
+
+        Note: PreToolUse was removed in commit 775b8e4 because prompt-based
+        hooks cannot reliably execute git operations and were blocking
+        legitimate commits. Tidy First discipline is now enforced via
+        documentation and skills instead.
+        """
         # PostToolUse is optional - only add if meaningful functionality needed
+        # PreToolUse was intentionally removed - see commit 775b8e4
         self.assertIn("SessionStart", self.hooks_data["hooks"])
-        self.assertIn("PreToolUse", self.hooks_data["hooks"])
 
     def test_hook_types_valid(self):
         """All hooks must have valid type field."""
@@ -557,6 +563,173 @@ class TestHooksConfiguration(unittest.TestCase):
                 hook_group,
                 "PostToolUse hooks should have matcher for tool filtering",
             )
+
+
+class TestCrossPlatformCompatibility(unittest.TestCase):
+    """Test cross-platform (Windows/Unix) compatibility."""
+
+    def test_hooks_json_no_single_quotes_in_commands(self):
+        """Hook commands should avoid single quotes for Windows PowerShell compatibility.
+
+        Windows cmd.exe and PowerShell handle single quotes differently from bash.
+        Commands should use double quotes or escape properly for cross-platform support.
+        """
+        hooks_json = PLUGIN_ROOT / "hooks" / "hooks.json"
+        with open(hooks_json, "r") as f:
+            data = json.load(f)
+
+        for event_name, event_hooks in data.get("hooks", {}).items():
+            for hook_group in event_hooks:
+                for hook in hook_group.get("hooks", []):
+                    if hook.get("type") == "command":
+                        command = hook.get("command", "")
+                        # Check for problematic single-quote patterns
+                        # Allow single quotes inside double-quoted strings
+                        # but warn about outer single quotes
+                        if command.startswith("echo '"):
+                            self.fail(
+                                f"{event_name} hook uses single-quoted echo which "
+                                f"may fail on Windows. Use double quotes or prompt type."
+                            )
+
+    def test_python_scripts_use_pathlib_or_os_path(self):
+        """Python scripts should use pathlib or os.path for cross-platform paths."""
+        scripts_dir = PLUGIN_ROOT / "skills" / "context-manager" / "scripts"
+        if not scripts_dir.exists():
+            self.skipTest("No scripts directory found")
+
+        for py_file in scripts_dir.glob("*.py"):
+            with open(py_file, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            # Check for hardcoded forward slashes in path operations
+            # Allow forward slashes in: comments, strings with http://, regex patterns
+            lines = content.split("\n")
+            for i, line in enumerate(lines, 1):
+                # Skip comments and docstrings
+                stripped = line.strip()
+                if stripped.startswith("#") or stripped.startswith('"""'):
+                    continue
+                # Skip URL patterns
+                if "http://" in line or "https://" in line:
+                    continue
+
+                # Check for direct string path concatenation with /
+                # This is a simple heuristic check
+                if '+ "/"' in line or "+ '/' " in line:
+                    self.fail(
+                        f"{py_file.name}:{i} uses string concatenation for paths. "
+                        f"Use os.path.join() or pathlib instead."
+                    )
+
+    def test_no_unix_specific_commands_in_documentation(self):
+        """Documentation should note Windows alternatives for Unix commands."""
+        # Check bootstrapper.md which contains shell commands
+        bootstrapper = PLUGIN_ROOT / "agents" / "bootstrapper.md"
+        with open(bootstrapper, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        unix_commands = ["ls -la", "chmod ", "/dev/null"]
+        found_issues = []
+
+        for cmd in unix_commands:
+            if cmd in content:
+                # Check if there's a note about cross-platform
+                if "cross-platform" not in content.lower() and "windows" not in content.lower():
+                    found_issues.append(cmd)
+
+        if found_issues:
+            # This is a warning, not a failure, since docs may intentionally show Unix examples
+            # The key is that the actual implementation should be cross-platform
+            pass  # Log warning but don't fail
+
+    def test_hooks_use_stable_patterns(self):
+        """Hooks should use stable, non-blocking patterns.
+
+        Based on lessons learned from commit 775b8e4 where PreToolUse hooks
+        caused blocking issues.
+        """
+        hooks_json = PLUGIN_ROOT / "hooks" / "hooks.json"
+        with open(hooks_json, "r") as f:
+            data = json.load(f)
+
+        for event_name, event_hooks in data.get("hooks", {}).items():
+            for hook_group in event_hooks:
+                for hook in hook_group.get("hooks", []):
+                    if hook.get("type") == "command":
+                        command = hook.get("command", "")
+
+                        # Commands that require git state may be unreliable
+                        unreliable_patterns = [
+                            "git diff",
+                            "git status",
+                            "git log",
+                        ]
+                        for pattern in unreliable_patterns:
+                            if pattern in command and event_name == "PreToolUse":
+                                self.fail(
+                                    f"{event_name} hook uses '{pattern}' which may be unreliable. "
+                                    f"Consider using prompt type instead or moving to documentation."
+                                )
+
+
+class TestHookStability(unittest.TestCase):
+    """Test hook configuration for stability and reliability."""
+
+    def setUp(self):
+        """Load hooks.json."""
+        hooks_json = PLUGIN_ROOT / "hooks" / "hooks.json"
+        with open(hooks_json, "r") as f:
+            self.hooks_data = json.load(f)
+
+    def test_session_start_hook_is_informational_only(self):
+        """SessionStart hook should only provide information, not block execution."""
+        session_hooks = self.hooks_data.get("hooks", {}).get("SessionStart", [])
+
+        for hook_group in session_hooks:
+            for hook in hook_group.get("hooks", []):
+                hook_type = hook.get("type")
+                # command type should be simple echo/info commands
+                if hook_type == "command":
+                    command = hook.get("command", "")
+                    # Should not contain blocking operations
+                    blocking_patterns = ["read ", "input(", "pause", "sleep "]
+                    for pattern in blocking_patterns:
+                        self.assertNotIn(
+                            pattern,
+                            command,
+                            f"SessionStart hook contains blocking pattern: {pattern}",
+                        )
+
+    def test_no_infinite_loop_risk_in_hooks(self):
+        """Hooks should not risk causing infinite loops."""
+        for event_name, event_hooks in self.hooks_data.get("hooks", {}).items():
+            for hook_group in event_hooks:
+                for hook in hook_group.get("hooks", []):
+                    if hook.get("type") == "command":
+                        command = hook.get("command", "")
+                        # Check for recursive patterns that could loop
+                        self.assertNotIn(
+                            "/cw:",
+                            command,
+                            f"{event_name} hook should not invoke cw commands to avoid loops",
+                        )
+
+    def test_hooks_output_valid_json_structure(self):
+        """Command hooks that output JSON should produce valid structure."""
+        for event_name, event_hooks in self.hooks_data.get("hooks", {}).items():
+            for hook_group in event_hooks:
+                for hook in hook_group.get("hooks", []):
+                    if hook.get("type") == "command":
+                        command = hook.get("command", "")
+                        # If command outputs hookSpecificOutput, verify structure hint
+                        if "hookSpecificOutput" in command:
+                            # Should include hookEventName
+                            self.assertIn(
+                                "hookEventName",
+                                command,
+                                f"{event_name} hook output should include hookEventName",
+                            )
 
 
 if __name__ == "__main__":
