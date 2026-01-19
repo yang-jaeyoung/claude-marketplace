@@ -1,0 +1,210 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loop State Schema",
+  "description": "State tracking for /cw:loop autonomous execution (dingco Ralph Loop pattern)",
+  "type": "object",
+  "required": ["schema_version", "loop_id", "status", "started_at", "config", "current_iteration"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version for future compatibility",
+      "const": "1.0"
+    },
+    "loop_id": {
+      "type": "string",
+      "description": "Unique identifier (format: loop_YYYYMMDD_HHMMSS)",
+      "pattern": "^loop_\\d{8}_\\d{6}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["running", "completed", "max_iterations_reached", "failed", "paused"],
+      "description": "Current loop status"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Loop start timestamp"
+    },
+    "completed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Loop completion timestamp (null if still running)"
+    },
+    "task_description": {
+      "type": "string",
+      "description": "Original task description provided to the loop"
+    },
+    "config": {
+      "type": "object",
+      "description": "Loop configuration parameters",
+      "required": ["max_iterations", "completion_promise", "auto_fix", "reflect_on_complete"],
+      "properties": {
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 20,
+          "description": "Maximum iterations before forced exit"
+        },
+        "completion_promise": {
+          "type": "string",
+          "default": "DONE",
+          "description": "Keyword to detect in output for early completion"
+        },
+        "auto_fix": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Fixer agent for error recovery"
+        },
+        "reflect_on_complete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Invoke /cw:reflect after loop completion"
+        },
+        "verbose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable verbose progress output"
+        }
+      }
+    },
+    "current_iteration": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Current iteration number (0 = not started)"
+    },
+    "consecutive_failures": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Number of consecutive failed iterations (resets on success)"
+    },
+    "no_progress_count": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Number of iterations with no step progress"
+    },
+    "completion_detected": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether completion_promise was found in output"
+    },
+    "completion_context": {
+      "type": ["string", "null"],
+      "description": "Context around detected completion promise (for debugging)"
+    },
+    "iterations": {
+      "type": "array",
+      "description": "History of all iterations",
+      "items": {
+        "type": "object",
+        "required": ["number", "started_at", "outcome"],
+        "properties": {
+          "number": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Iteration number"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["success", "partial", "failure", "no_progress", "skipped"],
+            "description": "Iteration result: success=step(s) completed, partial=progress made but step incomplete, failure=error occurred, no_progress=no change detected, skipped=step skipped via recovery"
+          },
+          "steps_completed": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of step IDs completed in this iteration (e.g., ['1.1', '1.2'])"
+          },
+          "steps_attempted": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of step IDs attempted in this iteration"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "step_id": { "type": "string" },
+                "error_type": { "type": "string" },
+                "message": { "type": "string" },
+                "recovery_action": {
+                  "type": "string",
+                  "enum": ["retry", "fixer_applied", "alternative_planned", "skipped", "abort"]
+                }
+              }
+            },
+            "description": "Errors encountered during iteration"
+          },
+          "recovery_level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5,
+            "description": "Error recovery level applied (0=none, 1-5=recovery levels)"
+          },
+          "output_contains_promise": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether completion promise was found in this iteration's output"
+          }
+        }
+      }
+    },
+    "error_recovery": {
+      "type": "object",
+      "description": "Error recovery state tracking",
+      "properties": {
+        "total_retries": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "fixer_invocations": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "planner_invocations": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+        "steps_skipped": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Step IDs that were skipped due to recovery"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Final summary (populated on completion)",
+      "properties": {
+        "total_iterations": { "type": "integer" },
+        "total_steps_completed": { "type": "integer" },
+        "total_errors": { "type": "integer" },
+        "exit_reason": {
+          "type": "string",
+          "enum": [
+            "completion_promise_detected",
+            "all_steps_complete",
+            "max_iterations_reached",
+            "consecutive_failures",
+            "manual_abort",
+            "critical_error"
+          ]
+        },
+        "duration_seconds": { "type": "number" }
+      }
+    }
+  }
+}
