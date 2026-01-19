@@ -293,14 +293,18 @@ Each agent has tier-specific implementations:
 | `/cw:init` | Initialize CAW environment (creates `.caw/` directory) |
 | `/cw:start` | Start a new workflow with task description or import Plan Mode plans |
 | `/cw:status` | Display current workflow status with visual progress bar |
-| `/cw:next` | Execute the next pending step from task plan |
+| `/cw:next` | Execute the next pending step from task plan (supports auto-parallel execution) |
 | `/cw:review` | Run code review with configurable depth (--haiku/--sonnet/--opus) |
 | `/cw:fix` | Apply fixes from review results (auto-fix or manual) |
+| `/cw:tidy` | Analyze and apply structural improvements (Tidy First methodology) |
 | `/cw:check` | Validate compliance with project rules and conventions |
 | `/cw:context` | Manage context files (add, remove, pack, view) |
 | `/cw:brainstorm` | Interactive requirements discovery through Socratic dialogue |
 | `/cw:design` | Create UX/UI or architecture design documents |
 | `/cw:reflect` | Run Ralph Loop - continuous improvement cycle |
+| `/cw:sync` | Synchronize CAW state with Serena memory (cross-session persistence) |
+| `/cw:worktree` | Manage Git worktrees for parallel phase execution |
+| `/cw:merge` | Merge completed worktree branches back to main |
 
 ## Schema Reference
 
@@ -323,6 +327,10 @@ Schemas are located in `schemas/` and `_shared/schemas/`:
 - [x] Auto-mode behavior modifications for agents
 - [x] Error handling with state persistence and resumability
 - [x] Skip flags (--skip-review, --skip-reflect)
+- [x] **Tidy First methodology** with `/cw:tidy` command and `commit-discipline` skill
+- [x] `/cw:sync` for Serena MCP memory synchronization
+- [x] `/cw:worktree` and `/cw:merge` for Git worktree parallel execution
+- [x] PreToolUse hook for automatic Tidy First commit validation
 
 ### Completed (v1.5.0)
 - [x] Ralph Loop continuous improvement cycle (RALPH: Reflect-Analyze-Learn-Plan-Habituate)

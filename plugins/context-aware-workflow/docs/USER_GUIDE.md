@@ -59,6 +59,7 @@ claude plugin add /path/to/context-aware-workflow
 
 | 명령어 | 단축형 | 설명 |
 |--------|--------|------|
+| `/context-aware-workflow:auto` | `/cw:auto` | **전체 워크플로우 자동 실행** |
 | `/context-aware-workflow:init` | `/cw:init` | 환경 초기화 (자동 실행) |
 | `/context-aware-workflow:brainstorm` | `/cw:brainstorm` | 요구사항 발굴 (선택) |
 | `/context-aware-workflow:design` | `/cw:design` | UX/UI, 아키텍처 설계 (선택) |
@@ -220,11 +221,11 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 | **Bootstrapper** | 환경 초기화, 프로젝트 탐지 | `.caw/context_manifest.json` |
 
 **선택적 설계 에이전트** (사전 설계 단계):
-| 에이전트 | 역할 | 출력물 |
-|----------|------|--------|
-| **Ideator** | 요구사항 발굴, Socratic 질문 | `.caw/brainstorm.md` |
-| **Designer** | UX/UI 설계, 와이어프레임 | `.caw/design/ux-ui.md` |
-| **Architect** | 시스템 아키텍처 설계 | `.caw/design/architecture.md` |
+| 에이전트 | 역할 | 기본 모델 | 출력물 |
+|----------|------|----------|--------|
+| **Ideator** | 요구사항 발굴, Socratic 질문 | Opus | `.caw/brainstorm.md` |
+| **Designer** | UX/UI 설계, 와이어프레임 | Sonnet | `.caw/design/ux-ui.md` |
+| **Architect** | 시스템 아키텍처 설계 | Opus | `.caw/design/architecture.md` |
 
 **핵심 구현 에이전트** (티어별 변형 포함):
 | 에이전트 | 역할 | 티어 변형 |
@@ -232,7 +233,7 @@ CAW는 9개의 전문 에이전트를 사용합니다 (각각 티어별 변형 �
 | **Planner** | 실행 계획 생성 | Haiku, Sonnet (기본), Opus |
 | **Builder** | TDD 구현 및 테스트 | Haiku, Sonnet, Opus (기본) |
 | **Reviewer** | 코드 품질 리뷰 | Haiku, Sonnet (기본), Opus |
-| **Fixer** | 리뷰 결과 수정/리팩토링 | Haiku, Sonnet (기본) |
+| **Fixer** | 리뷰 결과 수정/리팩토링 | Haiku, Sonnet, Opus (기본) |
 | **ComplianceChecker** | 규칙 준수 검증 | Haiku (기본) |
 
 **전체 워크플로우 다이어그램**:
