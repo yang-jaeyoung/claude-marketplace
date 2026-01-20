@@ -1,0 +1,9 @@
+{
+  "name": "gemini-cli",
+  "version": "1.0.0",
+  "description": "Google Gemini CLI integration for code review, commit messages, and documentation",
+  "author": {
+    "name": "jyyang",
+    "email": "jyyang@eye.co.kr"
+  }
+}
