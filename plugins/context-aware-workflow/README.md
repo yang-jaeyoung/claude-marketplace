@@ -76,7 +76,24 @@ cp -r context-aware-workflow /your/project/.claude-plugin/
 
 ## Configuration
 
-Create `.claude/caw.local.md` for project-specific settings (optional):
+### plansDirectory Setting (Claude Code Integration)
+
+CAW respects Claude Code's `plansDirectory` setting. Configure it in settings files (priority order):
+
+```json
+// .claude/settings.local.json (highest priority)
+// .claude/settings.json
+// ~/.claude/settings.json
+{
+  "plansDirectory": ".plans/"
+}
+```
+
+CAW will search for plans in the configured directory, plus always check `.claude/plan.md` for legacy compatibility.
+
+### CAW Local Settings
+
+Create `.claude/caw.local.md` for CAW-specific settings (optional):
 
 ```markdown
 # CAW Local Settings
@@ -86,7 +103,6 @@ Create `.claude/caw.local.md` for project-specific settings (optional):
 - Auto-prune after: 5 turns
 
 ## Plan Preferences
-- Default plan location: .claude/plan.md
 - Auto-detect plans: true
 ```
 
