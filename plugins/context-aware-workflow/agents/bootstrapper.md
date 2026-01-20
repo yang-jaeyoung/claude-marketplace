@@ -201,14 +201,30 @@ See [Manifest Schema](../_shared/schemas/manifest.schema.md) for detection patte
 
 ### Step 4: Detect Existing Plans
 
-Search for Plan Mode outputs in multiple locations:
+**First, resolve plansDirectory setting** (Reference: `_shared/plans-directory-resolution.md`):
+
+1. **Check settings files** (priority order):
+   ```
+   Read: .claude/settings.local.json → extract "plansDirectory"
+   If not found → Read: .claude/settings.json → extract "plansDirectory"
+   If not found → Read: ~/.claude/settings.json → extract "plansDirectory"
+   If not found → Use default: ".claude/plans/"
+   ```
+
+2. **Interpret path**:
+   - Absolute path (starts with `/`) → Use as-is
+   - Relative path → Resolve from project root
+
+**Then, search for Plan Mode outputs:**
 
 ```
-# Check plan locations (priority order)
-Glob: plan.md, PLAN.md                    # Project root
-Glob: .claude/plan.md                      # Claude standard location
-Glob: .claude/plans/current.md             # Active plan
-Glob: .claude/plans/*.md                   # All plans
+# Check resolved plansDirectory first
+Glob: {plansDirectory}/current.md          # Active plan
+Glob: {plansDirectory}/*.md                # All plans in configured dir
+
+# Always check legacy locations (backward compatibility)
+Glob: .claude/plan.md                      # Legacy Claude location
+Glob: plan.md, PLAN.md                     # Project root
 Glob: docs/plan.md, docs/PLAN.md          # Documentation folder
 Glob: .github/plan.md                      # GitHub folder
 ```
@@ -217,11 +233,11 @@ Glob: .github/plan.md                      # GitHub folder
 
 | Priority | Path | Description |
 |----------|------|-------------|
-| 1 | `.claude/plans/current.md` | Explicitly marked current plan |
-| 2 | `.claude/plan.md` | Claude standard location |
-| 3 | `plan.md` / `PLAN.md` | Project root |
-| 4 | `docs/plan.md` | Documentation folder |
-| 5 | `.claude/plans/*.md` | Other plan files |
+| 1 | `{plansDirectory}/current.md` | Explicitly marked current plan |
+| 2 | `{plansDirectory}/*.md` | Plans in configured directory |
+| 3 | `.claude/plan.md` | Legacy location (always check) |
+| 4 | `plan.md` / `PLAN.md` | Project root |
+| 5 | `docs/plan.md` | Documentation folder |
 
 **If plans found**:
 - Report to user: "Found existing plan at [path]"

@@ -127,7 +127,8 @@ After successful initialization:
 | Workspace | `.caw/` created |
 | Project Type | Node.js (TypeScript) |
 | Guidelines | Found `GUIDELINES.md` |
-| Existing Plans | Found `.claude/plan.md` |
+| Plans Directory | `{resolved_plansDirectory}` |
+| Existing Plans | Found in configured location |
 
 ### Next Steps
 - `/cw:start "task description"` - Start planning a task

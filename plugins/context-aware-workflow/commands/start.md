@@ -91,14 +91,22 @@ When invoked with `--from-plan`:
 /cw:start --from-plan
 ```
 
-1. **Detect** existing Plan Mode output:
-   - Check `.claude/plan.md` (default)
-   - Check `.claude/plans/current.md`
-2. If found:
+1. **Resolve plansDirectory** (Reference: `_shared/plans-directory-resolution.md`):
+   - Check `.claude/settings.local.json` → extract "plansDirectory"
+   - If not found → Check `.claude/settings.json`
+   - If not found → Check `~/.claude/settings.json`
+   - If not found → Use default ".claude/plans/"
+
+2. **Detect** existing Plan Mode output:
+   - Check `{plansDirectory}/*.md` (configured location)
+   - Check `.claude/plan.md` (legacy, always)
+
+3. If found:
    - Display plan summary
    - Ask user to confirm import
    - Convert to `.caw/task_plan.md` format
-3. If not found:
+
+4. If not found:
    - Inform user no plan detected
    - Offer to start fresh workflow
 
@@ -276,16 +284,21 @@ This enables:
 
 ```
 /cw:start 실행 시:
-1. Plan Mode 파일 확인:
-   - .claude/plan.md
-   - .claude/plans/current.md
-   - .claude/plans/*.md (최신 파일)
+1. plansDirectory 설정 해석:
+   - .claude/settings.local.json → "plansDirectory"
+   - .claude/settings.json → "plansDirectory"
+   - ~/.claude/settings.json → "plansDirectory"
+   - 기본값: ".claude/plans/"
 
-2. 파일이 존재하면:
+2. Plan Mode 파일 확인:
+   - {plansDirectory}/*.md (설정된 경로)
+   - .claude/plan.md (레거시, 항상 확인)
+
+3. 파일이 존재하면:
    - 계획 내용 요약 표시
    - 변환 여부 확인 질문
 
-3. 사용자 선택:
+4. 사용자 선택:
    [1] Plan Mode 계획을 CAW task_plan.md로 변환
    [2] 새로운 계획 작성 (Plan Mode 무시)
    [3] Plan Mode 계획 확인 후 결정

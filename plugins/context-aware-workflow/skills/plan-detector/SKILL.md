@@ -1,6 +1,6 @@
 ---
 name: plan-detector
-description: Detects Plan Mode completion and suggests starting CAW workflow. Use when ExitPlanMode is called or when a plan file is created/updated in .claude/plans/ directory.
+description: Detects Plan Mode completion and suggests starting CAW workflow. Use when ExitPlanMode is called or when a plan file is created/updated in the configured plansDirectory (resolves from settings).
 allowed-tools: Read, Glob, AskUserQuestion
 hooks:
   ExitPlanMode:
@@ -17,7 +17,7 @@ Automatically detect Plan Mode completion and offer to start a structured CAW wo
 
 This skill activates when:
 1. `ExitPlanMode` tool is called
-2. Plan file is created/modified in `.claude/plans/`
+2. Plan file is created/modified in configured `plansDirectory` (see `_shared/plans-directory-resolution.md`)
 3. User mentions "plan is ready" or similar phrases
 
 ## Behavior
@@ -27,9 +27,18 @@ This skill activates when:
 When triggered, locate the plan file:
 
 ```
-1. Check for recently modified files in .claude/plans/
-2. Validate file contains implementation steps
-3. Parse plan structure using patterns from patterns.md
+1. Resolve plansDirectory setting:
+   - Read .claude/settings.local.json → "plansDirectory"
+   - If not found → Read .claude/settings.json
+   - If not found → Read ~/.claude/settings.json
+   - If not found → Use default ".claude/plans/"
+
+2. Check for recently modified files:
+   - {plansDirectory}/*.md (configured location)
+   - .claude/plan.md (legacy, always check)
+
+3. Validate file contains implementation steps
+4. Parse plan structure using patterns from patterns.md
 ```
 
 ### Step 2: Analyze Plan Content
