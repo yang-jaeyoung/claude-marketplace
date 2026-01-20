@@ -11,6 +11,11 @@
       "source": "./plugins/codex-cli"
     },
     {
+      "name": "gemini-cli",
+      "description": "Google Gemini CLI integration for code review, commit messages, and documentation",
+      "source": "./plugins/gemini-cli"
+    },
+    {
       "name": "mssql",
       "description": "MS SQL Server integration for Claude Code - Execute queries, explore schemas, and manage databases with Windows Authentication",
       "source": "./plugins/mssql"
