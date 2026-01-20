@@ -1,5 +1,6 @@
 ---
 description: Review implemented code for quality, best practices, and potential issues
+argument-hint: "[path] [--phase N] [--step N.M]"
 ---
 
 # /cw:review - Code Review

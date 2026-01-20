@@ -1,5 +1,6 @@
 ---
 description: Initialize CAW environment without starting a task. Sets up .caw/ workspace, detects project context, and prepares for workflow.
+argument-hint: "[--reset] [--type <type>] [--verbose]"
 ---
 
 # /cw:init - Environment Initialization

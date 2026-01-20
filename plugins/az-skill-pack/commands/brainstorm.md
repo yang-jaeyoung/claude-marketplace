@@ -1,5 +1,4 @@
 ---
-name: az:brainstorm
 description: Start a structured brainstorming session using techniques like SCAMPER, Six Thinking Hats, or Divergent Expansion
 argument-hint: "[topic]"
 allowed-tools: Read, Write, Glob

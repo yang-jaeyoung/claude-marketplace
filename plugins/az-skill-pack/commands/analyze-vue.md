@@ -1,5 +1,4 @@
 ---
-name: az:analyze-vue
 description: Systematically analyze a Vue.js project structure, components, and dependencies to generate architecture documentation
 argument-hint: "[target-path]"
 allowed-tools: Read, Grep, Glob, Bash

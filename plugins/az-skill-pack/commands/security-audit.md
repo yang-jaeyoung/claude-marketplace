@@ -1,5 +1,4 @@
 ---
-name: az:security-audit
 description: Run a comprehensive security audit on the codebase, detecting project type and applying appropriate checks
 argument-hint: "[scope] [--severity=level] [--format=type] [--fix] [--path=dir]"
 allowed-tools: Read, Grep, Glob, Bash

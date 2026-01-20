@@ -1,5 +1,6 @@
 ---
 description: Start a context-aware workflow session. Initializes environment if needed, analyzes task requirements, imports Plan Mode plans, and generates structured task_plan.md.
+argument-hint: "<task> [--from-plan] [--plan-file <path>]"
 ---
 
 # /cw:start - Workflow Initialization

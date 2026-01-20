@@ -1,5 +1,6 @@
 ---
 description: Manage context files - add, remove, pack, or view current context
+argument-hint: "<show|add|remove|pack|prune> [options]"
 ---
 
 # /cw:context - Context Management

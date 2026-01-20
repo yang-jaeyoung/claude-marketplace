@@ -1,5 +1,6 @@
 ---
 description: Validate compliance with project rules, conventions, and workflow requirements
+argument-hint: "[--workflow] [--rules] [--all]"
 ---
 
 # /cw:check - Compliance Check

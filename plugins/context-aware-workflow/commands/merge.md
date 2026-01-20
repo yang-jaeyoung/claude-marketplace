@@ -1,6 +1,6 @@
 ---
 description: Merge completed worktree branches back to main and synchronize task plan state
-argument-hint: "[options]"
+argument-hint: "[phase N] [--all] [--dry-run]"
 ---
 
 # /cw:merge - Merge Worktree Branches

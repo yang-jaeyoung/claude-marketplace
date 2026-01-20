@@ -1,5 +1,6 @@
 ---
 description: Create UX/UI or architecture design documents before implementation
+argument-hint: "[--ui] [--arch] [--all]"
 ---
 
 # /cw:design - Design Phase

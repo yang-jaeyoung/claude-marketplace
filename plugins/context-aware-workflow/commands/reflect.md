@@ -1,5 +1,6 @@
 ---
 description: Run Ralph Loop - continuous improvement cycle after task completion (Reflect-Analyze-Learn-Plan-Habituate)
+argument-hint: "[--task N.M] [--full]"
 ---
 
 # /cw:reflect - Ralph Loop Improvement Cycle

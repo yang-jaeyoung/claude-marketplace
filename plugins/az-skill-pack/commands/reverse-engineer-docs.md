@@ -1,5 +1,4 @@
 ---
-name: az:reverse-engineer-docs
 description: Generate project documentation by analyzing the codebase (requirements, functional spec, use cases, architecture, UI, database, operations)
 argument-hint: "[doc-type] [--output=format]"
 allowed-tools: Read, Grep, Glob, Bash

@@ -1,5 +1,6 @@
 ---
 description: Fix issues identified by Reviewer agent - quick auto-fixes or comprehensive refactoring
+argument-hint: "[--interactive] [--category <cat>] [--deep]"
 ---
 
 # /cw:fix - Fix Review Issues

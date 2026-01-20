@@ -36,7 +36,7 @@ python tests/test_plugin_structure.py             # Plugin structure validation
 
 ## Plugin Architecture
 
-> **📚 Official Documentation**: Always refer to the [Claude Code Plugins Documentation](https://code.claude.com/docs/en/plugins) for the latest plugin development guidelines, API changes, and best practices.
+> **📚 Official Documentation**: Always refer to the [Claude Code Plugins Documentation](https://code.claude.com/docs/en/plugins) and [Plugins Reference](https://code.claude.com/docs/en/plugins-reference.md) for the latest plugin development guidelines, API changes, and best practices.
 
 ### Plugin Types
 
@@ -63,11 +63,24 @@ Every plugin must have:
 ### Component Patterns
 
 **Commands** (`commands/*.md`):
+> See the [official Slash Commands documentation](https://code.claude.com/docs/en/slash-commands.md) for the latest frontmatter options and features.
+
 ```yaml
 ---
 description: Short description shown in help
-argument-hint: "<arg_name>"        # Optional
-allowed-tools: ["Bash", "Read"]    # Optional tool restrictions
+argument-hint: "<arg_name>"        # Optional: hint shown during autocomplete
+allowed-tools: ["Bash", "Read"]    # Optional: tool restrictions
+context: fork                      # Optional: run in forked sub-agent context
+agent: general-purpose             # Optional: agent type when context: fork
+model: claude-sonnet-4-20250514    # Optional: specific model string
+disable-model-invocation: false    # Optional: prevent Skill tool invocation
+hooks:                             # Optional: command-scoped hooks
+  PreToolUse:
+    - matcher: "Bash"
+      hooks:
+        - type: command
+          command: "./scripts/validate.sh"
+          once: true               # Run only once per session
 ---
 # Command instructions in markdown
 ```
@@ -113,7 +126,7 @@ context: fork                      # Runs in isolated context (replaces forked-c
 ```
 
 **Hooks** (`hooks/hooks.json`):
-> See the [official Hooks documentation](https://code.claude.com/docs/en/hooks-guide.md) for the latest hook events and configuration options.
+> See the [official Hooks documentation](https://code.claude.com/docs/en/hooks.md) and [Hooks Guide](https://code.claude.com/docs/en/hooks-guide.md) for the latest hook events and configuration options.
 
 ```json
 {

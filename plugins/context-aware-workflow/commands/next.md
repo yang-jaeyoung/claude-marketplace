@@ -1,5 +1,6 @@
 ---
 description: Execute the next pending step from task_plan.md using the Builder agent
+argument-hint: "[phase N] [--step N.M] [--parallel]"
 ---
 
 # /cw:next - Execute Next Step

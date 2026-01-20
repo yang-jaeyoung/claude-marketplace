@@ -1,5 +1,6 @@
 ---
 description: Display current workflow status, progress, and next actions
+argument-hint: "[--verbose] [--worktrees] [--agents]"
 ---
 
 # /cw:status - Workflow Status

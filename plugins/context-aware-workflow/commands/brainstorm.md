@@ -1,5 +1,6 @@
 ---
 description: Interactive requirements discovery through Socratic dialogue and brainstorming
+argument-hint: "[topic] [--reset]"
 ---
 
 # /cw:brainstorm - Requirements Discovery
