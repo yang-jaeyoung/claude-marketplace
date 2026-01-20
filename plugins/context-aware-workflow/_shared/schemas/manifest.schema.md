@@ -23,6 +23,8 @@ Location: `.caw/context_manifest.json`
     "ignored": ["node_modules/**", "dist/**"]
   },
   "plans": {
+    "plansDirectory": ".claude/plans/",
+    "plansDirectorySource": "default",
     "detected": [".claude/plan.md"],
     "active": null
   },

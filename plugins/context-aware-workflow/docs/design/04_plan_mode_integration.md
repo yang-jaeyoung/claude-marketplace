@@ -30,9 +30,53 @@ Claude Code의 기존 Plan Mode 출력을 워크플로우 플러그인에 통합
 # skills/plan-importer/scripts/detect_plan.py
 
 import os
+import json
 from datetime import datetime, timedelta
 from pathlib import Path
 
+def resolve_plans_directory() -> str:
+    """
+    plansDirectory 설정을 우선순위에 따라 해석
+
+    Priority:
+    1. .claude/settings.local.json
+    2. .claude/settings.json
+    3. ~/.claude/settings.json
+    4. Default: ".claude/plans/"
+    """
+    settings_files = [
+        ".claude/settings.local.json",
+        ".claude/settings.json",
+        os.path.expanduser("~/.claude/settings.json")
+    ]
+
+    for settings_path in settings_files:
+        if os.path.exists(settings_path):
+            try:
+                with open(settings_path) as f:
+                    settings = json.load(f)
+                if "plansDirectory" in settings:
+                    return settings["plansDirectory"]
+            except (json.JSONDecodeError, IOError):
+                continue
+
+    return ".claude/plans/"
+
+def get_plan_paths() -> list:
+    """
+    plansDirectory 설정을 기반으로 검색 경로 생성
+    """
+    plans_dir = resolve_plans_directory()
+
+    # Configured directory + legacy paths
+    return [
+        f"{plans_dir}/current.md",
+        f"{plans_dir}/*.md",
+        ".claude/plan.md",  # Legacy (always check)
+        "docs/plan.md"
+    ]
+
+# Legacy constant for backward compatibility
 DEFAULT_PLAN_PATHS = [
     ".claude/plan.md",
     ".claude/plans/current.md",
@@ -49,10 +93,14 @@ def detect_existing_plan():
             "path": str,
             "modified": datetime,
             "summary": str,
-            "completion_rate": float
+            "completion_rate": float,
+            "plans_directory": str  # Resolved plansDirectory
         }
     """
-    for plan_path in DEFAULT_PLAN_PATHS:
+    plans_directory = resolve_plans_directory()
+    plan_paths = get_plan_paths()
+
+    for plan_path in plan_paths:
         if os.path.exists(plan_path):
             stat = os.stat(plan_path)
             modified = datetime.fromtimestamp(stat.st_mtime)
@@ -70,10 +118,11 @@ def detect_existing_plan():
                 "path": plan_path,
                 "modified": modified,
                 "summary": summary,
-                "completion_rate": completion
+                "completion_rate": completion,
+                "plans_directory": plans_directory
             }
 
-    return {"found": False}
+    return {"found": False, "plans_directory": plans_directory}
 
 def extract_summary(content: str) -> str:
     """첫 번째 헤더 또는 첫 줄에서 요약 추출"""
