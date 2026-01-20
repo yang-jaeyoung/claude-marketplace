@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "intent-skill-creator/output",
+  "title": "Intent Skill Creator Output Schema",
+  "description": "새로 생성된 스킬의 구조를 검증하는 스키마",
+  "type": "object",
+  "required": ["meta", "files", "validation"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["generated_at", "skill_version", "skill_name", "skill_type"],
+      "properties": {
+        "generated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "스킬 생성 시간"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "생성된 스킬 버전"
+        },
+        "skill_name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "description": "스킬 이름 (kebab-case)"
+        },
+        "skill_type": {
+          "type": "string",
+          "enum": ["analyzer", "generator", "documenter", "transformer", "validator", "custom"],
+          "description": "스킬 유형"
+        },
+        "output_dir": {
+          "type": "string",
+          "description": "스킬이 생성된 디렉토리 경로"
+        }
+      }
+    },
+    "files": {
+      "type": "object",
+      "required": ["intent_yaml", "skill_md", "output_schema", "checklist", "verification_script"],
+      "properties": {
+        "intent_yaml": {
+          "type": "object",
+          "required": ["path", "exists", "valid"],
+          "properties": {
+            "path": { "type": "string" },
+            "exists": { "type": "boolean" },
+            "valid": { "type": "boolean" },
+            "sections": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "skill_md": {
+          "type": "object",
+          "required": ["path", "exists"],
+          "properties": {
+            "path": { "type": "string" },
+            "exists": { "type": "boolean" },
+            "has_frontmatter": { "type": "boolean" },
+            "has_process": { "type": "boolean" }
+          }
+        },
+        "output_schema": {
+          "type": "object",
+          "required": ["path", "exists", "valid"],
+          "properties": {
+            "path": { "type": "string" },
+            "exists": { "type": "boolean" },
+            "valid": { "type": "boolean" }
+          }
+        },
+        "checklist": {
+          "type": "object",
+          "required": ["path", "exists", "valid"],
+          "properties": {
+            "path": { "type": "string" },
+            "exists": { "type": "boolean" },
+            "valid": { "type": "boolean" },
+            "must_count": { "type": "integer" },
+            "should_count": { "type": "integer" }
+          }
+        },
+        "verification_script": {
+          "type": "object",
+          "required": ["path", "exists", "executable"],
+          "properties": {
+            "path": { "type": "string" },
+            "exists": { "type": "boolean" },
+            "executable": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["overall_status", "checks"],
+      "properties": {
+        "overall_status": {
+          "type": "string",
+          "enum": ["pass", "fail", "warning"],
+          "description": "전체 검증 상태"
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "status", "priority"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "status": {
+                "type": "string",
+                "enum": ["pass", "fail", "warning", "skipped"]
+              },
+              "priority": {
+                "type": "string",
+                "enum": ["must", "should", "could"]
+              },
+              "message": { "type": "string" }
+            }
+          }
+        },
+        "summary": {
+          "type": "object",
+          "properties": {
+            "total": { "type": "integer" },
+            "passed": { "type": "integer" },
+            "failed": { "type": "integer" },
+            "warnings": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "customization_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": { "type": "string" },
+          "line": { "type": "integer" },
+          "marker": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "description": "TODO/CUSTOMIZE 마커 위치 목록"
+    }
+  }
+}

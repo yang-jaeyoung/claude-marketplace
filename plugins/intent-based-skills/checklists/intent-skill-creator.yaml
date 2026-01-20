@@ -1,0 +1,336 @@
+# Skill Creator - Verification Checklist
+# 생성된 스킬이 프레임워크를 준수하는지 검증
+
+version: "1.0"
+last_updated: "2025-01-19"
+
+# ============================================================
+# 사전 조건 검증 (스킬 생성 전)
+# ============================================================
+pre_execution:
+  - id: PRE-001
+    name: "스킬 이름 형식 검증"
+    description: "스킬 이름이 kebab-case 형식인지 확인"
+    validation: auto
+    script: |
+      #!/bin/bash
+      SKILL_NAME="$1"
+      if echo "$SKILL_NAME" | grep -qE "^[a-z][a-z0-9-]*$"; then
+        echo "OK: Valid skill name format"
+      else
+        echo "FAIL: Skill name must be kebab-case (e.g., my-skill-name)"
+        exit 1
+      fi
+    priority: must
+    error_action: abort
+
+  - id: PRE-002
+    name: "출력 디렉토리 쓰기 가능"
+    description: "스킬을 생성할 디렉토리에 쓰기 권한이 있는지 확인"
+    validation: auto
+    script: |
+      #!/bin/bash
+      OUTPUT_DIR="$1"
+      if mkdir -p "$OUTPUT_DIR" 2>/dev/null && test -w "$OUTPUT_DIR"; then
+        echo "OK: Output directory is writable"
+      else
+        echo "FAIL: Cannot write to output directory"
+        exit 1
+      fi
+    priority: must
+    error_action: abort
+
+  - id: PRE-003
+    name: "기존 스킬 존재 확인"
+    description: "동일 이름의 스킬이 이미 존재하는지 확인"
+    validation: auto
+    script: |
+      #!/bin/bash
+      SKILL_PATH="$1"
+      if test -d "$SKILL_PATH"; then
+        echo "WARNING: Skill already exists at $SKILL_PATH"
+      else
+        echo "OK: No existing skill found"
+      fi
+    priority: should
+    error_action: warn
+
+# ============================================================
+# 파일 생성 검증 (스킬 생성 후)
+# ============================================================
+post_execution:
+  
+  # === 필수 파일 존재 검증 ===
+  files:
+    - id: FILE-001
+      name: "intent.yaml 존재"
+      validation: auto
+      script: |
+        test -f "$SKILL_DIR/intent.yaml" && echo "OK" || echo "FAIL: intent.yaml not found"
+      priority: must
+
+    - id: FILE-002
+      name: "SKILL.md 존재"
+      validation: auto
+      script: |
+        test -f "$SKILL_DIR/SKILL.md" && echo "OK" || echo "FAIL: SKILL.md not found"
+      priority: must
+
+    - id: FILE-003
+      name: "output.schema.json 존재"
+      validation: auto
+      script: |
+        test -f "$SKILL_DIR/schema/output.schema.json" && echo "OK" || echo "FAIL: schema not found"
+      priority: must
+
+    - id: FILE-004
+      name: "checklist.yaml 존재"
+      validation: auto
+      script: |
+        test -f "$SKILL_DIR/verification/checklist.yaml" && echo "OK" || echo "FAIL: checklist not found"
+      priority: must
+
+    - id: FILE-005
+      name: "run-verification.sh 존재 및 실행 가능"
+      validation: auto
+      script: |
+        if test -f "$SKILL_DIR/verification/run-verification.sh"; then
+          if test -x "$SKILL_DIR/verification/run-verification.sh"; then
+            echo "OK"
+          else
+            echo "FAIL: run-verification.sh is not executable"
+          fi
+        else
+          echo "FAIL: run-verification.sh not found"
+        fi
+      priority: must
+
+  # === 파일 유효성 검증 ===
+  validity:
+    - id: VALID-001
+      name: "intent.yaml YAML 유효성"
+      validation: auto
+      script: |
+        python3 -c "import yaml; yaml.safe_load(open('$SKILL_DIR/intent.yaml'))" 2>/dev/null && \
+          echo "OK" || echo "FAIL: Invalid YAML syntax"
+      priority: must
+
+    - id: VALID-002
+      name: "output.schema.json JSON 유효성"
+      validation: auto
+      script: |
+        python3 -c "import json; json.load(open('$SKILL_DIR/schema/output.schema.json'))" 2>/dev/null && \
+          echo "OK" || echo "FAIL: Invalid JSON syntax"
+      priority: must
+
+    - id: VALID-003
+      name: "checklist.yaml YAML 유효성"
+      validation: auto
+      script: |
+        python3 -c "import yaml; yaml.safe_load(open('$SKILL_DIR/verification/checklist.yaml'))" 2>/dev/null && \
+          echo "OK" || echo "FAIL: Invalid YAML syntax"
+      priority: must
+
+  # === SKILL.md Frontmatter 검증 ===
+  frontmatter:
+    - id: FRONT-001
+      name: "SKILL.md Frontmatter YAML 유효성"
+      description: "SKILL.md의 frontmatter가 유효한 YAML인지 확인"
+      validation: auto
+      script: |
+        # frontmatter 추출 후 YAML 유효성 검증
+        sed -n '2,/^---$/p' "$SKILL_DIR/SKILL.md" | head -n -1 | \
+        python3 -c "import yaml, sys; yaml.safe_load(sys.stdin)" && \
+        echo "OK" || echo "FAIL: Invalid frontmatter YAML"
+      priority: must
+
+    - id: FRONT-002
+      name: "Frontmatter name 필드 존재"
+      description: "frontmatter에 name 필드가 있는지 확인"
+      validation: auto
+      script: |
+        sed -n '2,/^---$/p' "$SKILL_DIR/SKILL.md" | grep -q "^name:" && \
+        echo "OK" || echo "FAIL: Missing 'name' in frontmatter"
+      priority: must
+
+    - id: FRONT-003
+      name: "description 형식 준수"
+      description: "description이 Claude Code 스킬 형식을 따르는지 확인"
+      validation: auto
+      script: |
+        # "This skill should be used when" 시작 + "Triggers:" 포함
+        sed -n '2,/^---$/p' "$SKILL_DIR/SKILL.md" | \
+        grep -q 'description:.*This skill should be used when.*Triggers:' && \
+        echo "OK" || echo "FAIL: description must follow Claude Code skill format"
+      priority: must
+
+  # === 구조 검증 ===
+  structure:
+    - id: STRUCT-001
+      name: "intent.yaml 필수 섹션 존재"
+      validation: auto
+      script: |
+        required_sections=("meta" "intent" "input" "output" "constraints" "verification")
+        missing=""
+        for section in "${required_sections[@]}"; do
+          if ! grep -q "^${section}:" "$SKILL_DIR/intent.yaml"; then
+            missing="$missing $section"
+          fi
+        done
+        if [ -z "$missing" ]; then
+          echo "OK"
+        else
+          echo "FAIL: Missing sections:$missing"
+        fi
+      priority: must
+
+    - id: STRUCT-002
+      name: "SKILL.md 필수 구조 존재"
+      validation: auto
+      script: |
+        has_frontmatter=$(grep -c "^---" "$SKILL_DIR/SKILL.md" 2>/dev/null || echo "0")
+        has_process=$(grep -qiE "^#{1,2}.*(프로세스|process|실행)" "$SKILL_DIR/SKILL.md" && echo "1" || echo "0")
+        has_phase=$(grep -qiE "^#{1,2}.*(phase|단계)" "$SKILL_DIR/SKILL.md" && echo "1" || echo "0")
+        
+        if [ "$has_frontmatter" -ge 2 ] && [ "$has_process" = "1" ]; then
+          echo "OK"
+        else
+          echo "FAIL: Missing required SKILL.md structure"
+        fi
+      priority: must
+
+    - id: STRUCT-003
+      name: "output.schema.json 기본 구조"
+      validation: auto
+      script: |
+        python3 << 'EOF'
+        import json
+        import sys
+        
+        with open('$SKILL_DIR/schema/output.schema.json') as f:
+            schema = json.load(f)
+        
+        required = ['$schema', 'type', 'properties']
+        missing = [r for r in required if r not in schema]
+        
+        if missing:
+            print(f"FAIL: Missing schema fields: {missing}")
+            sys.exit(1)
+        
+        if 'meta' not in schema.get('properties', {}):
+            print("FAIL: Missing 'meta' in properties")
+            sys.exit(1)
+        
+        print("OK")
+        EOF
+      priority: must
+
+    - id: STRUCT-004
+      name: "checklist.yaml MUST 항목 존재"
+      validation: auto
+      script: |
+        if grep -q "priority: must" "$SKILL_DIR/verification/checklist.yaml"; then
+          echo "OK"
+        else
+          echo "FAIL: No MUST priority items in checklist"
+        fi
+      priority: must
+
+  # === 커스터마이즈 포인트 검증 ===
+  customization:
+    - id: CUSTOM-001
+      name: "TODO 마커 존재"
+      validation: auto
+      script: |
+        todo_count=$(grep -r "TODO" "$SKILL_DIR" --include="*.yaml" --include="*.md" 2>/dev/null | wc -l)
+        if [ "$todo_count" -ge 3 ]; then
+          echo "OK: Found $todo_count TODO markers"
+        else
+          echo "WARNING: Only $todo_count TODO markers found (recommend >= 3)"
+        fi
+      priority: should
+
+    - id: CUSTOM-002
+      name: "CUSTOMIZE 마커 존재"
+      validation: auto
+      script: |
+        if grep -rq "CUSTOMIZE\|수정 필요\|커스터마이즈" "$SKILL_DIR" --include="*.yaml" --include="*.md" 2>/dev/null; then
+          echo "OK"
+        else
+          echo "WARNING: No CUSTOMIZE markers found"
+        fi
+      priority: could
+
+  # === 품질 검증 ===
+  quality:
+    - id: QUAL-001
+      name: "intent.goal 명확성"
+      validation: manual
+      guidance: |
+        intent.yaml의 intent.goal을 확인하세요:
+        - 달성하려는 목표가 명확하게 기술되어 있는가?
+        - 구체적이고 측정 가능한가?
+        - 스킬의 범위가 명확한가?
+      priority: should
+
+    - id: QUAL-002
+      name: "execution_hints 완성도"
+      validation: manual
+      guidance: |
+        intent.yaml의 execution_hints를 확인하세요:
+        - phase_order가 논리적인가?
+        - 각 phase에 focus 항목이 있는가?
+        - duration이 현실적인가?
+      priority: should
+
+    - id: QUAL-003
+      name: "verification 항목 충분성"
+      validation: manual
+      guidance: |
+        verification/checklist.yaml을 확인하세요:
+        - 모든 output artifact에 대한 검증이 있는가?
+        - MUST/SHOULD/COULD 우선순위가 적절한가?
+        - 자동 검증과 수동 검증이 적절히 분배되어 있는가?
+      priority: should
+
+# ============================================================
+# 통합 검증 리포트 템플릿
+# ============================================================
+report_template: |
+  # 스킬 생성 검증 리포트
+  
+  **스킬 이름**: {skill_name}
+  **생성 시간**: {created_at}
+  **스킬 유형**: {skill_type}
+  
+  ## 검증 요약
+  
+  | 카테고리 | 통과 | 실패 | 경고 |
+  |---------|------|------|------|
+  | 파일 존재 | {files_pass} | {files_fail} | - |
+  | 파일 유효성 | {valid_pass} | {valid_fail} | - |
+  | 구조 검증 | {struct_pass} | {struct_fail} | - |
+  | 커스터마이즈 | {custom_pass} | - | {custom_warn} |
+  
+  **전체 상태**: {overall_status}
+  
+  ## 생성된 파일
+  
+  ```
+  {skill_name}/
+  ├── intent.yaml         [{intent_status}]
+  ├── SKILL.md            [{skill_md_status}]
+  ├── schema/
+  │   └── output.schema.json [{schema_status}]
+  └── verification/
+      ├── checklist.yaml  [{checklist_status}]
+      └── run-verification.sh [{script_status}]
+  ```
+  
+  ## 다음 단계
+  
+  {next_steps}
+  
+  ## 커스터마이즈 포인트
+  
+  {customization_points}

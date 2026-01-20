@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "feedback-loop/event",
+  "title": "Feedback Event Schema",
+  "description": "스킬 실행 피드백 이벤트 스키마",
+  "type": "object",
+  "required": ["timestamp", "event_type", "skill"],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["execution_start", "execution_complete", "verification_failure", "user_correction"]
+    },
+    "skill": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "event_type": { "const": "execution_start" } } },
+      "then": {
+        "properties": {
+          "version": { "type": "string" },
+          "input_summary": { "type": "string" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "execution_complete" } } },
+      "then": {
+        "required": ["duration_seconds", "total_checks"],
+        "properties": {
+          "duration_seconds": { "type": "number" },
+          "total_checks": { "type": "integer" },
+          "passed_checks": { "type": "integer" },
+          "failed_checks": { "type": "integer" },
+          "warning_checks": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "verification_failure" } } },
+      "then": {
+        "required": ["check_id", "check_name", "priority"],
+        "properties": {
+          "check_id": { "type": "string" },
+          "check_name": { "type": "string" },
+          "priority": { "type": "string", "enum": ["must", "should", "could"] },
+          "error_message": { "type": "string" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "event_type": { "const": "user_correction" } } },
+      "then": {
+        "required": ["file_path", "action"],
+        "properties": {
+          "file_path": { "type": "string" },
+          "action": { "type": "string", "enum": ["add", "modify", "delete"] },
+          "section": { "type": "string" },
+          "lines_added": { "type": "integer" },
+          "lines_removed": { "type": "integer" }
+        }
+      }
+    }
+  ]
+}

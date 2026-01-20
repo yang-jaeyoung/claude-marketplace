@@ -1,0 +1,548 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "vue-project-analyzer/output",
+  "title": "Vue Project Analyzer Output Schema",
+  "description": "Vue 프로젝트 분석 결과 데이터 스키마",
+  "type": "object",
+  "required": ["meta", "project", "components", "stores", "routes"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "분석 메타데이터",
+      "required": ["generated_at", "skill_version", "project_path"],
+      "properties": {
+        "generated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "분석 생성 시간 (ISO 8601)"
+        },
+        "skill_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "스킬 버전"
+        },
+        "project_path": {
+          "type": "string",
+          "description": "분석된 프로젝트 경로"
+        },
+        "analysis_options": {
+          "type": "object",
+          "description": "분석 옵션",
+          "properties": {
+            "analysis_depth": {
+              "type": "string",
+              "enum": ["shallow", "deep"],
+              "default": "shallow"
+            },
+            "component_paths": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "include_node_modules": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "description": "프로젝트 메타 정보",
+      "required": ["name", "vueVersion", "vueGeneration"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "프로젝트 이름"
+        },
+        "vueVersion": {
+          "type": "string",
+          "description": "Vue 버전 (예: 3.4.0)"
+        },
+        "vueGeneration": {
+          "type": "string",
+          "enum": ["2.x", "3.x"],
+          "description": "Vue 세대"
+        },
+        "buildTool": {
+          "type": "string",
+          "enum": ["vite", "vue-cli", "webpack", "other"],
+          "description": "빌드 도구"
+        },
+        "typescript": {
+          "type": "boolean",
+          "description": "TypeScript 사용 여부"
+        },
+        "stateManagement": {
+          "type": "string",
+          "enum": ["pinia", "vuex", "both", "none"],
+          "description": "상태관리 라이브러리"
+        },
+        "router": {
+          "type": "string",
+          "description": "라우터 버전 (예: vue-router@4.x)"
+        },
+        "uiFramework": {
+          "type": "string",
+          "description": "UI 프레임워크 (예: element-plus, vuetify)"
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "description": "디렉토리 구조 정보",
+      "properties": {
+        "sourceDir": {
+          "type": "string",
+          "description": "소스 디렉토리 경로 (예: src)"
+        },
+        "directories": {
+          "type": "array",
+          "description": "주요 디렉토리 목록",
+          "items": {
+            "type": "object",
+            "required": ["path", "type"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "디렉토리 경로"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["components", "views", "pages", "layouts", "stores", "router", "composables", "utils", "assets", "other"],
+                "description": "디렉토리 유형"
+              },
+              "fileCount": {
+                "type": "integer",
+                "description": "파일 수"
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "description": "컴포넌트 목록",
+      "items": {
+        "type": "object",
+        "required": ["name", "path", "category"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "컴포넌트 이름"
+          },
+          "path": {
+            "type": "string",
+            "description": "컴포넌트 파일 경로"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["Page", "Layout", "Common", "Feature", "Base", "Unclassified"],
+            "description": "컴포넌트 분류"
+          },
+          "scriptType": {
+            "type": "string",
+            "enum": ["setup", "composition", "options", "none"],
+            "description": "스크립트 유형"
+          },
+          "lang": {
+            "type": "string",
+            "enum": ["ts", "js"],
+            "description": "스크립트 언어"
+          },
+          "props": {
+            "type": "array",
+            "description": "Props 목록",
+            "items": {
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Prop 이름"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Prop 타입"
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "필수 여부"
+                },
+                "default": {
+                  "type": "string",
+                  "description": "기본값"
+                }
+              }
+            }
+          },
+          "emits": {
+            "type": "array",
+            "description": "Emit 이벤트 목록",
+            "items": {
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "이벤트 이름"
+                },
+                "payload": {
+                  "type": "string",
+                  "description": "페이로드 타입"
+                }
+              }
+            }
+          },
+          "slots": {
+            "type": "array",
+            "description": "Slot 목록",
+            "items": {
+              "type": "object",
+              "required": ["name"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Slot 이름"
+                },
+                "scoped": {
+                  "type": "boolean",
+                  "description": "Scoped slot 여부"
+                }
+              }
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "description": "의존하는 컴포넌트/모듈",
+            "items": {
+              "type": "object",
+              "required": ["name", "type"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "의존 대상 이름"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "의존 대상 경로"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["component", "composable", "store", "utility", "external"],
+                  "description": "의존 유형"
+                },
+                "dynamic": {
+                  "type": "boolean",
+                  "description": "동적 import 여부"
+                }
+              }
+            }
+          },
+          "usedComposables": {
+            "type": "array",
+            "description": "사용된 Composable 목록",
+            "items": { "type": "string" }
+          },
+          "usedStores": {
+            "type": "array",
+            "description": "사용된 Store 목록",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "stores": {
+      "type": "object",
+      "description": "상태관리 분석 결과",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["pinia", "vuex", "both", "none"],
+          "description": "상태관리 유형"
+        },
+        "pinia": {
+          "type": "object",
+          "description": "Pinia stores 정보",
+          "properties": {
+            "stores": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "path", "id"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Store 함수명 (예: useUserStore)"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "Store ID"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "파일 경로"
+                  },
+                  "state": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string" },
+                        "type": { "type": "string" }
+                      }
+                    }
+                  },
+                  "getters": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "actions": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "description": "의존하는 다른 store",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "vuex": {
+          "type": "object",
+          "description": "Vuex 정보",
+          "properties": {
+            "modules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "path"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "모듈 이름"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "파일 경로"
+                  },
+                  "namespaced": {
+                    "type": "boolean",
+                    "description": "namespaced 여부"
+                  },
+                  "state": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "getters": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "mutations": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "actions": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "routes": {
+      "type": "object",
+      "description": "라우팅 분석 결과",
+      "properties": {
+        "hasRouter": {
+          "type": "boolean",
+          "description": "Vue Router 사용 여부"
+        },
+        "routerVersion": {
+          "type": "string",
+          "description": "Vue Router 버전"
+        },
+        "routes": {
+          "type": "array",
+          "description": "라우트 목록",
+          "items": {
+            "type": "object",
+            "required": ["path"],
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "라우트 경로"
+              },
+              "name": {
+                "type": "string",
+                "description": "라우트 이름"
+              },
+              "component": {
+                "type": "string",
+                "description": "연결된 컴포넌트 경로"
+              },
+              "lazy": {
+                "type": "boolean",
+                "description": "Lazy loading 여부"
+              },
+              "meta": {
+                "type": "object",
+                "description": "메타 정보",
+                "additionalProperties": true
+              },
+              "children": {
+                "type": "array",
+                "description": "중첩 라우트",
+                "items": { "$ref": "#/properties/routes/properties/routes/items" }
+              },
+              "dynamicSegments": {
+                "type": "array",
+                "description": "동적 세그먼트 목록",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "guards": {
+          "type": "array",
+          "description": "네비게이션 가드 목록",
+          "items": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["beforeEach", "afterEach", "beforeResolve", "beforeEnter"],
+                "description": "가드 유형"
+              },
+              "route": {
+                "type": "string",
+                "description": "적용 라우트 (beforeEnter인 경우)"
+              },
+              "description": {
+                "type": "string",
+                "description": "가드 설명"
+              }
+            }
+          }
+        }
+      }
+    },
+    "composables": {
+      "type": "array",
+      "description": "Composable 목록 (Vue 3)",
+      "items": {
+        "type": "object",
+        "required": ["name", "path"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Composable 이름 (예: useAuth)"
+          },
+          "path": {
+            "type": "string",
+            "description": "파일 경로"
+          },
+          "exports": {
+            "type": "array",
+            "description": "export 목록",
+            "items": { "type": "string" }
+          },
+          "dependencies": {
+            "type": "array",
+            "description": "의존하는 composable",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "description": "의존성 분석 결과",
+      "properties": {
+        "graph": {
+          "type": "object",
+          "description": "컴포넌트 의존성 그래프 (인접 리스트)",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "circular": {
+          "type": "array",
+          "description": "순환 의존성 목록",
+          "items": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "packages": {
+          "type": "object",
+          "description": "npm 패키지 정보",
+          "properties": {
+            "dependencies": {
+              "type": "object",
+              "description": "dependencies",
+              "additionalProperties": { "type": "string" }
+            },
+            "devDependencies": {
+              "type": "object",
+              "description": "devDependencies",
+              "additionalProperties": { "type": "string" }
+            },
+            "vuePlugins": {
+              "type": "array",
+              "description": "Vue 플러그인 목록",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "version": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "description": "종합 메트릭스",
+      "properties": {
+        "total_components": {
+          "type": "integer",
+          "description": "총 컴포넌트 수"
+        },
+        "total_stores": {
+          "type": "integer",
+          "description": "총 Store 수"
+        },
+        "total_routes": {
+          "type": "integer",
+          "description": "총 라우트 수"
+        },
+        "total_composables": {
+          "type": "integer",
+          "description": "총 Composable 수"
+        },
+        "circular_dependencies": {
+          "type": "integer",
+          "description": "순환 의존성 수"
+        },
+        "component_distribution": {
+          "type": "object",
+          "description": "카테고리별 컴포넌트 분포",
+          "additionalProperties": { "type": "integer" }
+        }
+      }
+    }
+  }
+}

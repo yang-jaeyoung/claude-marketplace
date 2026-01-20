@@ -49,6 +49,26 @@
         "audit"
       ],
       "category": "productivity"
+    },
+    {
+      "name": "intent-based-skills",
+      "description": "Intent-based skill framework plugin for consistent and verifiable complex task execution with feedback loop system",
+      "source": "./plugins/intent-based-skills",
+      "version": "1.0.0",
+      "author": {
+        "name": "urd"
+      },
+      "keywords": [
+        "skills",
+        "intent",
+        "framework",
+        "analyzer",
+        "react",
+        "vue",
+        "dotnet",
+        "feedback"
+      ],
+      "category": "productivity"
     }
   ]
 }

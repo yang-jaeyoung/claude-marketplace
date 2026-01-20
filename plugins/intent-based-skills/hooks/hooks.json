@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Check if the conversation involved running any of these skills: vue-project-analyzer, react-project-analyzer, dotnet-project-analyzer, intent-skill-creator.\n\nIf a skill was executed and generated output files (ARCHITECTURE.md, analysis-data.json, or diagrams/*.mmd), suggest to the user:\n\n1. To verify the output: `/verify-skill <skill-name>`\n2. To start feedback collection: `/feedback-start <skill-name>`\n\nOnly mention this if relevant output files were actually created during this session. If no skill was run or no output was generated, do not mention anything."
+          }
+        ]
+      }
+    ]
+  }
+}
