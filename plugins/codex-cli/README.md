@@ -8,8 +8,13 @@ Codex CLI를 Claude Code에서 직접 사용할 수 있는 플러그인입니다
   - 일반 질의: `gpt-5.2`
   - 코드 관련: `gpt-5.2-codex`
 - **안전한 실행**: 기본적으로 `read-only` 샌드박스 모드 사용
+- **세션 관리**: 이전 세션 이어가기 지원
+- **클라우드 통합**: Codex Cloud 태스크 지원
+- **MCP 통합**: MCP 서버 관리 지원
 
 ## Commands
+
+### Core Commands
 
 | Command | Description | Model |
 |---------|-------------|-------|
@@ -17,7 +22,38 @@ Codex CLI를 Claude Code에서 직접 사용할 수 있는 플러그인입니다
 | `/codex:code` | 코드 관련 질의 | gpt-5.2-codex |
 | `/codex:review` | 코드 리뷰 실행 | gpt-5.2-codex |
 
+### Session & Automation
+
+| Command | Description | Model |
+|---------|-------------|-------|
+| `/codex:resume` | 이전 세션 이어가기 | - |
+| `/codex:auto` | Full-auto 모드 실행 | gpt-5.2-codex |
+| `/codex:vision` | 이미지 컨텍스트 질의 | gpt-5.2 |
+| `/codex:search` | 웹 검색 포함 질의 | gpt-5.2 |
+
+### Cloud Integration
+
+| Command | Description |
+|---------|-------------|
+| `/codex:cloud` | Cloud 태스크 생성 (--env 필요) |
+| `/codex:apply` | Cloud 태스크 결과 로컬 적용 |
+
+### MCP Integration
+
+| Command | Description |
+|---------|-------------|
+| `/codex:mcp-list` | 설정된 MCP 서버 목록 |
+| `/codex:mcp-add` | MCP 서버 추가 |
+
+### Utility
+
+| Command | Description |
+|---------|-------------|
+| `/codex:status` | 인증 상태 확인 |
+
 ## Usage
+
+### 기본 사용법
 
 ```bash
 # 일반 질의
@@ -29,6 +65,63 @@ Codex CLI를 Claude Code에서 직접 사용할 수 있는 플러그인입니다
 # 코드 리뷰
 /codex:review
 /codex:review src/main.py
+```
+
+### 세션 관리
+
+```bash
+# 마지막 세션 이어가기
+/codex:resume --last
+
+# 특정 세션 이어가기
+/codex:resume session_abc123
+
+# 세션 목록 확인
+/codex:resume
+```
+
+### Full-Auto 모드
+
+```bash
+# 자동 실행 모드 (주의: 무인 실행)
+/codex:auto Fix all linting errors in src/
+/codex:auto Add type annotations to utils.py
+```
+
+### 이미지 분석
+
+```bash
+# 이미지와 함께 질의
+/codex:vision ./screenshot.png What does this UI show?
+/codex:vision ./error.png Explain this error message
+```
+
+### 웹 검색
+
+```bash
+# 실시간 정보가 필요한 질의
+/codex:search Latest React 19 features
+/codex:search Current Python 3.12 release notes
+```
+
+### Cloud 기능 (실험적)
+
+```bash
+# Cloud 태스크 생성
+/codex:cloud --env env123 Review this PR
+
+# 결과 적용
+/codex:apply task_abc123
+```
+
+### MCP 서버 관리 (실험적)
+
+```bash
+# 서버 목록
+/codex:mcp-list
+
+# 서버 추가
+/codex:mcp-add myserver --url https://mcp.example.com
 ```
 
 ## Prerequisites
@@ -53,3 +146,10 @@ claude plugins install codex-cli
 ```
 
 Claude Code 재시작 후 자동으로 로드됩니다.
+
+## Notes
+
+- `--full-auto` 모드는 로컬 환경에서만 사용 권장
+- Cloud 기능은 환경 ID가 필요하며 실험적 기능임
+- MCP 기능도 실험적 상태임
+- 모든 커맨드는 `read-only` 샌드박스 기본값 유지 (안전성)
