@@ -1,25 +1,7 @@
 ---
-name: feedback-failure
-description: "검증 실패를 기록합니다."
-arguments:
-  - name: skill
-    description: "스킬 이름"
-    required: true
-  - name: session
-    description: "세션 ID"
-    required: true
-  - name: check_id
-    description: "검증 ID (예: FILE-001)"
-    required: true
-  - name: check_name
-    description: "검증 이름"
-    required: true
-  - name: priority
-    description: "우선순위 (must/should/could)"
-    required: true
-  - name: error
-    description: "에러 메시지"
-    required: false
+description: "검증 실패를 기록"
+argument-hint: "<skill> <session> <check_id> <check_name> <priority> [error]"
+allowed-tools: ["Bash"]
 ---
 # /feedback-failure
 
@@ -30,6 +12,17 @@ arguments:
 ```
 /feedback-failure <skill> <session> <check_id> <check_name> <priority> [error]
 ```
+
+## 파라미터
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| skill | O | 스킬 이름 |
+| session | O | 세션 ID |
+| check_id | O | 검증 ID (예: FILE-001) |
+| check_name | O | 검증 이름 |
+| priority | O | 우선순위 (must/should/could) |
+| error | X | 에러 메시지 |
 
 ## 예시
 
@@ -46,7 +39,9 @@ arguments:
 | `should` | 권장 | 경고 |
 | `could` | 선택 | 정보 |
 
-## 실행
+## 실행 지시
+
+다음 bash 명령을 실행하세요:
 
 ```bash
 python ${CLAUDE_PLUGIN_ROOT}/lib/feedback_collector.py failure "$skill" "$session" "$check_id" "$check_name" "$priority" "${error:-}"

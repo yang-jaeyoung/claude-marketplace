@@ -1,28 +1,7 @@
 ---
-name: feedback-correction
-description: "사용자 수정을 기록합니다."
-arguments:
-  - name: skill
-    description: "스킬 이름"
-    required: true
-  - name: session
-    description: "세션 ID"
-    required: true
-  - name: file
-    description: "수정된 파일"
-    required: true
-  - name: action
-    description: "수정 행위 (modify/add/delete)"
-    required: true
-  - name: section
-    description: "수정된 섹션"
-    required: false
-  - name: added
-    description: "추가된 줄 수"
-    required: false
-  - name: removed
-    description: "삭제된 줄 수"
-    required: false
+description: "사용자 수정을 기록"
+argument-hint: "<skill> <session> <file> <action> [section] [added] [removed]"
+allowed-tools: ["Bash"]
 ---
 # /feedback-correction
 
@@ -33,6 +12,18 @@ arguments:
 ```
 /feedback-correction <skill> <session> <file> <action> [section] [added] [removed]
 ```
+
+## 파라미터
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| skill | O | 스킬 이름 |
+| session | O | 세션 ID |
+| file | O | 수정된 파일 |
+| action | O | 수정 행위 (modify/add/delete) |
+| section | X | 수정된 섹션 |
+| added | X | 추가된 줄 수 (기본: 0) |
+| removed | X | 삭제된 줄 수 (기본: 0) |
 
 ## 예시
 
@@ -49,7 +40,9 @@ arguments:
 | `add` | 새 내용 추가 |
 | `delete` | 내용 삭제 |
 
-## 실행
+## 실행 지시
+
+다음 bash 명령을 실행하세요:
 
 ```bash
 python ${CLAUDE_PLUGIN_ROOT}/lib/feedback_collector.py correction "$skill" "$session" "$file" "$action" "${section:-}" "${added:-0}" "${removed:-0}"

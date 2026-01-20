@@ -1,13 +1,7 @@
 ---
-name: feedback-apply
-description: "개선 제안 적용 가이드를 생성합니다."
-arguments:
-  - name: skill
-    description: "대상 스킬 이름"
-    required: true
-  - name: dry-run
-    description: "적용하지 않고 가이드만 출력"
-    required: false
+description: "개선 제안 적용 가이드를 생성"
+argument-hint: "<skill> [--dry-run]"
+allowed-tools: ["Bash"]
 ---
 # /feedback-apply
 
@@ -18,6 +12,13 @@ arguments:
 ```
 /feedback-apply <skill> [--dry-run]
 ```
+
+## 파라미터
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| skill | O | 대상 스킬 이름 |
+| --dry-run | X | 적용하지 않고 가이드만 출력 |
 
 ## 예시
 
@@ -63,7 +64,9 @@ feedback analyze <skill>
 }
 ```
 
-## 실행
+## 실행 지시
+
+다음 bash 명령을 실행하세요:
 
 ```bash
 python ${CLAUDE_PLUGIN_ROOT}/lib/feedback_analyzer.py apply "$skill" ${dry_run:+--dry-run}

@@ -1,13 +1,7 @@
 ---
-name: verify-skill
-description: "스킬 출력물을 검증합니다."
-arguments:
-  - name: skill
-    description: "검증할 스킬 이름"
-    required: true
-  - name: output-dir
-    description: "출력물 디렉토리 경로"
-    required: false
+description: "스킬 출력물을 검증"
+argument-hint: "<skill> [--output-dir=./docs/architecture]"
+allowed-tools: ["Bash", "Read", "Glob"]
 ---
 # /verify-skill
 
@@ -18,6 +12,13 @@ arguments:
 ```
 /verify-skill <skill> [--output-dir=./docs/architecture]
 ```
+
+## 파라미터
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| skill | O | 검증할 스킬 이름 |
+| --output-dir | X | 출력물 디렉토리 경로 (기본: ./docs/architecture) |
 
 ## 예시
 
@@ -41,16 +42,16 @@ arguments:
 - 분류가 실제 용도와 일치
 - 의존성 그래프가 정확함
 
-## 실행
+## 실행 지시
 
-스킬별 검증 스크립트를 실행합니다:
+스킬별 검증 스크립트를 실행하세요:
 
 ```bash
 # Python 검증기 (권장)
-python ${CLAUDE_PLUGIN_ROOT}/../{skill}/verification/verifier.py --output-dir "${output_dir:-./docs/architecture}"
+python "${CLAUDE_PLUGIN_ROOT}/../${skill}/verification/verifier.py" --output-dir "${output_dir:-./docs/architecture}"
 
 # 또는 Bash 검증기 (레거시)
-bash ${CLAUDE_PLUGIN_ROOT}/../{skill}/verification/run-verification.sh --output-dir "${output_dir:-./docs/architecture}"
+bash "${CLAUDE_PLUGIN_ROOT}/../${skill}/verification/run-verification.sh" --output-dir "${output_dir:-./docs/architecture}"
 ```
 
 ## 출력

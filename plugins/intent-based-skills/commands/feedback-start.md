@@ -1,26 +1,25 @@
 ---
-name: feedback-start
-description: "스킬 실행 피드백 수집을 시작하고 session_id를 반환합니다."
-arguments:
-  - name: skill
-    description: "스킬 이름"
-    required: true
-  - name: version
-    description: "스킬 버전 (기본값: 1.0.0)"
-    required: false
-  - name: input
-    description: "입력 요약"
-    required: false
+description: "스킬 실행 피드백 수집을 시작하고 session_id를 반환"
+argument-hint: "<skill> [version] [input]"
+allowed-tools: ["Bash"]
 ---
 # /feedback-start
 
-스킬 실행 피드백 수집을 시작합니다.
+피드백 수집 세션을 시작합니다.
 
 ## 사용법
 
 ```
 /feedback-start <skill> [version] [input]
 ```
+
+## 파라미터
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| skill | O | 스킬 이름 |
+| version | X | 스킬 버전 (기본: 1.0.0) |
+| input | X | 입력 요약 |
 
 ## 예시
 
@@ -29,10 +28,12 @@ arguments:
 /feedback-start dotnet-project-analyzer
 ```
 
-## 실행
+## 실행 지시
+
+다음 bash 명령을 실행하세요:
 
 ```bash
-python ${CLAUDE_PLUGIN_ROOT}/lib/feedback_collector.py start "$skill" ${version:-"1.0.0"} "${input:-}"
+python ${CLAUDE_PLUGIN_ROOT}/lib/feedback_collector.py start "$skill" "${version:-1.0.0}" "${input:-}"
 ```
 
 ## 출력

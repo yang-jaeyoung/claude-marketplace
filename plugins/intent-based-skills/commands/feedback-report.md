@@ -1,13 +1,7 @@
 ---
-name: feedback-report
-description: "스킬 피드백 분석 리포트를 생성합니다."
-arguments:
-  - name: skill
-    description: "리포트 대상 스킬 이름"
-    required: true
-  - name: format
-    description: "출력 형식 (md/json) - 기본값: md"
-    required: false
+description: "스킬 피드백 분석 리포트를 생성"
+argument-hint: "<skill> [--format=md|json]"
+allowed-tools: ["Bash"]
 ---
 # /feedback-report
 
@@ -18,6 +12,13 @@ arguments:
 ```
 /feedback-report <skill> [--format=md|json]
 ```
+
+## 파라미터
+
+| 파라미터 | 필수 | 설명 |
+|----------|------|------|
+| skill | O | 리포트 대상 스킬 이름 |
+| --format | X | 출력 형식 (md 또는 json, 기본: md) |
 
 ## 예시
 
@@ -56,7 +57,9 @@ arguments:
 2. [MEDIUM] ...
 ```
 
-## 실행
+## 실행 지시
+
+다음 bash 명령을 실행하세요:
 
 ```bash
 python ${CLAUDE_PLUGIN_ROOT}/lib/feedback_analyzer.py report "$skill" --format="${format:-md}"
