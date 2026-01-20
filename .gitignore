@@ -1,5 +1,9 @@
 # Local settings
-.claude/*.local.json
+.caw/
+.claude/
+.worktrees/
+.plans/
+.serena/
 
 # IDE
 .idea/
@@ -21,10 +25,5 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 
-# CAW worktrees (local only)
-.worktrees/
-.caw/
-
 # Windows
 nul
-.serena/
