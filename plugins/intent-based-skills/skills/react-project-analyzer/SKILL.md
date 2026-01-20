@@ -1,6 +1,7 @@
 ---
 name: react-project-analyzer
 description: "This skill should be used when the user wants to analyze React project structure, component dependencies, state management (Redux/Zustand/Context), and routing. Generates comprehensive documentation with Mermaid diagrams. Triggers: 'React 프로젝트 분석', 'React 아키텍처 분석', 'React 컴포넌트 분석', 'react-project-analyzer'."
+allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # React Project Analyzer

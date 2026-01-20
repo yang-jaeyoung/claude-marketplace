@@ -1,6 +1,7 @@
 ---
 name: vue-project-analyzer
 description: "This skill should be used when the user wants to analyze Vue 2/3 project structure, component dependencies, state management (Pinia/Vuex), and routing. Generates comprehensive documentation with Mermaid diagrams. Triggers: 'Vue 프로젝트 분석', 'Vue 아키텍처 분석', 'Vue 컴포넌트 분석', 'vue-project-analyzer'."
+allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # Vue Project Analyzer

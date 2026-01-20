@@ -1,6 +1,7 @@
 ---
 name: intent-skill-creator
 description: "This skill should be used when the user wants to create a new intent-based skill, scaffold an intent-based skill structure, or generate skill templates. Creates intent.yaml, SKILL.md, schema/, and verification/ following the intent-based skill framework. Triggers: '새 스킬 만들어줘', 'create new skill', 'scaffold skill', '분석 스킬 생성', 'generate skill template', '의도 기반 스킬 생성'."
+allowed-tools: Read, Write, Bash, Glob
 ---
 
 # Intent Skill Creator - 의도 기반 스킬 생성기
@@ -261,10 +262,13 @@ execution_hints:
 ---
 name: {skill_name}
 description: "This skill should be used when the user wants to {use_case}. {skill_domain} Triggers: '{trigger1}', '{trigger2}'."
+allowed-tools: Read, Glob, Grep, Bash, Write  # 스킬에 필요한 도구 명시
 ---
 ```
 
-> **중요**: `description`은 반드시 "This skill should be used when..."으로 시작하고, 마지막에 `Triggers:`로 트리거 키워드를 포함해야 합니다.
+> **중요**:
+> - `description`은 반드시 "This skill should be used when..."으로 시작하고, 마지막에 `Triggers:`로 트리거 키워드를 포함해야 합니다.
+> - `allowed-tools`는 스킬 실행에 필요한 Claude Code 도구를 명시합니다.
 
 **필수 구조:**
 
@@ -272,6 +276,7 @@ description: "This skill should be used when the user wants to {use_case}. {skil
 ---
 name: {skill_name}
 description: "This skill should be used when the user wants to {use_case}. {description} Triggers: '{triggers}'."
+allowed-tools: Read, Glob, Grep  # 스킬 유형에 맞게 조정
 ---
 
 # {Skill Title}

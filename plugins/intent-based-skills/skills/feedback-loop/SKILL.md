@@ -1,6 +1,7 @@
 ---
 name: feedback-loop
 description: "This skill should be used when the user wants to collect, analyze, or report skill execution feedback. Detects repeated failures, user corrections, and performance anomalies. Triggers: 'feedback start', 'feedback analyze', 'feedback report', '스킬 피드백 분석', 'analyze skill performance'."
+allowed-tools: Read, Bash, Glob
 ---
 
 # Feedback Loop - 스킬 개선 피드백 시스템

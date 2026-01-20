@@ -1,6 +1,7 @@
 ---
 name: dotnet-project-analyzer
 description: "This skill should be used when the user wants to analyze .NET solution structure, project dependencies, NuGet packages, or architecture patterns. Analyzes Clean Architecture compliance, CQRS patterns, and generates comprehensive documentation with Mermaid diagrams. Triggers: '닷넷 프로젝트 분석', '.NET 솔루션 분석', 'dotnet project analyzer', '프로젝트 아키텍처 분석'."
+allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # .NET Project Analyzer
