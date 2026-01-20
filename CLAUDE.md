@@ -36,6 +36,8 @@ python tests/test_plugin_structure.py             # Plugin structure validation
 
 ## Plugin Architecture
 
+> **📚 Official Documentation**: Always refer to the [Claude Code Plugins Documentation](https://code.claude.com/docs/en/plugins) for the latest plugin development guidelines, API changes, and best practices.
+
 ### Plugin Types
 
 1. **Markdown-only plugins** (codex-cli): Commands defined as `.md` files with YAML frontmatter
@@ -98,27 +100,34 @@ mcp_servers:
 Selection is automatic based on task complexity scoring (0.0-1.0).
 
 **Skills** (`skills/*/SKILL.md`):
+> See the [official Skills documentation](https://code.claude.com/docs/en/skills.md) for the latest configuration options and best practices.
+
 ```yaml
 ---
 name: skill-name
 description: What the skill does
 allowed-tools: Read, Glob, Grep
-forked-context: true               # Runs in isolated context
+context: fork                      # Runs in isolated context (replaces forked-context)
 ---
 # Skill behavior instructions
 ```
 
 **Hooks** (`hooks/hooks.json`):
+> See the [official Hooks documentation](https://code.claude.com/docs/en/hooks-guide.md) for the latest hook events and configuration options.
+
 ```json
 {
   "hooks": {
     "SessionStart": [{ "hooks": [{ "type": "prompt", "prompt": "..." }] }],
-    "PreToolUse": [...],
+    "PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "..." }] }],
     "PostToolUse": [...],
+    "Notification": [...],
     "Stop": [...]
   }
 }
 ```
+
+Available hook events: `PreToolUse`, `PermissionRequest`, `PostToolUse`, `UserPromptSubmit`, `Notification`, `Stop`, `SubagentStop`, `PreCompact`, `SessionStart`, `SessionEnd`.
 
 ## MCP Server Development
 
@@ -141,6 +150,8 @@ await server.connect(transport);
 ```
 
 ## Adding a New Plugin
+
+> See the [official plugins quickstart guide](https://code.claude.com/docs/en/plugins) for detailed instructions.
 
 1. Create `plugins/<plugin-name>/`
 2. Add `.claude-plugin/plugin.json`
