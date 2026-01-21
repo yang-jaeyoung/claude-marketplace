@@ -89,12 +89,13 @@ flowchart LR
 
 ## Quick Reference
 
-| 목적 | 명령어 |
-|------|--------|
-| Vue 파일 수 | `find src -name "*.vue" \| wc -l` |
-| 컴포넌트별 LOC | `wc -l src/components/**/*.vue` |
-| 미사용 컴포넌트 | `scripts/find_unused.sh` |
-| 순환 의존성 | `scripts/check_circular.sh` |
+| 목적 | 명령어 (Cross-platform) |
+|------|-------------------------|
+| Vue 파일 수 | `python -c "from pathlib import Path; print(len(list(Path('src').rglob('*.vue'))))"` |
+| 미사용 컴포넌트 | `python scripts/find_unused.py .` |
+| 순환 의존성 | `python scripts/check_circular.py .` |
+
+> **Note**: 기존 shell 스크립트(`.sh`)는 Python 스크립트(`.py`)로 대체되어 Windows/macOS/Linux 모두 지원합니다.
 
 ## 참고
 

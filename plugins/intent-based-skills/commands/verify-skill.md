@@ -44,15 +44,14 @@ allowed-tools: ["Bash", "Read", "Glob"]
 
 ## 실행 지시
 
-스킬별 검증 스크립트를 실행하세요:
+스킬별 검증 스크립트를 실행하세요 (Windows/macOS/Linux 호환):
 
 ```bash
-# Python 검증기 (권장)
-python "${CLAUDE_PLUGIN_ROOT}/../${skill}/verification/verifier.py" --output-dir "${output_dir:-./docs/architecture}"
-
-# 또는 Bash 검증기 (레거시)
-bash "${CLAUDE_PLUGIN_ROOT}/../${skill}/verification/run-verification.sh" --output-dir "${output_dir:-./docs/architecture}"
+# Python 검증기 (권장 - 크로스 플랫폼)
+python -c "import os, sys; from pathlib import Path; root=Path(os.environ.get('CLAUDE_PLUGIN_ROOT','.')).parent/'$skill'/'verification'; sys.path.insert(0,str(root)); import verifier; verifier.main('${output_dir:-./docs/architecture}')"
 ```
+
+> **Note**: 레거시 Bash 검증기 (`run-verification.sh`)는 Unix 시스템에서만 지원됩니다.
 
 ## 출력
 

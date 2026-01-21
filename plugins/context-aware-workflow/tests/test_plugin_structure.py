@@ -559,5 +559,67 @@ class TestHooksConfiguration(unittest.TestCase):
             )
 
 
+class TestCrossPlatformCompatibility(unittest.TestCase):
+    """Test cross-platform compatibility patterns."""
+
+    def setUp(self):
+        """Load hooks.json."""
+        hooks_json = PLUGIN_ROOT / "hooks" / "hooks.json"
+        with open(hooks_json, "r") as f:
+            self.hooks_data = json.load(f)
+            self.hooks_content = hooks_json.read_text()
+
+    def test_no_single_quote_echo_in_hooks(self):
+        """Hooks should not use echo with single quotes (Windows incompatible)."""
+        # Check for problematic patterns
+        self.assertNotIn(
+            "echo '",
+            self.hooks_content,
+            "Single quote echo found - use 'type: prompt' instead for Windows compatibility"
+        )
+
+    def test_hooks_use_prompt_for_simple_output(self):
+        """SessionStart should use prompt type, not command type with echo."""
+        session_start_hooks = self.hooks_data["hooks"].get("SessionStart", [])
+        for hook_group in session_start_hooks:
+            for hook in hook_group.get("hooks", []):
+                if hook.get("type") == "command":
+                    cmd = hook.get("command", "")
+                    self.assertFalse(
+                        cmd.startswith("echo "),
+                        "SessionStart should use 'type: prompt' for simple messages instead of echo command"
+                    )
+
+    def test_pretooluse_uses_python_inline_pattern(self):
+        """PreToolUse hooks should use Python inline pattern for cross-platform."""
+        pre_tool_hooks = self.hooks_data["hooks"].get("PreToolUse", [])
+        for hook_group in pre_tool_hooks:
+            for hook in hook_group.get("hooks", []):
+                if hook.get("type") == "command":
+                    cmd = hook.get("command", "")
+                    # Should use python -c pattern, not direct script path with $CLAUDE_PLUGIN_ROOT
+                    if "CLAUDE_PLUGIN_ROOT" in cmd:
+                        self.assertIn(
+                            "python -c",
+                            cmd,
+                            "Hooks using CLAUDE_PLUGIN_ROOT should use 'python -c' pattern for cross-platform compatibility"
+                        )
+
+    def test_no_shell_variable_in_direct_path(self):
+        """Hook commands should not use shell variable expansion in paths."""
+        for event_name, event_hooks in self.hooks_data["hooks"].items():
+            for hook_group in event_hooks:
+                for hook in hook_group.get("hooks", []):
+                    if hook.get("type") == "command":
+                        cmd = hook.get("command", "")
+                        # Check for problematic pattern: python "$CLAUDE_PLUGIN_ROOT/..."
+                        # This fails on Windows because $ is not expanded
+                        self.assertNotRegex(
+                            cmd,
+                            r'python[3]?\s+"?\$CLAUDE_PLUGIN_ROOT',
+                            f"{event_name} hook uses shell variable in path - use Python os.environ.get() instead"
+                        )
+
+
 if __name__ == "__main__":
     unittest.main()

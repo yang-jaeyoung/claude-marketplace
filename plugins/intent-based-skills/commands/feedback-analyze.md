@@ -37,10 +37,10 @@ allowed-tools: ["Bash"]
 
 ## 실행 지시
 
-다음 bash 명령을 실행하세요:
+다음 bash 명령을 실행하세요 (Windows/macOS/Linux 호환):
 
 ```bash
-python ${CLAUDE_PLUGIN_ROOT}/lib/feedback_analyzer.py analyze "$skill" --period="${period:-7}"
+python -c "import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'lib')); import feedback_analyzer; sys.argv=['fa','analyze','$skill','--period=${period:-7}']; feedback_analyzer.main()"
 ```
 
 ## 출력
