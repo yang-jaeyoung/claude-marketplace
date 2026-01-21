@@ -4,8 +4,8 @@
       {
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "CAW (Context-Aware Workflow) plugin is active. Use /cw:status to check workflow state or /cw:start to begin a new task."
+            "type": "command",
+            "command": "echo 'CAW (Context-Aware Workflow) plugin is active. Use /cw:status to check workflow state or /cw:start to begin a new task.'"
           }
         ]
       }
