@@ -1,0 +1,110 @@
+#!/usr/bin/env python3
+"""
+Gemini-powered code review for git commits.
+
+This PreToolUse hook performs automated code review using gemini-cli's
+headless mode before git commits.
+
+Activation:
+    export CAW_GEMINI_REVIEW=enabled
+
+Authentication (one of):
+    - gemini auth login (Google account)
+    - export GEMINI_API_KEY=your_api_key
+
+Debug mode:
+    export CAW_GEMINI_DEBUG=enabled
+
+Output format:
+{
+  "result": "approve",
+  "additionalContext": "[Gemini Review] ..."
+}
+"""
+
+from pathlib import Path
+
+# Import shared utilities
+from gemini_utils import (
+    debug_log,
+    is_gemini_review_enabled,
+    is_caw_active,
+    is_git_commit_command,
+    get_tool_input,
+    get_staged_diff,
+    get_staged_files,
+    run_gemini_prompt,
+    truncate_text,
+    format_review_output,
+    approve_result,
+)
+
+
+REVIEW_PROMPT = """Review this git diff for potential issues. Focus on:
+1. Bugs or logic errors
+2. Security vulnerabilities
+3. Performance issues
+4. Code quality concerns
+
+Be concise (max 3 sentences). If no issues found, say "LGTM".
+
+Diff:
+"""
+
+
+def main():
+    """Main entry point."""
+    try:
+        # Check if this is a git commit command
+        tool_input = get_tool_input()
+        if not is_git_commit_command(tool_input):
+            print(approve_result())
+            return
+
+        debug_log("Git commit detected, checking review conditions")
+
+        # Check if feature is enabled and configured
+        if not is_gemini_review_enabled():
+            print(approve_result())
+            return
+
+        # Only run if CAW is active
+        if not is_caw_active():
+            print(approve_result())
+            return
+
+        # Get staged changes
+        diff = get_staged_diff()
+        if not diff.strip():
+            debug_log("No staged changes to review")
+            print(approve_result())
+            return
+
+        # Get staged files for context
+        files = get_staged_files()
+        file_count = len(files)
+        file_info = f"{file_count} file{'s' if file_count != 1 else ''}"
+
+        debug_log(f"Reviewing {file_info}")
+
+        # Run Gemini review
+        prompt = REVIEW_PROMPT + truncate_text(diff, 8000)
+        review = run_gemini_prompt(prompt)
+
+        if review:
+            context_prefix = f"[Gemini Review] {file_info}"
+            context = format_review_output(review, context_prefix)
+            print(approve_result(context))
+        else:
+            # Gemini review failed or unavailable
+            debug_log("Gemini review returned no result")
+            print(approve_result())
+
+    except Exception as e:
+        # Silent failure - approve by default
+        debug_log(f"Exception in commit review: {e}")
+        print(approve_result())
+
+
+if __name__ == "__main__":
+    main()
