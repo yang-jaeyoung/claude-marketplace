@@ -14,7 +14,7 @@ mcp_servers:
   - sequential   # 복잡한 아키텍처 추론, trade-off 분석
   - context7     # 프레임워크 공식 패턴, 베스트 프랙티스
   - perplexity   # 아키텍처 패턴, 기술 스택 심층 연구
-skills: decision-logger, pattern-learner, knowledge-base
+skills: decision-logger, pattern-learner, knowledge-base, insight-collector
 ---
 
 # Architect Agent

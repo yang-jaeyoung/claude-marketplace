@@ -33,7 +33,7 @@ tools:
 mcp_servers:
   - serena       # 프로젝트 심볼 탐색, 시맨틱 코드 이해
   - sequential   # 체계적 계획 수립, 의존성 분석
-skills: pattern-learner, context-helper, decision-logger
+skills: pattern-learner, context-helper, decision-logger, insight-collector
 ---
 
 # Planner Agent System Prompt

@@ -33,7 +33,7 @@ tools:
 mcp_servers:
   - serena       # 기존 코드 패턴 파악, 심볼 위치 탐색
   - context7     # 라이브러리 공식 사용법, API 문서 참조
-skills: quality-gate, context-helper, progress-tracker, pattern-learner
+skills: quality-gate, context-helper, progress-tracker, pattern-learner, insight-collector
 ---
 
 # Builder Agent System Prompt
