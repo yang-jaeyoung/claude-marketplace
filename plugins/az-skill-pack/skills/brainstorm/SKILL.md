@@ -1,102 +1,49 @@
 ---
 name: brainstorm
-description: Generate diverse ideas and creative solutions through structured brainstorming techniques. Use when users ask for brainstorming, ideation, idea generation, creative solutions, problem-solving alternatives, or when they want multiple perspectives on a topic. Triggers on phrases like "brainstorm", "give me ideas", "help me think of", "what are some ways to", "generate options for", or "I need creative solutions".
+description: Start a structured brainstorming session using techniques like SCAMPER, Six Thinking Hats, or Divergent Expansion
 ---
 
 # Brainstorm Skill
 
-Generate diverse, creative ideas through structured brainstorming techniques.
+구조화된 브레인스토밍 기법으로 아이디어를 생성합니다.
 
-## Core Workflow
+## Workflow
 
-1. **Clarify the topic** - Understand what the user wants to brainstorm about
-2. **Select technique** - Choose appropriate brainstorming method based on context
-3. **Generate ideas** - Apply technique to produce diverse options
-4. **Organize output** - Present ideas in a clear, actionable format
+1. **Clarify** - 주제 이해
+2. **Select** - 기법 선택
+3. **Generate** - 아이디어 생성
+4. **Organize** - 결과 정리
 
-## Brainstorming Techniques
+## 기법 선택 가이드
 
-### 1. Divergent Expansion (Default)
+| 상황 | 추천 기법 |
+|------|----------|
+| 열린 탐색 | Divergent Expansion |
+| 기존 개선 | SCAMPER |
+| 복잡한 의사결정 | Six Thinking Hats |
+| 최대 창의성 | Rapid Fire |
+| 문제 반전 | Reverse Brainstorming |
+| 질문 기반 | Starbursting |
 
-Generate ideas across multiple categories:
+**상세 기법**: [references/techniques.md](references/techniques.md)
+
+## 출력 형식
 
 ```
-Topic: [User's topic]
-
 🎯 Direct Solutions
 - [idea 1]
 - [idea 2]
 
-🔄 Alternative Approaches  
+🔄 Alternative Approaches
 - [idea 3]
-- [idea 4]
 
 💡 Creative/Unconventional
-- [idea 5]
-- [idea 6]
-
-🔗 Combinations & Hybrids
-- [idea 7]
-- [idea 8]
+- [idea 4]
 ```
 
-### 2. SCAMPER Method
+## 원칙
 
-Apply transformations systematically:
-
-| Action | Question | Ideas |
-|--------|----------|-------|
-| **S**ubstitute | What can be replaced? | |
-| **C**ombine | What can merge together? | |
-| **A**dapt | What can be modified from elsewhere? | |
-| **M**odify | What can be changed/enlarged/reduced? | |
-| **P**ut to other uses | What else could this be used for? | |
-| **E**liminate | What can be removed? | |
-| **R**everse | What can be inverted/rearranged? | |
-
-### 3. Six Thinking Hats
-
-Explore from multiple perspectives:
-
-| Hat | Focus | Ideas |
-|-----|-------|-------|
-| ⚪ White | Facts & Data | |
-| 🔴 Red | Emotions & Intuition | |
-| ⚫ Black | Risks & Cautions | |
-| 🟡 Yellow | Benefits & Optimism | |
-| 🟢 Green | Creativity & Alternatives | |
-| 🔵 Blue | Process & Summary | |
-
-### 4. Rapid Fire (Quantity Focus)
-
-Generate maximum ideas quickly without filtering:
-- Aim for 15-20+ ideas
-- No criticism during generation
-- Wild ideas welcome
-- Build on previous ideas
-
-## Output Guidelines
-
-- **Quantity over quality initially** - Generate many ideas before evaluating
-- **Visual organization** - Use tables, categories, or mind-map style formatting
-- **Actionable format** - Make ideas concrete and implementable
-- **Follow-up suggestions** - Offer to expand on promising ideas
-
-## Technique Selection Guide
-
-| Context | Recommended Technique |
-|---------|----------------------|
-| Open-ended exploration | Divergent Expansion |
-| Improving existing solution | SCAMPER |
-| Complex decision-making | Six Thinking Hats |
-| Maximum creativity needed | Rapid Fire |
-| Technical problem-solving | See [techniques.md](references/techniques.md) |
-
-## Advanced Techniques
-
-For specialized brainstorming scenarios, consult [references/techniques.md](references/techniques.md):
-- Reverse Brainstorming (problem inversion)
-- Starbursting (question-based)
-- Mind Mapping (visual connections)
-- Attribute Listing (component analysis)
-- Random Word Association (creative triggers)
+- **양 우선** - 먼저 많이, 나중에 평가
+- **비판 유보** - 생성 단계에서 판단 금지
+- **시각적 정리** - 테이블, 카테고리 활용
+- **후속 제안** - 유망한 아이디어 확장 제안

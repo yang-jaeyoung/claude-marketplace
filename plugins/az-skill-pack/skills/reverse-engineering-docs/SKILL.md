@@ -1,124 +1,70 @@
 ---
 name: reverse-engineering-docs
-description: 코드베이스를 분석하여 프로젝트 문서를 역설계합니다. 요구사항 명세서, 기능 명세서, 유스케이스, 아키텍처 설계서, UI 설계서, DB 설계서, 운영/유지보수 문서를 생성할 때 사용합니다.
+description: Generate project documentation by analyzing the codebase (requirements, functional spec, use cases, architecture, UI, database, operations)
 ---
 
 # 프로젝트 문서 역설계 Skill
 
-## 개요
+코드베이스를 분석하여 프로젝트 문서를 역설계합니다.
 
-기존 코드베이스를 분석하여 다음 7가지 프로젝트 문서를 역설계합니다:
+## 문서 유형
 
-| 문서 유형 | 설명 | 상세 가이드 |
-|----------|------|------------|
-| 요구사항 명세서 | 시스템이 충족해야 할 기능적/비기능적 요구사항 | [REQUIREMENTS.md](references/REQUIREMENTS.md) |
-| 기능 명세서 | 각 기능의 상세 동작 정의 | [FUNCTIONAL.md](references/FUNCTIONAL.md) |
-| 유스케이스 시나리오 | 사용자-시스템 상호작용 흐름 | [USECASE.md](references/USECASE.md) |
-| 시스템 아키텍처 설계서 | 전체 시스템 구조 및 컴포넌트 관계 | [ARCHITECTURE.md](references/ARCHITECTURE.md) |
-| UI/화면 설계서 | 사용자 인터페이스 구성 및 흐름 | [UI_DESIGN.md](references/UI_DESIGN.md) |
-| 데이터베이스 설계서 | 데이터 모델 및 스키마 정의 | [DATABASE.md](references/DATABASE.md) |
-| 운영/유지보수 산출물 | 배포, 모니터링, 문제해결 가이드 | [OPERATIONS.md](references/OPERATIONS.md) |
+| 문서 | 설명 | 가이드 |
+|------|------|--------|
+| 요구사항 명세서 | 기능적/비기능적 요구사항 | [REQUIREMENTS.md](references/REQUIREMENTS.md) |
+| 기능 명세서 | 각 기능의 상세 동작 | [FUNCTIONAL.md](references/FUNCTIONAL.md) |
+| 유스케이스 시나리오 | 사용자-시스템 상호작용 | [USECASE.md](references/USECASE.md) |
+| 아키텍처 설계서 | 시스템 구조 및 컴포넌트 | [ARCHITECTURE.md](references/ARCHITECTURE.md) |
+| UI/화면 설계서 | 인터페이스 구성 및 흐름 | [UI_DESIGN.md](references/UI_DESIGN.md) |
+| 데이터베이스 설계서 | 데이터 모델 및 스키마 | [DATABASE.md](references/DATABASE.md) |
+| 운영/유지보수 문서 | 배포, 모니터링, 문제해결 | [OPERATIONS.md](references/OPERATIONS.md) |
 
 ## 분석 프로세스
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    코드베이스 분석 프로세스                        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  1. 프로젝트 구조 파악                                            │
-│     └── 디렉토리 구조, 설정 파일, 의존성 분석                       │
-│                        ↓                                        │
-│  2. 기술 스택 식별                                                │
-│     └── 언어, 프레임워크, 라이브러리, 도구                          │
-│                        ↓                                        │
-│  3. 아키텍처 패턴 분석                                            │
-│     └── 레이어 구조, 모듈 관계, 통신 패턴                          │
-│                        ↓                                        │
-│  4. 도메인 모델 추출                                              │
-│     └── 엔티티, 값 객체, 비즈니스 규칙                             │
-│                        ↓                                        │
-│  5. 기능 및 API 매핑                                              │
-│     └── 엔드포인트, 서비스, 유스케이스                             │
-│                        ↓                                        │
-│  6. 문서 생성                                                    │
-│     └── 표준 템플릿 기반 문서화                                   │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
+1. **프로젝트 구조 파악** - 디렉토리, 설정 파일, 의존성
+2. **기술 스택 식별** - 언어, 프레임워크, 라이브러리
+3. **아키텍처 패턴 분석** - 레이어 구조, 모듈 관계
+4. **도메인 모델 추출** - 엔티티, 값 객체, 비즈니스 규칙
+5. **기능 및 API 매핑** - 엔드포인트, 서비스, 유스케이스
+6. **문서 생성** - 표준 템플릿 기반 문서화
 
 ## 사용 방법
 
-### 전체 문서 생성
 ```
+# 전체 문서 생성
 이 프로젝트의 문서를 역설계해 주세요
-```
 
-### 특정 문서만 생성
-```
+# 특정 문서만 생성
 이 코드베이스의 아키텍처 설계서를 작성해 주세요
-데이터베이스 설계서를 역설계해 주세요
 ```
 
-### 출력 형식 지정
-```
-요구사항 명세서를 Markdown으로 작성해 주세요
-기능 명세서를 DOCX 파일로 만들어 주세요
-```
+## 분석 대상 파일
 
-## 분석 시작 체크리스트
-
-코드베이스 분석 시 다음 항목을 확인합니다:
-
-### 프로젝트 구조
-```bash
-# 디렉토리 구조 확인
-tree -L 3 -I "node_modules|bin|obj|.git"
-
-# 주요 설정 파일 확인
-find . -name "*.json" -o -name "*.yaml" -o -name "*.yml" -o -name "*.config" | head -20
-```
-
-### 기술 스택 식별 파일
-| 파일 유형 | 확인 대상 |
-|----------|----------|
-| .NET | `*.csproj`, `*.sln`, `appsettings.json` |
+| 기술 | 파일 |
+|------|------|
+| .NET | `*.csproj`, `appsettings.json` |
 | Node.js | `package.json`, `tsconfig.json` |
 | Python | `requirements.txt`, `pyproject.toml` |
-| Java | `pom.xml`, `build.gradle` |
 | Docker | `Dockerfile`, `docker-compose.yml` |
 | CI/CD | `.github/workflows/`, `azure-pipelines.yml` |
 
-### 코드 분석 대상
-| 분석 영역 | 파일 패턴 |
-|----------|----------|
-| 엔티티/모델 | `**/Models/**`, `**/Entities/**`, `**/Domain/**` |
+## 코드 분석 영역
+
+| 영역 | 패턴 |
+|------|------|
+| 엔티티/모델 | `**/Models/**`, `**/Entities/**` |
 | 서비스 | `**/Services/**`, `**/Application/**` |
-| 컨트롤러/API | `**/Controllers/**`, `**/Endpoints/**` |
+| 컨트롤러 | `**/Controllers/**`, `**/Endpoints/**` |
 | 데이터 접근 | `**/Repositories/**`, `**/Data/**` |
-| 설정 | `**/Configuration/**`, `appsettings*.json` |
 
 ## 문서 품질 기준
 
-각 문서는 다음 품질 기준을 충족해야 합니다:
-
 | 기준 | 설명 |
-|-----|------|
-| 완전성 | 코드에서 식별된 모든 기능/구성요소 포함 |
-| 정확성 | 실제 구현과 일치하는 내용 |
-| 일관성 | 문서 간 용어 및 명명 규칙 통일 |
+|------|------|
+| 완전성 | 코드에서 식별된 모든 기능 포함 |
+| 정확성 | 실제 구현과 일치 |
+| 일관성 | 문서 간 용어 통일 |
 | 추적성 | 코드 위치 참조 포함 |
-| 가독성 | 다이어그램, 표, 예시 활용 |
-
-## 출력 형식
-
-### 기본 (Markdown)
-- 각 문서를 별도 `.md` 파일로 생성
-- Mermaid 다이어그램 포함
-
-### DOCX 요청 시
-- `/mnt/skills/public/docx/SKILL.md` 참조하여 전문적인 문서 생성
-- 목차, 표지, 페이지 번호 포함
 
 ## 주의사항
 
