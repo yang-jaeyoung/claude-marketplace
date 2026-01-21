@@ -298,7 +298,7 @@ class FeedbackAnalyzer:
                 {
                     "type": "cleanup_data",
                     "description": "해당 스킬의 피드백 데이터 정리 (선택)",
-                    "command": f"rm -rf ~/.claude/feedback/logs/{self.skill_name}"
+                    "command": f"python -c \"import shutil; from pathlib import Path; shutil.rmtree(Path.home() / '.claude' / 'feedback' / 'logs' / '{self.skill_name}', ignore_errors=True)\""
                 }
             ]
             return guide

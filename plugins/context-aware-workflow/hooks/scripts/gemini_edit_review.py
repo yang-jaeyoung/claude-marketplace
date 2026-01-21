@@ -25,6 +25,16 @@ Environment variables read by Claude Code:
 - CLAUDE_TOOL_INPUT: JSON containing the tool input parameters
 """
 
+import sys
+
+# Windows UTF-8 support
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
+
 from pathlib import Path
 from typing import Optional
 

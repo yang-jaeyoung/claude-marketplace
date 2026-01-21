@@ -13,6 +13,15 @@ Output format:
 """
 
 import json
+import sys
+
+# Windows UTF-8 support
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
 import os
 import re
 import sys
