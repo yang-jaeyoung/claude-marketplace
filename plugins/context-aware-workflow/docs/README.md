@@ -1,6 +1,6 @@
 # Context-Aware Workflow (CAW) 문서
 
-> **버전**: 1.6.0 | **최종 업데이트**: 2025-01-19
+> **버전**: 1.7.0 | **최종 업데이트**: 2026-01-21
 
 이 디렉토리는 CAW 플러그인의 모든 문서를 포함합니다.
 
@@ -25,6 +25,16 @@ docs/
     ├── Plugins.md
     └── Subagents.md
 ```
+
+---
+
+## 🆕 v1.7.0 신규 기능
+
+| 기능 | 설명 | 관련 문서 |
+|------|------|----------|
+| **`/cw:loop`** | 자율 반복 실행 루프 (5단계 오류 복구) | [USER_GUIDE.md](./USER_GUIDE.md#cw-loop) |
+| **Gemini CLI 리뷰** | Edit/Commit 훅에서 Gemini CLI 리뷰 통합 | [USER_GUIDE.md](./USER_GUIDE.md#hooks) |
+| **루프 상태 지속성** | `.caw/loop_state.json`으로 중단/재개 가능 | [USER_GUIDE.md](./USER_GUIDE.md#생성-아티팩트) |
 
 ---
 
@@ -63,12 +73,14 @@ docs/
 
 **주요 내용**:
 - 빠른 시작 (2분 완성)
-- 17개 명령어 상세 설명
+- 17개 명령어 상세 설명 (`/cw:loop` 포함)
 - 9개 에이전트 (티어별 변형 포함 17개)
 - 16개 스킬 목록
+- 자율 실행 루프 (`/cw:loop` vs `/cw:auto`)
 - Tidy First 방법론
 - Git Worktree 병렬 실행
 - Ralph Loop 지속적 개선
+- Gemini CLI 리뷰 통합
 - 워크플로우 예시
 - 문제 해결 가이드
 
@@ -78,8 +90,15 @@ docs/
 
 **주요 내용**:
 - 스킬 설계 원칙
-- 16개 스킬 상세 명세
+- 16개 스킬 상세 명세 (6개 신규 포함)
+  - `commit-discipline` - Tidy First 커밋 분리
+  - `context-manager` - 컨텍스트 윈도우 최적화
+  - `dependency-analyzer` - 의존성 분석 및 병렬 실행
+  - `quick-fix` - 자동 수정
+  - `reflect` - Ralph Loop 지속적 개선
+  - `serena-sync` - Serena MCP 동기화
 - Hook 연동 패턴
+- Agent-Skill 매핑
 - Progressive Disclosure 전략
 
 ---
@@ -129,4 +148,15 @@ Claude Code의 핵심 기능에 대한 참조 문서입니다.
 
 ---
 
-*마지막 업데이트: 2025-01-19*
+## 📋 버전 이력
+
+| 버전 | 날짜 | 주요 변경 |
+|------|------|----------|
+| **1.7.0** | 2026-01-21 | `/cw:loop` 자율 실행, Gemini CLI 통합, 6개 신규 스킬 |
+| 1.6.0 | 2025-01-19 | Tidy First, Git Worktree, Serena 동기화 |
+| 1.5.0 | 2025-01-15 | Ralph Loop 지속적 개선 |
+| 1.4.0 | 2025-01-10 | 모델 라우팅, 티어별 에이전트, `/cw:auto` |
+
+---
+
+*마지막 업데이트: 2026-01-21*

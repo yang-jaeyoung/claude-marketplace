@@ -9,6 +9,29 @@ Agent를 강화하는 자동화 Skill 설계 문서.
 3. **Hook과 연동** - 이벤트 기반 자동 트리거
 4. **Progressive Disclosure** - 필요 시에만 컨텍스트 로드
 
+## Skill 현황 (16개 구현 완료)
+
+| # | Skill | 설명 | 상태 |
+|---|-------|------|------|
+| 1 | plan-detector | Plan Mode 감지 및 워크플로우 시작 | ✅ 구현 |
+| 2 | insight-collector | Insight 자동 수집 및 저장 | ✅ 구현 |
+| 3 | session-persister | 세션 상태 저장 및 복구 | ✅ 구현 |
+| 4 | quality-gate | Step 완료 전 품질 검증 | ✅ 구현 |
+| 5 | progress-tracker | 작업 진행 상황 메트릭 추적 | ✅ 구현 |
+| 6 | context-helper | Agent 컨텍스트 이해 및 관리 지원 | ✅ 구현 |
+| 7 | pattern-learner | 코드베이스 패턴 학습 | ✅ 구현 |
+| 8 | decision-logger | 기술적 결정 자동 기록 (ADR) | ✅ 구현 |
+| 9 | knowledge-base | 프로젝트 지식 축적 및 검색 | ✅ 구현 |
+| 10 | review-assistant | 코드 리뷰 체크리스트 자동 생성 | ✅ 구현 |
+| 11 | **commit-discipline** | Tidy First 커밋 분리 규칙 강제 | ✅ 구현 |
+| 12 | **context-manager** | 컨텍스트 윈도우 최적화 관리 | ✅ 구현 |
+| 13 | **dependency-analyzer** | 의존성 그래프 분석 및 병렬 실행 | ✅ 구현 |
+| 14 | **quick-fix** | 간단한 리뷰 이슈 자동 수정 | ✅ 구현 |
+| 15 | **reflect** | Ralph Loop 지속적 개선 사이클 | ✅ 구현 |
+| 16 | **serena-sync** | Serena MCP 메모리 동기화 | ✅ 구현 |
+
+---
+
 ## Skill 카탈로그
 
 ---
@@ -43,7 +66,7 @@ Agent를 강화하는 자동화 Skill 설계 문서.
 [2] 아니오, 나중에 수동으로 시작
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/plan-detector/
 ├── SKILL.md
@@ -89,7 +112,7 @@ skills/plan-detector/
 #authentication #security #middleware
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/insight-collector/
 ├── SKILL.md
@@ -134,7 +157,7 @@ skills/insight-collector/
 3. .caw/insights/jwt-refresh-pattern.md
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/context-helper/
 ├── SKILL.md
@@ -186,7 +209,7 @@ skills/context-helper/
 - Consistent error response format
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/pattern-learner/
 ├── SKILL.md
@@ -238,7 +261,7 @@ JWT 기반 인증 채택
 2. OAuth only: 외부 의존성 증가
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/decision-logger/
 ├── SKILL.md
@@ -288,7 +311,7 @@ skills/decision-logger/
 }
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/progress-tracker/
 ├── SKILL.md
@@ -336,7 +359,7 @@ Warnings:
 Proceed to next step? [Y/n]
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/quality-gate/
 ├── SKILL.md
@@ -384,7 +407,7 @@ skills/quality-gate/
     └── optimization-notes.md
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/knowledge-base/
 ├── SKILL.md
@@ -437,7 +460,7 @@ Last Activity: 30분 전
 [3] 세션 상태만 확인
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/session-persister/
 ├── SKILL.md
@@ -485,7 +508,7 @@ skills/session-persister/
 - [ ] 불필요한 DB 조회 없는가?
 ```
 
-**필요 파일:**
+**디렉토리:**
 ```
 skills/review-assistant/
 ├── SKILL.md
@@ -499,47 +522,299 @@ skills/review-assistant/
 
 ---
 
+### 11. commit-discipline (NEW)
+**Tidy First 커밋 분리 규칙 강제**
+
+| 속성 | 값 |
+|------|-----|
+| **트리거** | git commit 전, Builder 커밋 시 |
+| **출력** | VALID / INVALID / MIXED_CHANGE_DETECTED |
+| **연동** | PreToolUse Hook (Bash), Builder |
+
+**핵심 원칙:**
+```
+"Never mix structural and behavioral changes in the same commit.
+Always make structural changes first when both are needed."
+— Kent Beck, Tidy First
+```
+
+**커밋 유형:**
+| 유형 | 아이콘 | 접두사 | 설명 |
+|------|--------|--------|------|
+| Tidy | 🧹 | `[tidy]` | 구조적 변경 (동작 변경 없음) |
+| Build | 🔨 | `[feat]`, `[fix]` | 동작 변경 (새 기능, 버그 수정) |
+
+**검증 결과:**
+```
+🧹 Commit Discipline Check
+
+Analyzing staged changes...
+  ✅ src/auth/jwt.ts - Tidy (rename, extract method)
+  ✅ src/auth/middleware.ts - Tidy (move function)
+  ❌ src/routes/login.ts - Build (new endpoint)
+
+Result: MIXED_CHANGE_DETECTED
+
+Recommendation:
+1. First commit: Tidy changes only
+   git commit -m "[tidy] Extract JWT utilities"
+2. Second commit: Build changes
+   git commit -m "[feat] Add login endpoint"
+```
+
+**디렉토리:**
+```
+skills/commit-discipline/
+├── SKILL.md
+└── change-classifier.md   # 변경 유형 분류 기준
+```
+
+---
+
+### 12. context-manager (NEW)
+**컨텍스트 윈도우 최적화 관리**
+
+| 속성 | 값 |
+|------|-----|
+| **트리거** | 컨텍스트 부족 시, /cw:context 명령 |
+| **출력** | 최적화된 컨텍스트, 팩킹/프루닝 결과 |
+| **연동** | 모든 Agent, /cw:context |
+
+**기능:**
+```
+1. Plan Detection - 계획 문서 분석
+2. Context Packing - 인터페이스/시그니처 추출
+3. Context Pruning - 불필요 파일 정리
+```
+
+**사용 예시:**
+```
+📦 Context Manager: Packing
+
+Current context: 45,000 tokens
+Target: 30,000 tokens
+
+Actions:
+  📄 src/auth/jwt.ts → Packed (interface only)
+  📄 src/utils/helpers.ts → Pruned (not in current phase)
+  ✅ src/auth/middleware.ts → Keep (active)
+
+Result: 28,500 tokens (-36%)
+```
+
+**디렉토리:**
+```
+skills/context-manager/
+├── SKILL.md
+└── scripts/
+    ├── detect_plan.py
+    ├── pack_context.py
+    └── prune_context.py
+```
+
+---
+
+### 13. dependency-analyzer (NEW)
+**의존성 그래프 분석 및 병렬 실행 기회 식별**
+
+| 속성 | 값 |
+|------|-----|
+| **트리거** | /cw:next --parallel, /cw:worktree 전 |
+| **출력** | 의존성 그래프, 병렬 실행 그룹 |
+| **연동** | Builder, /cw:next, /cw:worktree |
+
+**분석 대상:**
+```
+1. Phase 레벨 의존성
+2. Step 레벨 의존성
+3. 파일 레벨 의존성
+```
+
+**출력 예시:**
+```
+📊 Dependency Analysis
+
+Phase Dependencies:
+  Phase 1: Setup → (no deps)
+  Phase 2: Core → Phase 1
+  Phase 3: API → Phase 2
+  Phase 4: Tests → Phase 2, 3 (parallel possible)
+
+Parallel Execution Groups:
+  Group A: Steps 2.1, 2.2, 2.3 (independent)
+  Group B: Steps 3.1, 3.2 (after Group A)
+
+Worktree Recommendation:
+  ✅ Phase 4 can run in parallel with Phase 3
+     Create worktree: caw-phase-4-tests
+```
+
+**디렉토리:**
+```
+skills/dependency-analyzer/
+├── SKILL.md
+└── analyzers/
+    ├── phase-deps.md
+    ├── step-deps.md
+    └── file-deps.md
+```
+
+---
+
+### 14. quick-fix (NEW)
+**간단한 리뷰 이슈 자동 수정**
+
+| 속성 | 값 |
+|------|-----|
+| **트리거** | /cw:fix 실행, 리뷰 완료 후 |
+| **출력** | 자동 수정 결과, 남은 이슈 목록 |
+| **연동** | Reviewer, /cw:fix |
+
+**자동 수정 가능 카테고리:**
+```
+1. Magic Numbers → 상수 추출
+2. Missing Docs → JSDoc/docstring 추가
+3. Style Violations → 린트 자동 수정
+4. Import Order → 자동 정렬
+5. Unused Variables → 제거
+```
+
+**수정 결과:**
+```
+🔧 Quick Fix Results
+
+Fixed (5):
+  ✅ src/auth/jwt.ts:23 - Magic number → TOKEN_EXPIRY
+  ✅ src/auth/jwt.ts:45 - Added JSDoc
+  ✅ src/utils/helpers.ts - Import ordering
+  ✅ src/routes/login.ts - Unused import removed
+  ✅ src/routes/login.ts:67 - Magic number → MAX_RETRIES
+
+Skipped (2):
+  ⏭️ Complex refactoring needed (use /cw:fix --deep)
+  ⏭️ Security concern (manual review required)
+
+Summary: 5 fixed, 2 skipped, 0 failed
+```
+
+**디렉토리:**
+```
+skills/quick-fix/
+├── SKILL.md
+└── fixers/
+    ├── magic-numbers.md
+    ├── missing-docs.md
+    ├── style-fixes.md
+    └── import-order.md
+```
+
+---
+
+### 15. reflect (NEW)
+**Ralph Loop 지속적 개선 사이클**
+
+| 속성 | 값 |
+|------|-----|
+| **트리거** | /cw:reflect, 작업 완료 후 |
+| **출력** | `.caw/learnings.md`, Serena 메모리 |
+| **연동** | /cw:reflect, 모든 Agent |
+
+**RALPH 사이클:**
+| 단계 | 설명 | 출력 |
+|------|------|------|
+| **R**eflect | 작업 중 발생한 일 검토 | 작업 요약, 결과 평가 |
+| **A**nalyze | 패턴 및 근본 원인 식별 | 잘된 점, 아쉬운 점, 패턴 |
+| **L**earn | 실행 가능한 교훈 추출 | 핵심 인사이트, 개선된 스킬, 격차 |
+| **P**lan | 개선 액션 생성 | 우선순위 액션 아이템 |
+| **H**abituate | 향후 작업에 적용 | 업데이트된 기본값, 체크리스트, 메모리 |
+
+**출력 예시:**
+```
+🔮 Ralph Loop: Task Reflection
+
+## Reflect
+- Task: JWT 인증 구현
+- Duration: 2시간 15분
+- Outcome: ✅ 성공 (경미한 이슈 수정)
+
+## Analyze
+- ✅ TDD 접근법이 효과적이었음
+- ⚠️ 초기 토큰 만료 시간 너무 짧게 설정
+- 패턴: 보안 관련 설정은 환경 변수로
+
+## Learn
+- JWT 갱신 로직에서 race condition 주의
+- 항상 토큰 만료를 환경 변수로 설정
+
+## Plan
+1. [HIGH] .env.example에 JWT 설정 추가
+2. [MED] 토큰 갱신 로직 문서화
+
+## Habituate
+→ learnings.md 업데이트 완료
+→ Serena 메모리 동기화 완료
+```
+
+**디렉토리:**
+```
+skills/reflect/
+├── SKILL.md
+└── templates/
+    └── ralph-template.md
+```
+
+---
+
+### 16. serena-sync (NEW)
+**Serena MCP 메모리 동기화**
+
+| 속성 | 값 |
+|------|-----|
+| **트리거** | /cw:sync, 세션 종료 시 |
+| **출력** | Serena 메모리 업데이트 |
+| **연동** | Serena MCP, /cw:sync |
+| **MCP 서버** | serena |
+
+**메모리 스키마:**
+| 메모리 이름 | 내용 | 업데이트 주체 |
+|-------------|------|--------------|
+| `project_onboarding` | 프로젝트 유형, 프레임워크, 컨벤션, 주요 파일 | Bootstrapper |
+| `domain_knowledge` | 비즈니스 규칙, 도메인 개념, 패턴 | Planner, Builder |
+| `lessons_learned` | 에러 해결, 디버깅 인사이트, 주의사항 | Builder |
+| `workflow_patterns` | 성공적인 워크플로우 접근법, 모범 사례 | Reflect skill |
+| `session_backup` | 마지막 세션 상태 (선택적 백업) | Session Persister |
+
+**동기화 작업:**
+```
+🔄 Serena Sync
+
+Direction: CAW → Serena
+
+Syncing:
+  ✅ project_onboarding (unchanged)
+  ✅ domain_knowledge (2 new entries)
+  ✅ lessons_learned (1 new insight)
+  ✅ workflow_patterns (updated)
+
+Result: 4 memories synced
+Last sync: 2026-01-21T10:30:00Z
+```
+
+**디렉토리:**
+```
+skills/serena-sync/
+├── SKILL.md
+└── schema/
+    └── memory-schema.md
+```
+
+---
+
 ## Hook 연동 설계
 
 ```json
 {
   "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": {
-          "tool_name": "ExitPlanMode"
-        },
-        "hooks": [
-          {
-            "type": "skill",
-            "skill": "plan-detector"
-          }
-        ]
-      },
-      {
-        "matcher": {
-          "response_pattern": "★ Insight"
-        },
-        "hooks": [
-          {
-            "type": "skill",
-            "skill": "insight-collector"
-          }
-        ]
-      },
-      {
-        "matcher": {
-          "tool_name": "Edit",
-          "context": "caw_workflow_active"
-        },
-        "hooks": [
-          {
-            "type": "skill",
-            "skill": "progress-tracker"
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "hooks": [
@@ -551,14 +826,39 @@ skills/review-assistant/
         ]
       }
     ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          { "type": "skill", "skill": "progress-tracker" }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "skill", "skill": "commit-discipline" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": { "tool_name": "ExitPlanMode" },
+        "hooks": [
+          { "type": "skill", "skill": "plan-detector" }
+        ]
+      },
+      {
+        "matcher": { "response_pattern": "★ Insight" },
+        "hooks": [
+          { "type": "skill", "skill": "insight-collector" }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
-          {
-            "type": "skill",
-            "skill": "session-persister",
-            "action": "save"
-          }
+          { "type": "skill", "skill": "session-persister", "action": "save" },
+          { "type": "skill", "skill": "serena-sync" }
         ]
       }
     ]
@@ -572,35 +872,15 @@ skills/review-assistant/
 
 | Agent | 사용 Skills |
 |-------|-------------|
-| **Planner** | pattern-learner, context-helper, decision-logger |
-| **Builder** | context-helper, quality-gate, progress-tracker |
+| **Bootstrapper** | pattern-learner, knowledge-base |
+| **Planner** | pattern-learner, context-helper, decision-logger, dependency-analyzer |
+| **Builder** | context-helper, quality-gate, progress-tracker, commit-discipline, quick-fix |
 | **Reviewer** | review-assistant, pattern-learner, insight-collector |
-| **ComplianceChecker** | quality-gate, knowledge-base |
+| **Fixer** | quick-fix, pattern-learner |
+| **ComplianceChecker** | quality-gate, knowledge-base, commit-discipline |
 | **Ideator** | knowledge-base, insight-collector |
 | **Designer** | pattern-learner, decision-logger |
-| **Architect** | decision-logger, knowledge-base, pattern-learner |
-
----
-
-## 구현 우선순위 제안
-
-### Tier 1: 핵심 (즉시 가치)
-1. **plan-detector** - Plan Mode 연동 자동화
-2. **insight-collector** - 지식 자동 축적
-3. **session-persister** - 세션 연속성
-
-### Tier 2: 품질 강화
-4. **quality-gate** - 자동 품질 검증
-5. **progress-tracker** - 진행 상황 가시화
-6. **context-helper** - Agent 효율성 향상
-
-### Tier 3: 지식 관리
-7. **pattern-learner** - 코드베이스 학습
-8. **decision-logger** - 의사결정 기록
-9. **knowledge-base** - 지식 축적
-
-### Tier 4: 고급 기능
-10. **review-assistant** - 리뷰 자동화
+| **Architect** | decision-logger, knowledge-base, pattern-learner, dependency-analyzer |
 
 ---
 
@@ -614,37 +894,65 @@ context-aware-workflow/
 │   └── *.md
 ├── commands/
 │   └── *.md
-├── skills/                    # NEW
+├── skills/                    # 16 Skills
 │   ├── plan-detector/
 │   │   └── SKILL.md
 │   ├── insight-collector/
 │   │   ├── SKILL.md
 │   │   └── templates/
+│   ├── context-helper/
+│   │   └── SKILL.md
+│   ├── pattern-learner/
+│   │   └── SKILL.md
+│   ├── decision-logger/
+│   │   └── SKILL.md
+│   ├── progress-tracker/
+│   │   └── SKILL.md
+│   ├── quality-gate/
+│   │   └── SKILL.md
+│   ├── knowledge-base/
+│   │   └── SKILL.md
 │   ├── session-persister/
-│   │   ├── SKILL.md
-│   │   └── scripts/
-│   └── ...
+│   │   └── SKILL.md
+│   ├── review-assistant/
+│   │   └── SKILL.md
+│   ├── commit-discipline/      # NEW
+│   │   └── SKILL.md
+│   ├── context-manager/        # NEW
+│   │   └── SKILL.md
+│   ├── dependency-analyzer/    # NEW
+│   │   └── SKILL.md
+│   ├── quick-fix/              # NEW
+│   │   └── SKILL.md
+│   ├── reflect/                # NEW
+│   │   └── SKILL.md
+│   └── serena-sync/            # NEW
+│       └── SKILL.md
 ├── hooks/
-│   └── hooks.json            # Updated
+│   └── hooks.json
 └── docs/
-    └── SKILL_DESIGN.md       # This file
+    └── SKILL_DESIGN.md
 ```
 
 ---
 
-## 선택 가이드
+## 버전 이력
 
-어떤 Skill을 구현할지 선택해주세요:
+### v1.7.0 (현재)
+- **16개 스킬 모두 구현 완료**
+- 새로운 스킬 6개 추가:
+  - `commit-discipline` - Tidy First 커밋 분리
+  - `context-manager` - 컨텍스트 윈도우 최적화
+  - `dependency-analyzer` - 의존성 분석 및 병렬 실행
+  - `quick-fix` - 자동 수정
+  - `reflect` - Ralph Loop 지속적 개선
+  - `serena-sync` - Serena MCP 동기화
 
-| # | Skill | 복잡도 | 즉시 가치 | 의존성 |
-|---|-------|--------|----------|--------|
-| 1 | plan-detector | 낮음 | 높음 | Hook |
-| 2 | insight-collector | 중간 | 높음 | Hook |
-| 3 | session-persister | 중간 | 높음 | Hook |
-| 4 | quality-gate | 중간 | 중간 | Builder |
-| 5 | progress-tracker | 낮음 | 중간 | Hook |
-| 6 | context-helper | 낮음 | 중간 | - |
-| 7 | pattern-learner | 높음 | 중간 | - |
-| 8 | decision-logger | 낮음 | 낮음 | - |
-| 9 | knowledge-base | 높음 | 낮음 | - |
-| 10 | review-assistant | 중간 | 낮음 | Reviewer |
+### v1.6.0
+- 기본 10개 스킬 설계 완료
+- Tidy First 방법론 통합
+- Git Worktree 지원
+
+### v1.5.0
+- Ralph Loop 설계
+- Serena MCP 연동 계획

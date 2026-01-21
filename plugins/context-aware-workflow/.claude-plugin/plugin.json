@@ -1,7 +1,7 @@
 {
   "name": "cw",
-  "version": "1.6.0",
-  "description": "Context-aware workflow orchestration plugin with Plan Mode integration, intelligent context management, structured task planning, magic keywords, intelligent model routing, tiered agent variants, Ralph Loop continuous improvement, and full workflow automation",
+  "version": "1.7.0",
+  "description": "Context-aware workflow orchestration plugin with Plan Mode integration, intelligent context management, structured task planning, magic keywords, intelligent model routing, tiered agent variants, Ralph Loop continuous improvement, autonomous execution loop, Gemini CLI review integration, and full workflow automation",
   "author": {
     "name": "urd"
   }
