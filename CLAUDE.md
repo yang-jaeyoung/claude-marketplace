@@ -131,16 +131,23 @@ context: fork                      # Runs in isolated context (replaces forked-c
 ```json
 {
   "hooks": {
-    "SessionStart": [{ "hooks": [{ "type": "prompt", "prompt": "..." }] }],
+    "SessionStart": [{ "hooks": [{ "type": "command", "command": "echo '...'" }] }],
     "PreToolUse": [{ "matcher": "Bash", "hooks": [{ "type": "command", "command": "..." }] }],
     "PostToolUse": [...],
     "Notification": [...],
-    "Stop": [...]
+    "Stop": [{ "hooks": [{ "type": "prompt", "prompt": "..." }] }]
   }
 }
 ```
 
-Available hook events: `PreToolUse`, `PermissionRequest`, `PostToolUse`, `UserPromptSubmit`, `Notification`, `Stop`, `SubagentStop`, `PreCompact`, `SessionStart`, `SessionEnd`.
+**Hook Types**:
+- `type: "command"` - Bash 명령 실행 (모든 hook event에서 지원)
+- `type: "prompt"` - LLM 기반 평가 (**`Stop`과 `SubagentStop`에서만 지원**)
+
+> ⚠️ **주의**: `type: "prompt"`는 `Stop`과 `SubagentStop` hook에서만 사용 가능합니다.
+> SessionStart 등 다른 이벤트에서 사용하면 "hook error"가 발생합니다.
+
+Available hook events: `PreToolUse`, `PermissionRequest`, `PostToolUse`, `UserPromptSubmit`, `Notification`, `Stop`, `SubagentStop`, `PreCompact`, `Setup`, `SessionStart`, `SessionEnd`.
 
 ## MCP Server Development
 
