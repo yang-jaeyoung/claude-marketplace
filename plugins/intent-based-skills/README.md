@@ -58,6 +58,36 @@ Vue 프로젝트 구조 분석 및 문서화를 수행합니다.
 
 **트리거**: `.NET 프로젝트 분석`, `C# 아키텍처 분석`
 
+### research-orchestrator
+
+멀티 에이전트 기반 자동화된 연구 시스템입니다. 4단계 워크플로우를 통해 복잡한 연구 주제를 체계적으로 분석합니다.
+
+**트리거**: `/research`, `연구 수행`, `research on`
+
+**워크플로우**:
+1. **Decomposition**: 연구 목표를 독립적인 Stage로 분해
+2. **Execution**: 각 Stage를 병렬로 실행하여 Findings 수집
+3. **Verification**: 모든 결과를 교차 검증하여 일관성 평가
+4. **Synthesis**: 최종 연구 리포트 생성
+
+**연구 깊이**:
+- `quick`: 2-3 stages (빠른 개요)
+- `standard`: 4-6 stages (기본 분석)
+- `deep`: 7-10 stages (심층 연구)
+
+**연구 유형**:
+- `technical`: 기술 연구 (아키텍처, 구현, 성능)
+- `academic`: 학술 연구 (이론, 방법론, 선행연구)
+- `market`: 시장 조사 (경쟁사, 트렌드)
+- `comparative`: 비교 분석
+
+**출력물**:
+- `RESEARCH-REPORT.md` - 최종 연구 리포트
+- `research-data.json` - 구조화된 연구 데이터
+- `stages/` - 각 Stage별 결과
+- `validation/` - 교차 검증 결과
+- `diagrams/` - Mermaid 다이어그램
+
 ## 명령어 (Commands)
 
 ### Feedback 명령어
@@ -77,6 +107,17 @@ Vue 프로젝트 구조 분석 및 문서화를 수행합니다.
 | 명령어 | 설명 |
 |--------|------|
 | `/verify-skill <skill>` | 스킬 출력물 검증 |
+
+### Research 명령어
+
+| 명령어 | 설명 |
+|--------|------|
+| `/research --goal <goal>` | 연구 수행 (기본 standard 깊이) |
+| `/research --goal <goal> --depth quick` | 빠른 연구 (2-3 stages) |
+| `/research --goal <goal> --depth deep` | 심층 연구 (7-10 stages) |
+| `/research --goal <goal> --type market` | 시장 조사 유형 |
+| `/research --goal <goal> --auto` | 자동 실행 모드 |
+| `/research --resume` | 이전 연구 재개 |
 
 ## 사용 예시
 
@@ -105,6 +146,19 @@ Vue 프로젝트 구조 분석 및 문서화를 수행합니다.
 /feedback-report react-project-analyzer
 ```
 
+### 4. 연구 수행
+
+```bash
+# 기술 비교 연구
+/research --goal "React Server Components vs Next.js App Router 비교 분석" --type comparative --depth standard
+
+# 시장 조사
+/research --goal "2024 AI 코딩 어시스턴트 시장 분석" --type market --depth deep
+
+# 학술 연구
+/research --goal "LLM의 Reasoning 능력 평가 방법론" --type academic
+```
+
 ## 디렉토리 구조
 
 ```
@@ -125,24 +179,43 @@ intent-based-skills/
 │   ├── feedback-analyze.md
 │   ├── feedback-report.md
 │   ├── feedback-apply.md
-│   └── verify-skill.md
+│   ├── verify-skill.md
+│   └── research.md              # Research Orchestrator CLI
 ├── schemas/
 │   ├── react-project-analyzer.schema.json
 │   ├── vue-project-analyzer.schema.json
 │   ├── dotnet-project-analyzer.schema.json
 │   ├── intent-skill-creator.schema.json
-│   └── feedback-loop-event.schema.json
+│   ├── feedback-loop-event.schema.json
+│   └── research-orchestrator.schema.json  # 연구 결과 스키마
 ├── checklists/
 │   ├── react-project-analyzer.yaml
 │   ├── vue-project-analyzer.yaml
 │   ├── dotnet-project-analyzer.yaml
 │   ├── intent-skill-creator.yaml
-│   └── feedback-loop.yaml
+│   ├── feedback-loop.yaml
+│   └── research-orchestrator.yaml  # 연구 결과 검증
 ├── hooks/
 │   └── hooks.json            # Stop 이벤트 훅
-└── lib/
-    ├── feedback_collector.py # 이벤트 수집 CLI
-    └── feedback_analyzer.py  # 패턴 분석기
+├── lib/
+│   ├── feedback_collector.py # 이벤트 수집 CLI
+│   ├── feedback_analyzer.py  # 패턴 분석기
+│   ├── colors.py             # 크로스 플랫폼 색상 출력
+│   ├── verifier_base.py      # 검증 스크립트 기본 클래스
+│   └── research_orchestrator/  # 연구 오케스트레이터 라이브러리
+│       ├── __init__.py
+│       ├── orchestrator.py   # 메인 오케스트레이터
+│       ├── models.py         # 데이터 모델
+│       ├── config.py         # 설정 관리
+│       ├── errors.py         # 예외 클래스
+│       ├── guardrails.py     # AUTO 모드 안전장치
+│       ├── verifier.py       # 결과 검증기
+│       ├── agents/           # 에이전트 구현
+│       ├── utils/            # 유틸리티
+│       └── prompts/          # 프롬프트 템플릿
+└── skills/
+    └── research-orchestrator/
+        └── SKILL.md          # 연구 오케스트레이터 스킬
 ```
 
 ## 요구사항

@@ -1,0 +1,367 @@
+# Research Orchestrator - Verification Checklist
+# 연구 오케스트레이터 결과 검증 체크리스트
+
+version: "1.0"
+
+# ============================================================
+# 사전 조건 검증
+# ============================================================
+pre_execution:
+  - id: PRE-001
+    name: "연구 목표 유효성"
+    description: "연구 목표가 최소 요구 길이를 충족하는지 확인"
+    validation: auto
+    script: |
+      test -n "$RESEARCH_GOAL" && [ ${#RESEARCH_GOAL} -ge 10 ]
+    priority: must
+    error_message: "연구 목표는 최소 10자 이상이어야 합니다"
+
+  - id: PRE-002
+    name: "출력 디렉토리 쓰기 권한"
+    description: "출력 디렉토리에 쓰기 가능한지 확인"
+    validation: auto
+    script: |
+      mkdir -p "$OUTPUT_DIR" && test -w "$OUTPUT_DIR"
+    priority: must
+    error_message: "출력 디렉토리에 쓰기 권한이 없습니다"
+
+  - id: PRE-003
+    name: "연구 깊이 유효성"
+    description: "연구 깊이 설정이 유효한지 확인"
+    validation: auto
+    script: |
+      echo "$RESEARCH_DEPTH" | grep -qE "^(quick|standard|deep)$"
+    priority: should
+    error_message: "연구 깊이는 quick, standard, deep 중 하나여야 합니다"
+
+# ============================================================
+# 실행 후 검증
+# ============================================================
+post_execution:
+  # 파일 존재 검증
+  files:
+    - id: FILE-001
+      name: "종합 리포트 존재"
+      description: "RESEARCH-REPORT.md가 생성되었는지 확인"
+      validation: auto
+      file: "{output_dir}/RESEARCH-REPORT.md"
+      priority: must
+
+    - id: FILE-002
+      name: "연구 데이터 JSON 존재"
+      description: "research-data.json이 생성되었는지 확인"
+      validation: auto
+      file: "{output_dir}/research-data.json"
+      priority: must
+
+    - id: FILE-003
+      name: "단계별 리포트 디렉토리 존재"
+      description: "stages/ 디렉토리가 생성되었는지 확인"
+      validation: auto
+      directory: "{output_dir}/stages"
+      priority: must
+
+    - id: FILE-004
+      name: "다이어그램 디렉토리 존재"
+      description: "diagrams/ 디렉토리가 생성되었는지 확인"
+      validation: auto
+      directory: "{output_dir}/diagrams"
+      priority: should
+
+    - id: FILE-005
+      name: "분해 다이어그램 존재"
+      description: "research-decomposition.mmd가 생성되었는지 확인"
+      validation: auto
+      file: "{output_dir}/diagrams/research-decomposition.mmd"
+      priority: should
+
+    - id: FILE-006
+      name: "검증 매트릭스 다이어그램 존재"
+      description: "validation-matrix.mmd가 생성되었는지 확인"
+      validation: auto
+      file: "{output_dir}/diagrams/validation-matrix.mmd"
+      priority: should
+
+  # 스키마 검증
+  schema:
+    - id: SCHEMA-001
+      name: "research-data.json JSON 유효성"
+      description: "research-data.json이 유효한 JSON인지 확인"
+      validation: auto
+      file: "{output_dir}/research-data.json"
+      check_type: json_valid
+      priority: must
+
+    - id: SCHEMA-002
+      name: "필수 메타데이터 존재"
+      description: "research-data.json에 meta 섹션이 존재하는지 확인"
+      validation: auto
+      file: "{output_dir}/research-data.json"
+      check_type: json_key_exists
+      key_path: "meta"
+      priority: must
+
+    - id: SCHEMA-003
+      name: "stages 배열 존재"
+      description: "research-data.json에 stages 배열이 존재하는지 확인"
+      validation: auto
+      file: "{output_dir}/research-data.json"
+      check_type: json_key_exists
+      key_path: "stages"
+      priority: must
+
+    - id: SCHEMA-004
+      name: "validation 섹션 존재"
+      description: "research-data.json에 validation 섹션이 존재하는지 확인"
+      validation: auto
+      file: "{output_dir}/research-data.json"
+      check_type: json_key_exists
+      key_path: "validation"
+      priority: must
+
+    - id: SCHEMA-005
+      name: "synthesis 섹션 존재"
+      description: "research-data.json에 synthesis 섹션이 존재하는지 확인"
+      validation: auto
+      file: "{output_dir}/research-data.json"
+      check_type: json_key_exists
+      key_path: "synthesis"
+      priority: must
+
+  # 내용 검증
+  content:
+    - id: CONTENT-001
+      name: "리포트 Executive Summary 존재"
+      description: "RESEARCH-REPORT.md에 Executive Summary 섹션이 있는지 확인"
+      validation: auto
+      file: "{output_dir}/RESEARCH-REPORT.md"
+      pattern: "Executive Summary|요약"
+      priority: must
+
+    - id: CONTENT-002
+      name: "리포트 Methodology 존재"
+      description: "RESEARCH-REPORT.md에 Methodology 섹션이 있는지 확인"
+      validation: auto
+      file: "{output_dir}/RESEARCH-REPORT.md"
+      pattern: "Methodology|방법론"
+      priority: must
+
+    - id: CONTENT-003
+      name: "리포트 Conclusions 존재"
+      description: "RESEARCH-REPORT.md에 Conclusions 섹션이 있는지 확인"
+      validation: auto
+      file: "{output_dir}/RESEARCH-REPORT.md"
+      pattern: "Conclusions|결론"
+      priority: must
+
+    - id: CONTENT-004
+      name: "단계별 리포트 존재"
+      description: "stages/ 디렉토리에 단계별 리포트가 있는지 확인"
+      validation: auto
+      directory: "{output_dir}/stages"
+      pattern: "stage-*.md"
+      min_count: 1
+      priority: must
+
+    - id: CONTENT-005
+      name: "교차 검증 수행됨"
+      description: "research-data.json에 교차 검증 결과가 있는지 확인"
+      validation: auto
+      file: "{output_dir}/research-data.json"
+      check_type: json_key_exists
+      key_path: "validation.performed"
+      expected_value: true
+      priority: must
+
+    - id: CONTENT-006
+      name: "핵심 발견 존재"
+      description: "research-data.json에 key_findings가 비어있지 않은지 확인"
+      validation: auto
+      file: "{output_dir}/research-data.json"
+      check_type: json_array_not_empty
+      key_path: "synthesis.key_findings"
+      priority: must
+
+    - id: CONTENT-007
+      name: "Mermaid 다이어그램 유효성"
+      description: "생성된 Mermaid 다이어그램이 유효한 문법인지 확인"
+      validation: auto
+      directory: "{output_dir}/diagrams"
+      pattern: "*.mmd"
+      check_type: mermaid_valid
+      priority: should
+
+  # 정확도 검증 (수동)
+  accuracy:
+    - id: ACCURACY-001
+      name: "발견 일관성"
+      description: "핵심 발견들이 상호 일관성을 유지하는지 확인"
+      validation: manual
+      guidance: |
+        synthesis.key_findings의 각 발견을 검토하여:
+        1. 서로 모순되는 발견이 없는지 확인
+        2. 각 발견이 stages의 결과로 뒷받침되는지 확인
+        3. confidence 점수가 증거 수준과 일치하는지 확인
+      priority: should
+
+    - id: ACCURACY-002
+      name: "결론 근거"
+      description: "결론이 발견에 기반하여 도출되었는지 확인"
+      validation: manual
+      guidance: |
+        synthesis.conclusions의 각 결론을 검토하여:
+        1. 해당 결론을 지지하는 key_findings가 있는지 확인
+        2. 과도한 일반화가 없는지 확인
+        3. 불확실성이 적절히 언급되었는지 확인
+      priority: should
+
+    - id: ACCURACY-003
+      name: "출처 신뢰성"
+      description: "인용된 출처들이 신뢰할 수 있는지 확인"
+      validation: manual
+      guidance: |
+        references 배열의 각 출처를 검토하여:
+        1. URL이 유효한지 확인
+        2. 공식 문서, 학술 자료 등 신뢰할 수 있는 출처인지 확인
+        3. 날짜가 최신인지 확인 (특히 기술 관련)
+      priority: should
+
+    - id: ACCURACY-004
+      name: "연구 목표 달성"
+      description: "연구 결과가 원래 연구 목표를 충족하는지 확인"
+      validation: manual
+      guidance: |
+        다음을 검토:
+        1. meta.research_goal에 명시된 목표가 달성되었는지
+        2. 모든 주요 측면이 다루어졌는지
+        3. 답변되지 않은 질문이 limitations에 명시되었는지
+      priority: must
+
+# ============================================================
+# 실행 검증
+# ============================================================
+execution:
+  - id: EXEC-001
+    name: "체크포인트 파일 존재"
+    description: "Interactive 모드에서 체크포인트 파일이 생성되었는지 확인"
+    validation: auto
+    file: "{output_dir}/.checkpoint.json"
+    check_type: file_exists_if_interactive
+    priority: should
+
+  - id: EXEC-002
+    name: "실행 통계 존재"
+    description: "research-data.json에 execution_stats 섹션이 있는지 확인"
+    validation: auto
+    file: "{output_dir}/research-data.json"
+    check_type: json_key_exists
+    key_path: "execution_stats"
+    priority: should
+
+  - id: EXEC-003
+    name: "Stage 완료율"
+    description: "모든 Stage가 완료되었는지 확인"
+    validation: auto
+    file: "{output_dir}/research-data.json"
+    check_type: stage_completion_rate
+    min_rate: 0.8
+    priority: must
+
+  - id: EXEC-004
+    name: "가드레일 준수"
+    description: "AUTO 모드에서 가드레일이 준수되었는지 확인"
+    validation: auto
+    check_type: guardrail_compliance
+    checks:
+      - max_stages: 10
+      - max_parallel_agents: 5
+      - timeout_per_stage: 30
+    priority: must
+
+  - id: EXEC-005
+    name: "분해 결과 존재"
+    description: "decomposition.json이 생성되었는지 확인"
+    validation: auto
+    file: "{output_dir}/stages/decomposition.json"
+    priority: must
+
+  - id: EXEC-006
+    name: "검증 결과 존재"
+    description: "validation-result.json이 생성되었는지 확인"
+    validation: auto
+    file: "{output_dir}/validation/validation-result.json"
+    priority: must
+
+  - id: EXEC-007
+    name: "실행 시간 기록"
+    description: "execution_stats에 실행 시간이 기록되었는지 확인"
+    validation: auto
+    file: "{output_dir}/research-data.json"
+    check_type: json_key_exists
+    key_path: "execution_stats.total_execution_time"
+    priority: should
+
+  - id: EXEC-008
+    name: "재시도 횟수 검증"
+    description: "Stage별 재시도 횟수가 max_retries를 초과하지 않는지 확인"
+    validation: auto
+    check_type: retry_count_validation
+    max_retries: 2
+    priority: should
+
+# ============================================================
+# 품질 검증
+# ============================================================
+quality:
+  - id: QUALITY-001
+    name: "단계 커버리지"
+    description: "연구 깊이에 맞는 단계 수가 실행되었는지 확인"
+    validation: auto
+    check_type: stage_count
+    thresholds:
+      quick:
+        min: 2
+        max: 3
+      standard:
+        min: 4
+        max: 6
+      deep:
+        min: 7
+        max: 10
+    priority: should
+
+  - id: QUALITY-002
+    name: "일관성 점수"
+    description: "교차 검증 일관성 점수가 임계값 이상인지 확인"
+    validation: auto
+    file: "{output_dir}/research-data.json"
+    check_type: json_value_threshold
+    key_path: "validation.consistency_score"
+    min_value: 0.7
+    priority: should
+
+  - id: QUALITY-003
+    name: "모순 해결"
+    description: "발견된 모든 모순이 해결되었는지 확인"
+    validation: auto
+    file: "{output_dir}/research-data.json"
+    check_type: all_contradictions_resolved
+    priority: should
+
+# ============================================================
+# 검증 요약 기준
+# ============================================================
+summary:
+  pass_criteria:
+    must_pass_rate: 100  # 모든 MUST 항목 통과 필요
+    should_pass_rate: 70  # SHOULD 항목 70% 이상 통과 권장
+
+  fail_actions:
+    must_fail: "전체 실패로 처리, 수정 필요"
+    should_fail: "경고 표시, 개선 권장"
+    could_fail: "정보 표시만"
+
+  report_format:
+    include_details: true
+    show_guidance: true
+    export_json: true
