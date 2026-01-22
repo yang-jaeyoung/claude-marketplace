@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo 'CAW (Context-Aware Workflow) plugin is active. Use /cw:status to check workflow state or /cw:start to begin a new task.'"
+            "command": "echo \"CAW (Context-Aware Workflow) plugin is active. Use /cw:status to check workflow state or /cw:start to begin a new task.\""
           }
         ]
       }
@@ -16,11 +16,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import check_plan_adherence; check_plan_adherence.main()\""
+            "command": "python -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import check_plan_adherence; check_plan_adherence.main()\""
           },
           {
             "type": "command",
-            "command": "python3 -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import gemini_edit_review; gemini_edit_review.main()\""
+            "command": "python -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import gemini_edit_review; gemini_edit_review.main()\""
           }
         ]
       },
@@ -29,11 +29,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import validate_commit_discipline; validate_commit_discipline.main()\""
+            "command": "python -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import validate_commit_discipline; validate_commit_discipline.main()\""
           },
           {
             "type": "command",
-            "command": "python3 -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import gemini_commit_review; gemini_commit_review.main()\""
+            "command": "python -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import gemini_commit_review; gemini_commit_review.main()\""
           }
         ]
       }
