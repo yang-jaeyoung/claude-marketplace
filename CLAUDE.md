@@ -171,6 +171,27 @@ context: fork                      # Runs in isolated context (replaces forked-c
 
 Available hook events: `PreToolUse`, `PermissionRequest`, `PostToolUse`, `UserPromptSubmit`, `Notification`, `Stop`, `SubagentStop`, `PreCompact`, `Setup`, `SessionStart`, `SessionEnd`.
 
+**플러그인 경로 참조 (`${CLAUDE_PLUGIN_ROOT}`)**:
+
+> ⚠️ **중요**: `${CLAUDE_PLUGIN_ROOT}`는 환경변수가 아닌 **Claude Code가 런타임에 치환하는 특수 변수**입니다.
+
+```json
+// ✅ 올바른 사용법 - command 문자열에서 직접 사용
+{
+  "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/my_script.py\""
+}
+
+// ❌ 잘못된 사용법 - Python 코드 내에서 환경변수로 접근
+{
+  "command": "python -c \"import os; os.environ.get('CLAUDE_PLUGIN_ROOT', '.')\""
+}
+```
+
+| 변수 | 사용 위치 | 설명 |
+|------|----------|------|
+| `${CLAUDE_PLUGIN_ROOT}` | command 문자열 | 플러그인 루트 경로 (런타임 치환) |
+| `$CLAUDE_PROJECT_DIR` | command 문자열 | 프로젝트 루트 경로 (환경변수) |
+
 ## MCP Server Development
 
 MCP servers use `@modelcontextprotocol/sdk` with this pattern:

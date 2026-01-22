@@ -16,11 +16,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import check_plan_adherence; check_plan_adherence.main()\""
+            "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/check_plan_adherence.py\""
           },
           {
             "type": "command",
-            "command": "python -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import gemini_edit_review; gemini_edit_review.main()\""
+            "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/gemini_edit_review.py\""
           }
         ]
       },
@@ -29,11 +29,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import validate_commit_discipline; validate_commit_discipline.main()\""
+            "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/validate_commit_discipline.py\""
           },
           {
             "type": "command",
-            "command": "python -c \"import os, sys; sys.path.insert(0, os.path.join(os.environ.get('CLAUDE_PLUGIN_ROOT', '.'), 'hooks', 'scripts')); import gemini_commit_review; gemini_commit_review.main()\""
+            "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/gemini_commit_review.py\""
           }
         ]
       }
