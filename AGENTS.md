@@ -35,5 +35,8 @@ Since this is a monorepo, build and test commands are specific to each plugin.
 # Context Map (Action-Based Routing)
 
 - **[SQL Server MCP Plugin (TypeScript)](./plugins/mssql/AGENTS.md)** — Backend logic, MCP server implementation, Node.js tooling.
-- **[Context Aware Workflow (Python)](./plugins/context-aware-workflow/AGENTS.md)** — Agent logic, complex workflows, Python/Pytest tasks.
+- **[Context Aware Workflow (Python)](./plugins/context-aware-workflow/AGENTS.md)** — Agent logic, complex workflows, Python/Pytest tasks, OMC integration.
 - **[Codex CLI (Markdown)](./plugins/codex-cli/AGENTS.md)** — Static command definitions, pure Markdown/YAML editing.
+- **[Gemini CLI (Markdown)](./plugins/gemini-cli/README.md)** — Google Gemini CLI integration for code review, commits, docs.
+- **[Intent-Based Skills (Python)](./plugins/intent-based-skills/README.md)** — Intent framework, project analyzers, research orchestrator.
+- **[AZ Skill Pack (Markdown)](./plugins/az-skill-pack/README.md)** — Brainstorming, security audits, documentation generation.

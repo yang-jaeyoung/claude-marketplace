@@ -223,6 +223,42 @@ intent-based-skills/
 - Python 3.8+ (feedback 명령어 사용 시)
 - PyYAML (선택, 분석기 기능 확장)
 
+## OMC (oh-my-claudecode) 연동
+
+intent-based-skills와 oh-my-claudecode(OMC)는 상호 보완적인 관계입니다.
+
+### 연구 기능 비교
+
+| 기능 | intent-based-skills `/research` | OMC `/omc:research` | CAW `/cw:research` |
+|------|--------------------------------|--------------------|--------------------|
+| **목적** | 범용 주제 연구 | 코드베이스 + 외부 연구 | 프로젝트 컨텍스트 기반 연구 |
+| **워크플로우** | 4단계 (분해→실행→검증→합성) | Scientist 에이전트 기반 | Internal + External 연구 |
+| **깊이 옵션** | quick/standard/deep | AUTO 모드 | 고정 워크플로우 |
+| **출력물** | RESEARCH-REPORT.md + JSON | 자연어 응답 | .caw/ 연구 파일 |
+| **검증** | 교차 검증 내장 | 선택적 | 선택적 |
+
+### 사용 가이드
+
+**독립 사용**: intent-based-skills의 연구 기능은 OMC 없이도 완전히 동작합니다.
+
+**함께 사용 시**:
+- **기술 비교/학술 연구**: `/research` (intent-based-skills) - 구조화된 리포트 생성
+- **코드베이스 탐색 연구**: `/omc:research` - 빠른 코드 분석
+- **프로젝트 문서화**: `/cw:research` - CAW 워크플로우 연계
+
+### 에이전트 연동
+
+OMC가 설치된 환경에서 intent-based-skills의 research-orchestrator는 OMC 에이전트를 활용할 수 있습니다:
+
+```
+[OMC 에이전트 사용 가능 시]
+  Stage 실행 → omc:scientist (심층 분석)
+  교차 검증 → omc:critic (비판적 검토)
+
+[OMC 없을 시]
+  기본 에이전트로 모든 기능 수행
+```
+
 ## 라이선스
 
 MIT
