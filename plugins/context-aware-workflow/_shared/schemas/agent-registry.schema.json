@@ -1,0 +1,258 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "agent-registry.schema.json",
+  "title": "Agent Registry Schema",
+  "description": "Schema for CAW + OMC unified agent registry",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Schema version in semver format"
+    },
+    "namespaces": {
+      "type": "object",
+      "description": "Available agent namespaces",
+      "properties": {
+        "cw": {
+          "$ref": "#/definitions/namespace"
+        },
+        "omc": {
+          "$ref": "#/definitions/namespace"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/namespace"
+      }
+    },
+    "agents": {
+      "type": "array",
+      "description": "List of all registered agents",
+      "items": {
+        "$ref": "#/definitions/agent"
+      }
+    },
+    "fallback_map": {
+      "type": "object",
+      "description": "OMC agent to CAW fallback mapping",
+      "additionalProperties": {
+        "$ref": "#/definitions/fallback_entry"
+      }
+    },
+    "tier_rules": {
+      "type": "object",
+      "description": "Rules for tiered agent selection",
+      "additionalProperties": {
+        "$ref": "#/definitions/tier_rule"
+      }
+    }
+  },
+  "required": ["schema_version", "namespaces", "agents"],
+  "definitions": {
+    "namespace": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Namespace identifier"
+        },
+        "source": {
+          "type": "string",
+          "description": "Plugin source name"
+        },
+        "always_available": {
+          "type": "boolean",
+          "description": "Whether this namespace is always available"
+        },
+        "description": {
+          "type": "string",
+          "description": "Namespace description"
+        }
+      },
+      "required": ["name", "source", "always_available"]
+    },
+    "agent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Full agent identifier (e.g., 'cw:Builder')",
+          "pattern": "^[a-z]+:[a-zA-Z][a-zA-Z0-9-]*$"
+        },
+        "namespace": {
+          "type": "string",
+          "enum": ["cw", "omc"],
+          "description": "Agent namespace"
+        },
+        "name": {
+          "type": "string",
+          "description": "Agent name without namespace"
+        },
+        "file": {
+          "type": "string",
+          "description": "Agent definition file path"
+        },
+        "model": {
+          "type": "string",
+          "enum": ["haiku", "sonnet", "opus"],
+          "description": "Default model tier"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "planning",
+            "building",
+            "review",
+            "fixing",
+            "exploration",
+            "research",
+            "analysis",
+            "design",
+            "testing",
+            "content",
+            "utility"
+          ],
+          "description": "Agent category"
+        },
+        "tiered": {
+          "type": "boolean",
+          "description": "Whether this agent has tier variants"
+        },
+        "variants": {
+          "type": "array",
+          "description": "Tier variant identifiers",
+          "items": {
+            "type": "string"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "description": "List of agent capabilities",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tools": {
+          "type": "array",
+          "description": "Available tools for this agent",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fallback_for": {
+          "type": "string",
+          "description": "OMC agent this serves as fallback for"
+        },
+        "flags": {
+          "type": "array",
+          "description": "Supported command-line flags",
+          "items": {
+            "$ref": "#/definitions/agent_flag"
+          }
+        }
+      },
+      "required": ["id", "namespace", "name", "model", "category"]
+    },
+    "agent_flag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Flag name (e.g., '--deep')"
+        },
+        "description": {
+          "type": "string",
+          "description": "Flag description"
+        },
+        "modifies_tier": {
+          "type": "string",
+          "enum": ["haiku", "sonnet", "opus"],
+          "description": "Tier override when flag is used"
+        }
+      },
+      "required": ["name", "description"]
+    },
+    "fallback_entry": {
+      "type": "object",
+      "properties": {
+        "omc_agent": {
+          "type": "string",
+          "description": "OMC agent identifier"
+        },
+        "caw_fallback": {
+          "type": "string",
+          "description": "CAW fallback agent identifier"
+        },
+        "fallback_model": {
+          "type": "string",
+          "enum": ["haiku", "sonnet", "opus"],
+          "description": "Model tier for fallback"
+        },
+        "capability_diff": {
+          "type": "array",
+          "description": "Capabilities lost in fallback",
+          "items": {
+            "type": "string"
+          }
+        },
+        "additional_tools": {
+          "type": "array",
+          "description": "Additional tools needed for fallback",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["omc_agent", "caw_fallback"]
+    },
+    "tier_rule": {
+      "type": "object",
+      "properties": {
+        "agent_base": {
+          "type": "string",
+          "description": "Base agent name"
+        },
+        "default_tier": {
+          "type": "string",
+          "enum": ["haiku", "sonnet", "opus"],
+          "description": "Default tier for this agent"
+        },
+        "complexity_thresholds": {
+          "type": "object",
+          "properties": {
+            "haiku_max": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Max complexity for Haiku tier"
+            },
+            "sonnet_max": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Max complexity for Sonnet tier"
+            }
+          }
+        },
+        "variants": {
+          "type": "object",
+          "properties": {
+            "haiku": {
+              "type": "string",
+              "description": "Haiku variant identifier"
+            },
+            "sonnet": {
+              "type": "string",
+              "description": "Sonnet variant identifier"
+            },
+            "opus": {
+              "type": "string",
+              "description": "Opus variant identifier"
+            }
+          }
+        }
+      },
+      "required": ["agent_base", "default_tier", "variants"]
+    }
+  }
+}

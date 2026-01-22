@@ -1,0 +1,297 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "parallel-state.schema.json",
+  "title": "Parallel Execution State Schema",
+  "description": "Schema for tracking parallel step execution state",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "execution_id": {
+      "type": "string",
+      "pattern": "^par_\\d{8}_\\d{6}$",
+      "description": "Unique parallel execution identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "completed", "failed", "cancelled"],
+      "description": "Overall execution status"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Execution start timestamp"
+    },
+    "completed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Execution completion timestamp"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["auto_parallel", "forced_parallel", "sequential"],
+      "description": "Execution mode"
+    },
+    "scope": {
+      "type": "object",
+      "description": "Execution scope specification",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["step", "phase", "all"],
+          "description": "Scope type"
+        },
+        "id": {
+          "type": ["string", "null"],
+          "description": "Scope identifier (step ID, phase number)"
+        }
+      },
+      "required": ["type"]
+    },
+    "config": {
+      "type": "object",
+      "description": "Parallel execution configuration",
+      "properties": {
+        "max_concurrency": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 5,
+          "description": "Maximum concurrent agents"
+        },
+        "timeout_per_step": {
+          "type": "integer",
+          "minimum": 60000,
+          "maximum": 600000,
+          "default": 300000,
+          "description": "Timeout per step in milliseconds"
+        },
+        "skip_failed": {
+          "type": "boolean",
+          "default": false,
+          "description": "Continue on step failure"
+        },
+        "retry_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "default": 1,
+          "description": "Retry count for failed steps"
+        }
+      }
+    },
+    "dependency_graph": {
+      "type": "object",
+      "description": "Step dependency graph",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "List of step IDs this step depends on"
+      }
+    },
+    "waves": {
+      "type": "array",
+      "description": "Execution waves",
+      "items": {
+        "$ref": "#/definitions/wave"
+      }
+    },
+    "locked_files": {
+      "type": "array",
+      "description": "Currently locked files",
+      "items": {
+        "$ref": "#/definitions/file_lock"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "Execution summary",
+      "properties": {
+        "total_steps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total steps in scope"
+        },
+        "completed_steps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Successfully completed steps"
+        },
+        "failed_steps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Failed steps"
+        },
+        "blocked_steps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Blocked steps"
+        },
+        "skipped_steps": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Skipped steps"
+        },
+        "total_waves": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of waves"
+        },
+        "completed_waves": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Completed waves"
+        },
+        "total_duration_seconds": {
+          "type": ["number", "null"],
+          "description": "Actual total duration"
+        },
+        "estimated_sequential_seconds": {
+          "type": ["number", "null"],
+          "description": "Estimated duration if run sequentially"
+        },
+        "time_saved_seconds": {
+          "type": ["number", "null"],
+          "description": "Time saved by parallel execution"
+        },
+        "parallelism_factor": {
+          "type": ["number", "null"],
+          "description": "Effective parallelism factor achieved"
+        }
+      }
+    }
+  },
+  "required": ["schema_version", "execution_id", "status", "started_at", "mode", "scope", "waves"],
+  "definitions": {
+    "wave": {
+      "type": "object",
+      "description": "Single execution wave",
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Wave number"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "running", "completed", "failed", "partial"],
+          "description": "Wave status"
+        },
+        "started_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Wave start time"
+        },
+        "completed_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Wave completion time"
+        },
+        "agents": {
+          "type": "array",
+          "description": "Agents in this wave",
+          "items": {
+            "$ref": "#/definitions/agent_execution"
+          }
+        },
+        "duration_seconds": {
+          "type": ["number", "null"],
+          "description": "Wave duration (max of agent durations)"
+        }
+      },
+      "required": ["number", "status", "agents"]
+    },
+    "agent_execution": {
+      "type": "object",
+      "description": "Single agent execution record",
+      "properties": {
+        "step": {
+          "type": "string",
+          "description": "Step ID being executed"
+        },
+        "task_id": {
+          "type": "string",
+          "description": "Background task ID"
+        },
+        "agent_type": {
+          "type": "string",
+          "description": "Agent type used"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "running", "completed", "failed", "timeout", "blocked"],
+          "description": "Agent status"
+        },
+        "started_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Start time"
+        },
+        "completed_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Completion time"
+        },
+        "duration_seconds": {
+          "type": ["number", "null"],
+          "description": "Execution duration"
+        },
+        "output_file": {
+          "type": ["string", "null"],
+          "description": "Path to output file"
+        },
+        "files_modified": {
+          "type": "array",
+          "description": "Files modified by this agent",
+          "items": {
+            "type": "string"
+          }
+        },
+        "error": {
+          "type": ["string", "null"],
+          "description": "Error message if failed"
+        },
+        "retry_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of retries attempted"
+        },
+        "blocked_by": {
+          "type": ["string", "null"],
+          "description": "Step ID blocking this step"
+        }
+      },
+      "required": ["step", "status"]
+    },
+    "file_lock": {
+      "type": "object",
+      "description": "File lock record",
+      "properties": {
+        "file_path": {
+          "type": "string",
+          "description": "Locked file path"
+        },
+        "locked_by": {
+          "type": "string",
+          "description": "Step ID holding the lock"
+        },
+        "locked_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Lock acquisition time"
+        },
+        "lock_type": {
+          "type": "string",
+          "enum": ["exclusive", "shared"],
+          "description": "Type of lock"
+        }
+      },
+      "required": ["file_path", "locked_by", "locked_at"]
+    }
+  }
+}

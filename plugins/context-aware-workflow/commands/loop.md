@@ -42,6 +42,8 @@ Run tasks autonomously until completion conditions are met. Repeatedly executes 
 | `--reflect` | true | Run /cw:reflect after completion |
 | `--no-reflect` | - | Skip reflection phase |
 | `--verbose` | false | Show detailed iteration progress |
+| `--qa-each-step` | false | Run QA loop after each completed step |
+| `--qa-severity` | major | QA severity threshold (with --qa-each-step) |
 
 ## Exit Conditions
 
@@ -158,7 +160,20 @@ WHILE status == "running":
       IF consecutive_failures >= 3:
         → EXIT (consecutive_failures)
 
-  [10] Record Iteration
+  [10] Run QA Loop (if --qa-each-step enabled)
+       IF config.qa_each_step AND outcome == "success":
+         Invoke /cw:qaloop:
+           target_step: completed_step
+           max_cycles: 2
+           severity: config.qa_severity
+
+         IF qaloop_result == "passed":
+           qa_status = "passed"
+         ELSE:
+           outcome = "qa_failed"
+           consecutive_failures += 1
+
+  [11] Record Iteration
        Append to iterations array:
        {
          "number": current_iteration,
@@ -168,10 +183,10 @@ WHILE status == "running":
          "output_contains_promise": false
        }
 
-  [11] Save State
+  [12] Save State
        Write updated loop_state.json
 
-  [12] Display Progress
+  [13] Display Progress
        Show iteration summary to user
 ```
 

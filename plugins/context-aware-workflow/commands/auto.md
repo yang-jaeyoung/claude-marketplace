@@ -27,20 +27,22 @@ Execute the complete CW workflow in a single command. Ideal for simple projects 
 ```
 /cw:auto "task description"
 
-[1/7] init     → Initialize .caw/ environment if not exists
-[2/7] start    → Generate task_plan.md (minimal questions)
-[3/7] next     → Execute all steps until completion
-[4/7] review   → Run code review on implemented code
-[5/7] fix      → Auto-fix resolvable issues
-[6/7] check    → Validate compliance with project rules
-[7/7] reflect  → Run Ralph Loop for learning capture
+[1/8] init     → Initialize .caw/ environment if not exists
+[2/8] start    → Generate task_plan.md (minimal questions)
+[3/8] next     → Execute all steps until completion
+[4/8] qaloop   → Run automated QA cycles (build → review → fix)
+[5/8] review   → Run final code review on implemented code
+[6/8] fix      → Auto-fix remaining resolvable issues
+[7/8] check    → Validate compliance with project rules
+[8/8] reflect  → Run Ralph Loop for learning capture
 ```
 
 ## Flags
 
 | Flag | Description |
 |------|-------------|
-| `--skip-review` | Skip review, fix, and check stages (stages 4-6) |
+| `--skip-qa` | Skip QA loop stage (stage 4) |
+| `--skip-review` | Skip review, fix, and check stages (stages 5-7) |
 | `--skip-reflect` | Skip reflect stage (stage 7) |
 | `--verbose` | Show detailed progress for each stage |
 | `--no-questions` | Minimize interactive questions during planning |
@@ -94,7 +96,25 @@ WHILE pending_steps exist:
        - Proceed to Stage 4
 ```
 
-### Stage 4: Review (unless --skip-review)
+### Stage 4: QA Loop (unless --skip-qa)
+
+```
+IF all steps completed successfully:
+  Invoke /cw:qaloop:
+    target: all_completed_steps
+    max_cycles: 2
+    severity: major
+
+  IF qaloop_result == "passed":
+    Proceed to Stage 5
+  ELIF qaloop_result == "stalled":
+    Display warning: "QA found recurring issues"
+    Proceed to Stage 5 anyway (user can fix later)
+  ELSE:
+    Save state, report issues
+```
+
+### Stage 5: Review (unless --skip-review)
 
 ```
 Invoke Reviewer Agent:
@@ -103,7 +123,7 @@ Invoke Reviewer Agent:
   - Output: Review report + .caw/last_review.json
 ```
 
-### Stage 5: Fix (unless --skip-review)
+### Stage 6: Fix (unless --skip-review)
 
 ```
 IF review found issues:
@@ -119,7 +139,7 @@ IF review found issues:
     Display summary: "N issues require manual attention"
 ```
 
-### Stage 6: Check (unless --skip-review)
+### Stage 7: Check (unless --skip-review)
 
 ```
 Invoke ComplianceChecker Agent:
@@ -128,7 +148,7 @@ Invoke ComplianceChecker Agent:
   - Report any violations
 ```
 
-### Stage 7: Reflect (unless --skip-reflect)
+### Stage 8: Reflect (unless --skip-reflect)
 
 ```
 Invoke Ralph Loop:

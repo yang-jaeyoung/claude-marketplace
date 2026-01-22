@@ -78,6 +78,45 @@ Applies fixes based on review feedback.
 -   frontmatter: `name`, `description`, `allowed-tools`.
 -   Use `forked-context: true` for skills that need isolation.
 
+# OMC Integration (oh-my-claudecode)
+
+When the OMC plugin is available, additional specialized agents become accessible.
+
+## OMC Agent Summary
+
+| Agent | Model | Purpose | CAW Fallback |
+|-------|-------|---------|--------------|
+| `omc:architect` | Opus | System design | `cw:architect` |
+| `omc:researcher` | Sonnet | Documentation research | `cw:Planner` + WebSearch |
+| `omc:scientist` | Sonnet | Data analysis | `cw:Builder` + Bash |
+| `omc:explore` | Haiku | Fast codebase navigation | Task(Explore) |
+| `omc:executor` | Sonnet | Focused implementation | `cw:Builder` |
+| `omc:qa-tester` | Sonnet | Test execution | `cw:Reviewer` + Bash |
+| `omc:critic` | Opus | Deep code critique | `cw:reviewer-opus` |
+| `omc:analyst` | Opus | Pattern analysis | `cw:planner-opus` |
+| `omc:build-fixer` | Sonnet | Build error fixing | `cw:Fixer` |
+| `omc:security-reviewer` | Opus | Security analysis | `cw:reviewer-opus --security` |
+| `omc:code-reviewer` | Opus | Comprehensive review | `cw:reviewer-opus --deep` |
+
+## Graceful Degradation
+
+CAW functions fully without OMC. When OMC agents are requested but unavailable:
+
+1. Agent Resolver checks OMC availability
+2. Falls back to equivalent CAW agent
+3. Displays warning about reduced capability
+4. Continues operation with fallback
+
+See `_shared/agent-resolver.md` for implementation details.
+
+## New Commands (CAW + OMC)
+
+| Command | Description | Primary Agents |
+|---------|-------------|----------------|
+| `/cw:qaloop` | Review-Fix cycles | Builder, Reviewer, Fixer |
+| `/cw:ultraqa` | Auto QA (build/test/lint) | omc:architect, omc:executor |
+| `/cw:research` | Integrated research | omc:researcher, omc:explore |
+
 # Local Golden Rules
 
 ## Do's

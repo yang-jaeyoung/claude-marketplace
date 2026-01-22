@@ -1,0 +1,322 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "qaloop-state.schema.json",
+  "title": "QA Loop State Schema",
+  "description": "Schema for tracking QA loop execution state",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Schema version"
+    },
+    "qaloop_id": {
+      "type": "string",
+      "pattern": "^qa_\\d{8}_\\d{6}$",
+      "description": "Unique QA loop identifier"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["running", "passed", "failed", "stalled", "cancelled"],
+      "description": "Current QA loop status"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Loop start timestamp"
+    },
+    "completed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Loop completion timestamp"
+    },
+    "target": {
+      "type": "object",
+      "description": "QA target specification",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["step", "phase", "files"],
+          "description": "Target type"
+        },
+        "id": {
+          "type": "string",
+          "description": "Target identifier (step ID, phase number, or file path)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable target description"
+        }
+      },
+      "required": ["type", "id"]
+    },
+    "config": {
+      "type": "object",
+      "description": "QA loop configuration",
+      "properties": {
+        "max_cycles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 3,
+          "description": "Maximum number of QA cycles"
+        },
+        "severity_threshold": {
+          "type": "string",
+          "enum": ["minor", "major", "critical"],
+          "default": "major",
+          "description": "Minimum severity to fix"
+        },
+        "exit_severity": {
+          "type": "string",
+          "enum": ["minor", "major", "critical"],
+          "default": "major",
+          "description": "Exit when no issues at this severity"
+        },
+        "skip_build": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip build phase"
+        },
+        "stall_threshold": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 5,
+          "default": 3,
+          "description": "Cycles with same issues before stall"
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "description": "Runtime environment information",
+      "properties": {
+        "omc_available": {
+          "type": "boolean",
+          "description": "Whether OMC plugin is available"
+        },
+        "agents_used": {
+          "type": "object",
+          "description": "Resolved agents for each role",
+          "properties": {
+            "build": {
+              "type": "string",
+              "description": "Agent used for build phase"
+            },
+            "diagnose": {
+              "type": "string",
+              "description": "Agent used for diagnosis/review"
+            },
+            "fix": {
+              "type": "string",
+              "description": "Agent used for fixing"
+            }
+          }
+        },
+        "fallback_mode": {
+          "type": "boolean",
+          "description": "Whether running in fallback mode"
+        }
+      }
+    },
+    "current_cycle": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Current cycle number"
+    },
+    "stall_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Consecutive cycles with same issues"
+    },
+    "cycles": {
+      "type": "array",
+      "description": "History of QA cycles",
+      "items": {
+        "$ref": "#/definitions/cycle"
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "QA loop summary",
+      "properties": {
+        "total_issues_found": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total unique issues found"
+        },
+        "total_issues_fixed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total issues successfully fixed"
+        },
+        "remaining_issues": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Issues remaining unfixed"
+        },
+        "exit_reason": {
+          "type": ["string", "null"],
+          "enum": ["passed", "max_cycles", "stalled", "build_failed", "cancelled", null],
+          "description": "Reason for loop exit"
+        },
+        "duration_seconds": {
+          "type": ["number", "null"],
+          "description": "Total duration in seconds"
+        }
+      }
+    }
+  },
+  "required": ["schema_version", "qaloop_id", "status", "started_at", "target", "config", "current_cycle", "cycles"],
+  "definitions": {
+    "cycle": {
+      "type": "object",
+      "description": "Single QA cycle record",
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Cycle number"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Cycle start time"
+        },
+        "completed_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "Cycle completion time"
+        },
+        "build_result": {
+          "$ref": "#/definitions/build_result"
+        },
+        "review_result": {
+          "$ref": "#/definitions/review_result"
+        },
+        "fixes_applied": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of fixes applied"
+        },
+        "issue_hashes": {
+          "type": "array",
+          "description": "Hashes of issues for stall detection",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": ["number", "started_at"]
+    },
+    "build_result": {
+      "type": "object",
+      "description": "Build phase result",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "failed", "skipped"],
+          "description": "Build status"
+        },
+        "output_summary": {
+          "type": "string",
+          "description": "Summary of build output"
+        },
+        "error": {
+          "type": ["string", "null"],
+          "description": "Build error if failed"
+        },
+        "tests_run": {
+          "type": "integer",
+          "description": "Number of tests executed"
+        },
+        "tests_passed": {
+          "type": "integer",
+          "description": "Number of tests passed"
+        }
+      }
+    },
+    "review_result": {
+      "type": "object",
+      "description": "Review phase result",
+      "properties": {
+        "critical": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of critical issues"
+        },
+        "major": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of major issues"
+        },
+        "minor": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of minor issues"
+        },
+        "issues": {
+          "type": "array",
+          "description": "Detailed issue list",
+          "items": {
+            "$ref": "#/definitions/issue"
+          }
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "description": "Individual issue record",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique issue identifier"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "major", "minor"],
+          "description": "Issue severity"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["correctness", "quality", "security", "performance", "style"],
+          "description": "Issue category"
+        },
+        "file": {
+          "type": "string",
+          "description": "File path"
+        },
+        "line": {
+          "type": ["integer", "null"],
+          "description": "Line number"
+        },
+        "line_end": {
+          "type": ["integer", "null"],
+          "description": "End line for multi-line issues"
+        },
+        "description": {
+          "type": "string",
+          "description": "Issue description"
+        },
+        "suggestion": {
+          "type": ["string", "null"],
+          "description": "Suggested fix"
+        },
+        "hash": {
+          "type": "string",
+          "description": "Issue hash for deduplication"
+        },
+        "fixed": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether issue was fixed"
+        },
+        "fix_cycle": {
+          "type": ["integer", "null"],
+          "description": "Cycle in which issue was fixed"
+        }
+      },
+      "required": ["id", "severity", "file", "description", "hash"]
+    }
+  }
+}

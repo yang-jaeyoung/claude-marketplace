@@ -155,6 +155,16 @@ Overall: 🟢 Approved with suggestions
 - Performance profiling suggestions
 - Security audit depth
 
+**Agent Selection for Deep Review:**
+
+When OMC is available:
+- Agent: `omc:critic` (Opus) - Deep code critique specialist
+- Agent: `omc:code-reviewer` (Opus) - Comprehensive review
+
+When OMC is NOT available:
+- Agent: `cw:reviewer-opus` - CAW's Opus-tier reviewer
+- Fallback provides equivalent depth with less specialized prompting
+
 ### Focused Review
 
 ```bash
