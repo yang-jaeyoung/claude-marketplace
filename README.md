@@ -6,9 +6,12 @@ Personal Claude Code plugins marketplace by jyyang.
 
 | Plugin | Version | Description |
 |--------|---------|-------------|
+| [az-skill-pack](./plugins/az-skill-pack) | 1.0.0 | Brainstorming, security audits, documentation generation, and project analysis |
 | [codex-cli](./plugins/codex-cli) | 1.0.0 | Codex CLI integration for Claude Code |
+| [context-aware-workflow](./plugins/context-aware-workflow) | 1.8.0 | Context-aware workflow orchestration with Plan Mode integration |
+| [gemini-cli](./plugins/gemini-cli) | 1.0.0 | Google Gemini CLI integration for code review and documentation |
+| [intent-based-skills](./plugins/intent-based-skills) | 1.0.0 | Intent-based skill framework for consistent and verifiable task execution |
 | [mssql](./plugins/mssql) | 1.0.0 | MS SQL Server integration with Windows Authentication |
-| [context-aware-workflow](./plugins/context-aware-workflow) | 1.0.0 | Context-aware workflow orchestration with Plan Mode integration |
 
 ## Installation
 

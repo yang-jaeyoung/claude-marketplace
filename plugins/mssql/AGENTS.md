@@ -1,34 +1,89 @@
 # Module Context
 
-**Module:** MSSQL MCP Server
-**Role:** Provides Database connectivity and query capabilities to Claude via Model Context Protocol.
-**Tech Stack:** Node.js, TypeScript, MCP SDK (`@modelcontextprotocol/sdk`), Zod.
+**Module:** MSSQL Plugin
+**Role:** SQL Server connectivity for Claude Code via MCP protocol.
+**Tech Stack:** TypeScript, Node.js, `@modelcontextprotocol/sdk`, `mssql`, Zod.
+
+## Dependencies
+
+- MCP Server: `./mcp-server/` (TypeScript)
+- Commands: `./commands/*.md` (Markdown)
+- Skills: `./skills/` (Optional)
+
+---
 
 # Operational Commands
 
-## Build & Run
--   `npm install` — Install dependencies.
--   `npm run build` — Compile TypeScript to `dist/`.
--   `npm run dev` — Run in watch mode with `tsx`.
+```bash
+cd mcp-server
+
+# Install dependencies
+npm install
+
+# Build TypeScript
+npm run build
+
+# Development mode (watch)
+npm run dev
+
+# Run tests
+npm test
+```
+
+---
 
 # Implementation Patterns
 
-## MCP Server Structure
--   Use `McpServer` class from the SDK.
--   Define tools using `server.tool()` with `z.object()` schemas.
--   Keep tool implementations purely functional; avoid heavy state where possible.
+## Plugin Structure
 
-## File Naming
--   `index.ts`: Entry point.
--   `*.ts`: Lowercase with underscores or hyphens preferred for internal modules.
+```
+mssql/
+  .claude-plugin/plugin.json  # MCP server configuration
+  README.md                   # Usage documentation
+  commands/                   # Slash commands
+    query.md                  # /mssql:query
+    tables.md                 # /mssql:tables
+    schema.md                 # /mssql:schema
+    procedures.md             # /mssql:procedures
+    execute.md                # /mssql:execute
+  mcp-server/                 # TypeScript MCP server
+    src/
+      index.ts                # Entry point
+      connection.ts           # Connection pool management
+      types.ts                # Type definitions
+      tools/                  # MCP tool implementations
+      utils/                  # Shared utilities
+```
+
+## Environment Variables
+
+Required in plugin.json `mcpServers.mssql.env`:
+- `MSSQL_SERVER` — Server hostname
+- `MSSQL_DATABASE` — Database name
+- `MSSQL_TRUST_CERT` — Trust server certificate (optional)
+- `MSSQL_QUERY_TIMEOUT` — Query timeout in ms (optional)
+
+---
 
 # Local Golden Rules
 
 ## Do's
--   **DO** validate all inputs using Zod schemas.
--   **DO** handle SQL connection errors gracefully and return meaningful error messages to the model.
--   **DO** use `StdioServerTransport` for local communication.
+
+- **DO** validate all SQL inputs using Zod schemas.
+- **DO** handle connection errors gracefully with meaningful messages.
+- **DO** use parameterized queries to prevent SQL injection.
+- **DO** implement connection pooling for performance.
+- **DO** return structured JSON results for model consumption.
 
 ## Don'ts
--   **DON'T** hardcode database credentials. Use environment variables.
--   **DON'T** expose destructive SQL commands (DROP, DELETE) without explicit confirmation or safety flags if possible.
+
+- **DON'T** hardcode database credentials; use environment variables.
+- **DON'T** expose destructive operations (DROP, TRUNCATE) without confirmation.
+- **DON'T** allow arbitrary SQL execution without input validation.
+- **DON'T** log sensitive query parameters or results.
+
+---
+
+# Context Map
+
+- **[MCP Server Implementation](./mcp-server/AGENTS.md)** — TypeScript source code and patterns.

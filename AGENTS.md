@@ -1,42 +1,94 @@
-# Project Context & Operations
+# Project Context
 
-**Project:** Claude Marketplace (Monorepo)
-**Description:** A registry and collection of plugins for Claude Code, including MCP servers, agentic workflows, and markdown commands.
-**Core Stack:** Mixed (TypeScript for MCP, Python for agents, Markdown/YAML for simple plugins).
+**Project:** Claude Code Plugins Marketplace
+**Purpose:** Monorepo hosting multiple Claude Code plugins for extended functionality.
+**Owner:** jyyang
+
+## Tech Stack
+
+- Plugin Definition: Markdown with YAML frontmatter
+- MCP Servers: TypeScript, Node.js, `@modelcontextprotocol/sdk`
+- Testing: Python 3.x, Pytest (for caw plugin)
+- Package Management: npm (per MCP server)
 
 ## Operational Commands
-Since this is a monorepo, build and test commands are specific to each plugin.
-- **Dependency Install:** See specific plugin directories.
-- **Global Registry:** `.claude-plugin/marketplace.json` must be updated when adding plugins.
+
+```bash
+# Install marketplace
+claude plugins add github:jyyang/claude-marketplace
+
+# Install specific plugin
+claude plugins install <plugin-name>
+```
+
+---
 
 # Golden Rules
 
-## Immutable Standards
-1.  **Registry Synchronization:** Every new plugin MUST be registered in `.claude-plugin/marketplace.json`.
-2.  **Manifest Compliance:** All plugins MUST have a `.claude-plugin/plugin.json` adhering to the core schema.
-3.  **No Broken Links:** The `README.md` table of plugins MUST be kept in sync with the file structure.
+## Immutable
 
-## Do's & Don'ts
--   **DO** use strict semantic versioning in `plugin.json`.
--   **DO** provide a dedicated `README.md` for every plugin.
--   **DON'T** mix language stacks within a single plugin unless necessary (keep Python and TS plugins distinct).
--   **DON'T** commit credentials or `.env` files.
+- **plugin.json Schema:** Only `name`, `version`, `description`, `mcpServers` fields allowed. Any other field causes validation failure.
+- **No Hardcoded Secrets:** Never commit API keys, tokens, or credentials.
+- **File-Based Discovery:** Commands (`commands/*.md`), agents (`agents/*.md`), skills (`skills/*/SKILL.md`), hooks (`hooks/hooks.json`) are auto-discovered by path, not declared in plugin.json.
+- **Registry Sync:** Every plugin MUST be registered in `.claude-plugin/marketplace.json`.
 
-# Standards & References
+## Do's
+
+- **DO** use lowercase-with-hyphens for plugin names.
+- **DO** include `README.md` with usage examples for every plugin.
+- **DO** validate YAML frontmatter syntax before committing.
+- **DO** use `${CLAUDE_PLUGIN_ROOT}` in hook commands for plugin-relative paths.
+- **DO** update `marketplace.json` and root `README.md` when adding/removing plugins.
+- **DO** use strict semantic versioning in `plugin.json`.
+
+## Don'ts
+
+- **DON'T** add `author`, `features`, `commands`, `agents`, `skills`, or `hooks` fields to plugin.json.
+- **DON'T** use `type: "prompt"` hooks outside of `Stop`/`SubagentStop` events.
+- **DON'T** create MCP servers without proper error handling and Zod validation.
+- **DON'T** mix language stacks within a single plugin unless necessary.
+
+---
+
+# Standards
+
+## Plugin Types
+
+1. **Markdown-only:** Commands defined as `.md` files (codex-cli, gemini-cli)
+2. **MCP Server:** TypeScript server + optional commands (mssql)
+3. **Full-featured:** Agents, skills, hooks, commands (context-aware-workflow, intent-based-skills, az-skill-pack)
+
+## Required Plugin Structure
+
+```
+plugins/<name>/
+  .claude-plugin/plugin.json  # Required: name, version, description
+  README.md                   # Required: usage documentation
+  commands/*.md               # Optional: slash commands
+  agents/*.md                 # Optional: sub-agents
+  skills/*/SKILL.md           # Optional: skills
+  hooks/hooks.json            # Optional: lifecycle hooks
+  mcp-server/                 # Optional: MCP server source
+```
 
 ## Git Strategy
--   Commit messages: Conventional Commits (feat, fix, docs, chore).
--   Branching: Feature branches merged into main.
+
+- Branch: Feature branches from `master`
+- Commits: Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`)
+- PR: Update CHANGELOG if user-facing changes
 
 ## Maintenance Policy
--   If you find this document outdated, propose an update immediately.
--   Ensure `CLAUDE.md` is kept in sync with these governance rules.
 
-# Context Map (Action-Based Routing)
+When rules diverge from actual code patterns, propose an update immediately. Ensure `CLAUDE.md` stays in sync with these governance rules.
 
-- **[SQL Server MCP Plugin (TypeScript)](./plugins/mssql/AGENTS.md)** — Backend logic, MCP server implementation, Node.js tooling.
-- **[Context Aware Workflow (Python)](./plugins/context-aware-workflow/AGENTS.md)** — Agent logic, complex workflows, Python/Pytest tasks, OMC integration.
-- **[Codex CLI (Markdown)](./plugins/codex-cli/AGENTS.md)** — Static command definitions, pure Markdown/YAML editing.
-- **[Gemini CLI (Markdown)](./plugins/gemini-cli/README.md)** — Google Gemini CLI integration for code review, commits, docs.
-- **[Intent-Based Skills (Python)](./plugins/intent-based-skills/README.md)** — Intent framework, project analyzers, research orchestrator.
-- **[AZ Skill Pack (Markdown)](./plugins/az-skill-pack/README.md)** — Brainstorming, security audits, documentation generation.
+---
+
+# Context Map
+
+- **[MSSQL Plugin (MCP Server)](./plugins/mssql/AGENTS.md)** — TypeScript MCP server for SQL Server connectivity.
+- **[MSSQL MCP Server Source](./plugins/mssql/mcp-server/AGENTS.md)** — TypeScript implementation details and patterns.
+- **[Context-Aware Workflow](./plugins/context-aware-workflow/AGENTS.md)** — Advanced agents, skills, hooks orchestration with OMC integration.
+- **[Intent-Based Skills](./plugins/intent-based-skills/AGENTS.md)** — Intent-driven skill execution with feedback loops.
+- **[AZ Skill Pack](./plugins/az-skill-pack/AGENTS.md)** — Brainstorming, security audit, documentation generation.
+- **[Codex CLI](./plugins/codex-cli/AGENTS.md)** — Codex CLI integration commands.
+- **[Gemini CLI](./plugins/gemini-cli/AGENTS.md)** — Gemini CLI integration commands.
