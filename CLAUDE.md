@@ -86,6 +86,8 @@ hooks:                             # Optional: command-scoped hooks
 ```
 
 **Agents** (`agents/*.md`):
+> See the [official Sub-agents documentation](https://code.claude.com/docs/en/sub-agents.md) for the latest agent configuration options and best practices.
+
 ```yaml
 ---
 name: "AgentName"
