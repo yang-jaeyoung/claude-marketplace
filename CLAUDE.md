@@ -51,14 +51,34 @@ Every plugin must have:
 - `README.md` - Usage documentation
 
 ### plugin.json Schema
+
+> ⚠️ **중요**: plugin.json은 **아래 4개 필드만** 허용됩니다. 다른 필드 추가 시 플러그인 로드 실패!
+
 ```json
 {
   "name": "lowercase-with-hyphens",
   "version": "1.0.0",
   "description": "Plugin description",
-  "mcpServers": { }  // Optional: MCP server configuration
+  "mcpServers": { }
 }
 ```
+
+**허용되는 필드 (Allowed fields only):**
+| 필드 | 필수 | 설명 |
+|------|------|------|
+| `name` | ✅ | 플러그인 이름 (소문자, 하이픈만 허용) |
+| `version` | ✅ | 시맨틱 버전 (예: "1.0.0") |
+| `description` | ✅ | 플러그인 설명 |
+| `mcpServers` | ❌ | MCP 서버 설정 (선택) |
+
+**❌ 지원되지 않는 필드 (절대 사용 금지):**
+- `author` - 지원 안 됨
+- `features` - 지원 안 됨
+- `commands` - 지원 안 됨 (commands는 `commands/*.md` 파일로 자동 인식)
+- `agents` - 지원 안 됨 (agents는 `agents/*.md` 파일로 자동 인식)
+- `skills` - 지원 안 됨 (skills는 `skills/*/SKILL.md` 파일로 자동 인식)
+- `hooks` - 지원 안 됨 (hooks는 `hooks/hooks.json` 파일로 정의)
+- 기타 커스텀 필드 - 모두 validation error 발생
 
 ### Component Patterns
 

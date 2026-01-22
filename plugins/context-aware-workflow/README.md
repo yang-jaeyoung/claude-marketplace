@@ -11,7 +11,15 @@ Context-aware workflow orchestration plugin for Claude Code. Acts as a **Context
 
 ## Features
 
-### v1.7.0 (Current)
+### v1.8.0 (Current)
+
+- **OMC Integration** - Seamless oh-my-claudecode integration with graceful degradation
+- **`/cw:qaloop`** - QA Loop: Build → Review → Fix cycle until quality gates pass
+- **`/cw:ultraqa`** - Advanced auto QA with intelligent diagnosis (build/test/lint)
+- **`/cw:research`** - Integrated research mode (internal codebase + external docs)
+- **Enhanced Parallel Execution** - Automatic background agent parallel execution
+
+### v1.7.0
 
 - **`/cw:loop`** - Autonomous execution loop with 5-level error recovery
 - **Gemini CLI Review Integration** - Edit and commit review via Gemini CLI hooks
@@ -65,6 +73,9 @@ cp -r context-aware-workflow /your/project/.claude-plugin/
 | `/cw:sync` | Synchronize CAW state with Serena memory (cross-session persistence) |
 | `/cw:worktree` | Manage Git worktrees for parallel phase execution |
 | `/cw:merge` | Merge completed worktree branches back to main |
+| `/cw:qaloop` | **QA Loop** - Build → Review → Fix cycle until quality passes (NEW) |
+| `/cw:ultraqa` | **UltraQA** - Intelligent auto QA for build/test/lint issues (NEW) |
+| `/cw:research` | **Research Mode** - Internal codebase + external docs research (NEW) |
 
 ## Workflow Loop
 
@@ -171,6 +182,64 @@ CAW automatically selects the optimal model tier based on task complexity:
 /cw:review --security  # Auto-selects Opus
 ```
 
+## OMC Integration
+
+CAW integrates seamlessly with **oh-my-claudecode (OMC)** plugin for enhanced capabilities.
+
+### Core Principle: Graceful Degradation
+
+**CAW functions completely without OMC.** All OMC features are enhancements, not requirements.
+
+```
+Request: omc:architect
+    ↓
+[1] Check OMC Availability
+    ↓
+┌─────────────────┬─────────────────────────────────┐
+│  OMC Present ✅  │  OMC Missing ❌                  │
+│                 │                                  │
+│  omc:architect  │  → cw:architect (CAW Fallback)  │
+│  (Use as-is)    │  → Warning message displayed    │
+│                 │  → Core functionality preserved │
+└─────────────────┴─────────────────────────────────┘
+```
+
+### OMC Agent Mapping
+
+| OMC Agent | Model | CAW Fallback | Use Case |
+|-----------|-------|--------------|----------|
+| `omc:architect` | Opus | `cw:architect` | System design |
+| `omc:researcher` | Sonnet | `cw:Planner` + WebSearch | Doc research |
+| `omc:executor` | Sonnet | `cw:Builder` | Code implementation |
+| `omc:critic` | Opus | `cw:reviewer-opus` | Deep code critique |
+| `omc:security-reviewer` | Opus | `cw:reviewer-opus --security` | Security analysis |
+
+### Commands with OMC Enhancement
+
+| Command | Without OMC | With OMC |
+|---------|-------------|----------|
+| `/cw:qaloop` | Standard review cycle | Intelligent diagnosis |
+| `/cw:ultraqa` | Basic error parsing | Deep root cause analysis |
+| `/cw:research` | WebSearch + Serena | Specialized research agents |
+
+### Check OMC Status
+
+```bash
+/cw:status --omc
+
+# Output when OMC available:
+📊 Environment:
+  OMC: ✅ Available (v2.1.0)
+  Mode: Full Power
+
+# Output when OMC unavailable:
+📊 Environment:
+  OMC: ❌ Not available
+  Mode: Fallback (CAW-only)
+```
+
+See [Agent Resolver Documentation](_shared/agent-resolver.md) for detailed fallback logic.
+
 ## Hooks
 
 ### PreToolUse Hooks
@@ -249,6 +318,14 @@ Kent Beck's **Tidy First** methodology for code quality:
 
 ## Roadmap
 
+### Completed (v1.8.0)
+- [x] **OMC Integration** - oh-my-claudecode seamless integration with graceful degradation
+- [x] **`/cw:qaloop`** - QA Loop: Build → Review → Fix cycle until quality passes
+- [x] **`/cw:ultraqa`** - UltraQA: Intelligent auto QA for build/test/lint
+- [x] **`/cw:research`** - Integrated research mode (internal + external)
+- [x] Enhanced parallel execution with automatic background agents
+- [x] Agent Resolver system for fallback management
+
 ### Completed (v1.7.0)
 - [x] `/cw:loop` - Autonomous execution loop with 5-level error recovery
 - [x] Gemini CLI integration for edit and commit review hooks
@@ -274,6 +351,7 @@ Kent Beck's **Tidy First** methodology for code quality:
 - [ ] VS Code extension integration
 - [ ] GitHub Actions integration
 - [ ] Multi-project support
+- [ ] OMC full integration (Agent SDK based)
 
 ## License
 
