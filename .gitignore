@@ -27,3 +27,7 @@ __pycache__/
 
 # Windows
 nul
+
+research-output/
+research-output-edge-ai/
+research-output-jquery4/

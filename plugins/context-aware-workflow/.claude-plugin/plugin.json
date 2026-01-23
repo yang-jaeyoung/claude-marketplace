@@ -1,5 +1,5 @@
 {
   "name": "cw",
-  "version": "1.8.0",
-  "description": "Context-aware workflow orchestration plugin with Plan Mode integration, intelligent context management, structured task planning, magic keywords, intelligent model routing, tiered agent variants, Ralph Loop continuous improvement, autonomous execution loop, Gemini CLI review integration, full workflow automation, OMC integration with graceful degradation, QA loops (qaloop/ultraqa), parallel execution, and integrated research mode"
+  "version": "1.9.0",
+  "description": "Context-aware workflow orchestration plugin with Plan Mode integration, intelligent context management, structured task planning, magic keywords, intelligent model routing, tiered agent variants, Ralph Loop continuous improvement, autonomous execution loop, Gemini CLI review integration, full workflow automation, OMC integration with graceful degradation, QA loops (qaloop/ultraqa), parallel execution, integrated research mode, GUIDELINES.md generation, and hierarchical AGENTS.md deep initialization"
 }

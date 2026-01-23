@@ -11,7 +11,13 @@ Context-aware workflow orchestration plugin for Claude Code. Acts as a **Context
 
 ## Features
 
-### v1.8.0 (Current)
+### v1.9.0 (Current)
+
+- **GUIDELINES.md Generation** - Auto-generate workflow guidelines with `--with-guidelines`
+- **Deep Initialization** - Hierarchical AGENTS.md generation with `--deep` (oh-my-claudecode's deepinit pattern)
+- **Enhanced /cw:init** - New flags for comprehensive project documentation setup
+
+### v1.8.0
 
 - **OMC Integration** - Seamless oh-my-claudecode integration with graceful degradation
 - **`/cw:qaloop`** - QA Loop: Build → Review → Fix cycle until quality gates pass
@@ -76,6 +82,62 @@ cp -r context-aware-workflow /your/project/.claude-plugin/
 | `/cw:qaloop` | **QA Loop** - Build → Review → Fix cycle until quality passes (NEW) |
 | `/cw:ultraqa` | **UltraQA** - Intelligent auto QA for build/test/lint issues (NEW) |
 | `/cw:research` | **Research Mode** - Internal codebase + external docs research (NEW) |
+
+## Enhanced Initialization (v1.9.0)
+
+### GUIDELINES.md Generation
+
+Generate workflow guidelines customized to your project:
+
+```bash
+/cw:init --with-guidelines
+```
+
+Creates `.caw/GUIDELINES.md` with:
+- CAW workflow rules and best practices
+- Agent usage recommendations
+- Model routing guidance
+- Project-specific context (frameworks, conventions)
+- Quality gate criteria
+
+### Deep Initialization (AGENTS.md Hierarchy)
+
+Generate hierarchical documentation for AI agents:
+
+```bash
+/cw:init --deep
+```
+
+Creates `AGENTS.md` in each significant directory:
+```
+project/
+├── AGENTS.md                    # Root overview
+├── src/
+│   ├── AGENTS.md               # <!-- Parent: ../AGENTS.md -->
+│   ├── components/
+│   │   └── AGENTS.md           # <!-- Parent: ../AGENTS.md -->
+│   └── utils/
+│       └── AGENTS.md           # <!-- Parent: ../AGENTS.md -->
+└── tests/
+    └── AGENTS.md               # <!-- Parent: ../AGENTS.md -->
+```
+
+Each AGENTS.md contains:
+- Directory purpose
+- Key files with descriptions
+- Subdirectory links
+- AI agent instructions
+- Internal/external dependencies
+
+### Full Setup
+
+```bash
+# Initialize with all documentation
+/cw:init --with-guidelines --deep
+
+# Or reset and regenerate
+/cw:init --reset --with-guidelines --deep
+```
 
 ## Workflow Loop
 
@@ -158,11 +220,13 @@ For end-to-end feature development:
 |------|---------|
 | `.caw/task_plan.md` | Current task plan |
 | `.caw/context_manifest.json` | Active/Packed/Ignored file tracking |
+| `.caw/GUIDELINES.md` | Workflow guidelines (`--with-guidelines`) (NEW) |
 | `.caw/mode.json` | Active mode state (DEEP_WORK, NORMAL, etc.) |
 | `.caw/session.json` | Current session state |
-| `.caw/loop_state.json` | Autonomous loop state (NEW) |
+| `.caw/loop_state.json` | Autonomous loop state |
 | `.caw/learnings.md` | Accumulated improvement insights from Ralph Loop |
 | `.caw/archives/` | Completed/abandoned plans |
+| `*/AGENTS.md` | Directory documentation (`--deep`) (NEW) |
 
 ## Model Routing System
 
@@ -317,6 +381,12 @@ Kent Beck's **Tidy First** methodology for code quality:
 | `task-plan.schema.md` | `_shared/schemas/` | Task plan document format |
 
 ## Roadmap
+
+### Completed (v1.9.0)
+- [x] **GUIDELINES.md Generation** - Workflow guidelines with `--with-guidelines` flag
+- [x] **Deep Initialization** - Hierarchical AGENTS.md with `--deep` flag (OMC deepinit pattern)
+- [x] Template system for generated documentation
+- [x] Incremental updates and manual content preservation
 
 ### Completed (v1.8.0)
 - [x] **OMC Integration** - oh-my-claudecode seamless integration with graceful degradation
