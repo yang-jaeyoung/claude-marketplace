@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Validation Results Schema",
+  "description": "Results from parallel validation during /cw:auto review phase",
+  "type": "object",
+  "required": ["schema_version", "task", "timestamp", "rounds", "final_result"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "task": {
+      "type": "string",
+      "description": "Original task description"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Validation start timestamp"
+    },
+    "rounds": {
+      "type": "array",
+      "description": "History of validation rounds",
+      "items": {
+        "type": "object",
+        "required": ["round", "verdicts", "final_verdict", "started_at"],
+        "properties": {
+          "round": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verdicts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/verdict"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "final_verdict": {
+            "type": "string",
+            "enum": ["APPROVED", "REJECTED", "NEEDS_FIX"]
+          },
+          "issues_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "fixes_applied": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "issue_id": { "type": "string" },
+                "file": { "type": "string" },
+                "fix_description": { "type": "string" },
+                "success": { "type": "boolean" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "final_result": {
+      "type": "object",
+      "required": ["verdict", "total_rounds"],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": ["APPROVED", "REJECTED", "NEEDS_FIX", "USER_INTERVENTION"]
+        },
+        "total_rounds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "total_issues_found": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_issues_fixed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "remaining_issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          }
+        },
+        "user_intervention_reason": {
+          "type": "string",
+          "description": "Reason for requiring user intervention (if applicable)"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "verdict": {
+      "type": "object",
+      "required": ["type", "verdict"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["functional", "security", "quality"]
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["APPROVED", "REJECTED", "NEEDS_FIX"]
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/issue"
+          }
+        },
+        "summary": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "agent_id": {
+          "type": "string",
+          "description": "ID of the agent that produced this verdict"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "required": ["severity", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique issue identifier"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "major", "minor", "suggestion"]
+        },
+        "type": {
+          "type": "string",
+          "enum": ["functional", "security", "quality"]
+        },
+        "file": {
+          "type": "string",
+          "description": "File path where issue was found"
+        },
+        "line": {
+          "type": "integer",
+          "description": "Line number of the issue"
+        },
+        "description": {
+          "type": "string"
+        },
+        "suggestion": {
+          "type": "string",
+          "description": "Suggested fix"
+        },
+        "auto_fixable": {
+          "type": "boolean",
+          "default": false
+        },
+        "fixed": {
+          "type": "boolean",
+          "default": false
+        },
+        "fix_round": {
+          "type": "integer",
+          "description": "Round in which the issue was fixed"
+        }
+      }
+    }
+  }
+}

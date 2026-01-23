@@ -1,0 +1,464 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Auto State Schema",
+  "description": "State tracking for /cw:auto enhanced workflow with expansion, signal detection, and parallel validation (OMC Autopilot integration)",
+  "type": "object",
+  "required": ["schema_version", "active", "phase", "iteration", "started_at", "config"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version for future compatibility",
+      "const": "2.0"
+    },
+    "active": {
+      "type": "boolean",
+      "description": "Whether auto mode is currently active"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "expansion",
+        "init",
+        "planning",
+        "execution",
+        "qa",
+        "review",
+        "fix",
+        "check",
+        "reflect",
+        "complete",
+        "failed"
+      ],
+      "description": "Current workflow phase (9-stage pipeline)"
+    },
+    "iteration": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Current iteration count within phase"
+    },
+    "max_iterations": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 50,
+      "default": 20,
+      "description": "Safety limit for iterations per phase"
+    },
+    "task_description": {
+      "type": "string",
+      "description": "Original task description provided to auto mode"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Auto mode start timestamp"
+    },
+    "completed_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Completion timestamp (null if still running)"
+    },
+    "session_id": {
+      "type": ["string", "null"],
+      "description": "Optional session binding to prevent cross-session interference"
+    },
+    "config": {
+      "type": "object",
+      "description": "Auto mode configuration",
+      "required": ["skip_qa", "skip_review", "skip_reflect", "verbose"],
+      "properties": {
+        "skip_qa": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip QA loop stage"
+        },
+        "skip_review": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip review/fix/check stages"
+        },
+        "skip_reflect": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip reflect stage"
+        },
+        "verbose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable verbose progress output"
+        },
+        "no_questions": {
+          "type": "boolean",
+          "default": false,
+          "description": "Minimize interactive questions"
+        },
+        "parallel_validation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable 3-architect parallel validation"
+        }
+      }
+    },
+    "expansion": {
+      "type": "object",
+      "description": "Phase 1: Expansion (requirements analysis)",
+      "properties": {
+        "analyst_complete": {
+          "type": "boolean",
+          "default": false,
+          "description": "Analyst agent completed requirements extraction"
+        },
+        "architect_complete": {
+          "type": "boolean",
+          "default": false,
+          "description": "Architect agent completed tech spec"
+        },
+        "spec_path": {
+          "type": ["string", "null"],
+          "description": "Path to generated spec.md"
+        },
+        "requirements_summary": {
+          "type": "string",
+          "description": "Summary of extracted requirements"
+        },
+        "tech_stack": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Identified technologies"
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "EXPANSION_COMPLETE signal detected"
+        }
+      }
+    },
+    "init": {
+      "type": "object",
+      "description": "Phase 2: Initialization",
+      "properties": {
+        "bootstrapper_complete": {
+          "type": "boolean",
+          "default": false
+        },
+        "manifest_created": {
+          "type": "boolean",
+          "default": false
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "INIT_COMPLETE signal detected"
+        }
+      }
+    },
+    "planning": {
+      "type": "object",
+      "description": "Phase 3: Planning",
+      "properties": {
+        "plan_path": {
+          "type": ["string", "null"],
+          "description": "Path to task_plan.md"
+        },
+        "planner_iterations": {
+          "type": "integer",
+          "default": 0,
+          "description": "Plan refinement cycles"
+        },
+        "phases_count": {
+          "type": "integer",
+          "description": "Number of phases in plan"
+        },
+        "steps_count": {
+          "type": "integer",
+          "description": "Total number of steps in plan"
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "PLANNING_COMPLETE signal detected"
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "description": "Phase 4: Execution",
+      "properties": {
+        "builder_iterations": {
+          "type": "integer",
+          "default": 0,
+          "description": "Builder loop iterations"
+        },
+        "current_step": {
+          "type": ["string", "null"],
+          "description": "Current step being executed (e.g., '2.1')"
+        },
+        "tasks_completed": {
+          "type": "integer",
+          "default": 0,
+          "description": "Number of steps completed"
+        },
+        "tasks_total": {
+          "type": "integer",
+          "default": 0,
+          "description": "Total planned steps"
+        },
+        "files_created": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "New files created during execution"
+        },
+        "files_modified": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files modified during execution"
+        },
+        "use_omc_ralph": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use OMC Ralph+Ultrawork if available"
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "EXECUTION_COMPLETE signal detected"
+        }
+      }
+    },
+    "qa": {
+      "type": "object",
+      "description": "Phase 5: QA Loop",
+      "properties": {
+        "cycles": {
+          "type": "integer",
+          "default": 0,
+          "description": "QA loop cycles completed"
+        },
+        "build_status": {
+          "type": "string",
+          "enum": ["pending", "passing", "failing"],
+          "default": "pending"
+        },
+        "lint_status": {
+          "type": "string",
+          "enum": ["pending", "passing", "failing"],
+          "default": "pending"
+        },
+        "test_status": {
+          "type": "string",
+          "enum": ["pending", "passing", "failing", "skipped"],
+          "default": "pending"
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "QA_COMPLETE signal detected"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "description": "Phase 6: Review (enhanced with parallel validation)",
+      "properties": {
+        "reviewer_iterations": {
+          "type": "integer",
+          "default": 0
+        },
+        "issues_found": {
+          "type": "integer",
+          "default": 0
+        },
+        "issues_auto_fixed": {
+          "type": "integer",
+          "default": 0
+        },
+        "issues_deferred": {
+          "type": "integer",
+          "default": 0
+        },
+        "parallel_validation": {
+          "type": "object",
+          "description": "3-architect parallel validation results",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "default": true
+            },
+            "architects_spawned": {
+              "type": "integer",
+              "default": 0
+            },
+            "verdicts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["functional", "security", "quality"]
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": ["APPROVED", "REJECTED", "NEEDS_FIX"]
+                  },
+                  "issues": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "timestamp": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            },
+            "all_approved": {
+              "type": "boolean",
+              "default": false
+            },
+            "validation_rounds": {
+              "type": "integer",
+              "default": 0,
+              "description": "Number of validation retry rounds"
+            }
+          }
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "REVIEW_COMPLETE signal detected"
+        }
+      }
+    },
+    "fix": {
+      "type": "object",
+      "description": "Phase 7: Fix",
+      "properties": {
+        "fixer_iterations": {
+          "type": "integer",
+          "default": 0
+        },
+        "fixes_applied": {
+          "type": "integer",
+          "default": 0
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "FIX_COMPLETE signal detected"
+        }
+      }
+    },
+    "check": {
+      "type": "object",
+      "description": "Phase 8: Compliance Check",
+      "properties": {
+        "checker_iterations": {
+          "type": "integer",
+          "default": 0
+        },
+        "violations_found": {
+          "type": "integer",
+          "default": 0
+        },
+        "compliant": {
+          "type": "boolean",
+          "default": false
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "CHECK_COMPLETE signal detected"
+        }
+      }
+    },
+    "reflect": {
+      "type": "object",
+      "description": "Phase 9: Reflect (Ralph Loop)",
+      "properties": {
+        "ralph_iterations": {
+          "type": "integer",
+          "default": 0
+        },
+        "learnings_captured": {
+          "type": "integer",
+          "default": 0
+        },
+        "signal_detected": {
+          "type": "boolean",
+          "default": false,
+          "description": "REFLECT_COMPLETE signal detected"
+        }
+      }
+    },
+    "signals": {
+      "type": "object",
+      "description": "Signal detection tracking",
+      "properties": {
+        "last_checked": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "detected_signals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signal": {
+                "type": "string",
+                "enum": [
+                  "EXPANSION_COMPLETE",
+                  "INIT_COMPLETE",
+                  "PLANNING_COMPLETE",
+                  "EXECUTION_COMPLETE",
+                  "QA_COMPLETE",
+                  "REVIEW_COMPLETE",
+                  "FIX_COMPLETE",
+                  "CHECK_COMPLETE",
+                  "REFLECT_COMPLETE",
+                  "AUTO_COMPLETE"
+                ]
+              },
+              "detected_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    "phase_durations": {
+      "type": "object",
+      "description": "Duration tracking per phase (in seconds)",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "total_agents_spawned": {
+      "type": "integer",
+      "default": 0,
+      "description": "Total number of agents spawned during auto mode"
+    },
+    "exit_reason": {
+      "type": ["string", "null"],
+      "enum": [
+        null,
+        "all_phases_complete",
+        "auto_complete_signal",
+        "max_iterations_reached",
+        "critical_error",
+        "user_cancelled"
+      ],
+      "description": "Reason for workflow termination"
+    },
+    "last_error": {
+      "type": ["object", "null"],
+      "properties": {
+        "phase": { "type": "string" },
+        "step": { "type": "string" },
+        "message": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}
