@@ -50,6 +50,25 @@ claude-marketplace/
    - `%VAR%` - Windows cmd에서만 동작
    - Python/Node.js 내에서 `os.environ` 또는 `process.env` 사용 권장
 
+### 플러그인 캐시 주의사항
+> ⚠️ **중요**: 플러그인 수정 후 변경사항이 반영되지 않으면 **캐시 삭제** 필요
+
+Claude Code는 설치된 플러그인을 `~/.claude/plugins/cache/`에 캐싱합니다.
+로컬 또는 marketplace 버전을 수정해도 캐시된 버전이 계속 사용될 수 있습니다.
+
+```bash
+# 특정 플러그인 캐시 삭제
+rm -rf ~/.claude/plugins/cache/<marketplace-name>/<plugin-name>/
+
+# 예: context-aware-workflow 캐시 삭제
+rm -rf ~/.claude/plugins/cache/jyyang-claude-marketplace/cw/
+
+# 전체 캐시 삭제 (주의: 모든 플러그인 재다운로드 필요)
+rm -rf ~/.claude/plugins/cache/
+```
+
+캐시 삭제 후 Claude Code를 재시작하면 최신 버전이 로드됩니다.
+
 ### 줄바꿈 처리
 - 저장소는 `.gitattributes`로 LF 강제 권장
 - 스크립트에서 텍스트 파일 작성 시 명시적으로 `\n` 사용
