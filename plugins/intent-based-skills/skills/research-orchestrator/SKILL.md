@@ -215,6 +215,8 @@ flowchart TB
 이 분해가 적절한가요? [Y/n/수정]
 ```
 
+> 💡 사용자가 수정을 요청하면 피드백을 반영하여 Stage를 재분해하고, 수정된 계획을 다시 확인받습니다.
+
 ---
 
 ## Phase 2: Execution (20-60분)
@@ -543,6 +545,19 @@ IF error IN auto_mode:
 # 전체 롤백
 rm -rf {output_dir}
 ```
+
+---
+
+## Notes
+
+### 검색 전략
+
+- **기술적 주제의 경우, 영어 키워드로 검색하여 정보의 양과 질을 높인다**
+- 핵심 기술 용어는 원어(영어)로 검색: "type system", "ownership model", "memory safety" 등
+- 한국어 검색은 국내 커뮤니티 의견이나 번역 자료 수집 시 활용
+- 검색 쿼리 예시:
+  - ❌ "TypeScript 타입 시스템 특징"
+  - ✅ "TypeScript type system features structural typing"
 
 ---
 
