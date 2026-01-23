@@ -28,6 +28,7 @@ __pycache__/
 # Windows
 nul
 
+plans/
 research-output/
 research-output-edge-ai/
 research-output-jquery4/
