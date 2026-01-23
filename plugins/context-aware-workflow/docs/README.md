@@ -1,6 +1,6 @@
 # Context-Aware Workflow (CAW) 문서
 
-> **버전**: 1.7.0 | **최종 업데이트**: 2026-01-21
+> **버전**: 1.9.0 | **최종 업데이트**: 2026-01-23
 
 이 디렉토리는 CAW 플러그인의 모든 문서를 포함합니다.
 
@@ -28,12 +28,29 @@ docs/
 
 ---
 
-## 🆕 v1.7.0 신규 기능
+## 🆕 v1.9.0 신규 기능
 
 | 기능 | 설명 | 관련 문서 |
 |------|------|----------|
-| **`/cw:loop`** | 자율 반복 실행 루프 (5단계 오류 복구) | [USER_GUIDE.md](./USER_GUIDE.md#cw-loop) |
-| **Gemini CLI 리뷰** | Edit/Commit 훅에서 Gemini CLI 리뷰 통합 | [USER_GUIDE.md](./USER_GUIDE.md#hooks) |
+| **`--with-guidelines`** | GUIDELINES.md 자동 생성 | [USER_GUIDE.md](./USER_GUIDE.md#-초기화-고급-기능-new) |
+| **`--deep`** | 계층적 AGENTS.md 생성 (deepinit 패턴) | [USER_GUIDE.md](./USER_GUIDE.md#-초기화-고급-기능-new) |
+| **템플릿 시스템** | `_shared/templates/`에 템플릿 저장 | [USER_GUIDE.md](./USER_GUIDE.md#-초기화-고급-기능-new) |
+
+## v1.8.0 기능
+
+| 기능 | 설명 | 관련 문서 |
+|------|------|----------|
+| **OMC 통합** | oh-my-claudecode 통합 및 Graceful Degradation | [USER_GUIDE.md](./USER_GUIDE.md#-omc-통합) |
+| **`/cw:qaloop`** | QA 루프 (빌드→리뷰→수정 반복) | [USER_GUIDE.md](./USER_GUIDE.md#-qa-loop--ultraqa) |
+| **`/cw:ultraqa`** | 지능형 자동 QA | [USER_GUIDE.md](./USER_GUIDE.md#-qa-loop--ultraqa) |
+| **`/cw:research`** | 통합 연구 모드 | [USER_GUIDE.md](./USER_GUIDE.md#-research-mode) |
+
+## v1.7.0 기능
+
+| 기능 | 설명 | 관련 문서 |
+|------|------|----------|
+| **`/cw:loop`** | 자율 반복 실행 루프 (5단계 오류 복구) | [USER_GUIDE.md](./USER_GUIDE.md#-autonomous-loop) |
+| **Gemini CLI 리뷰** | Edit/Commit 훅에서 Gemini CLI 리뷰 통합 | [USER_GUIDE.md](./USER_GUIDE.md#-훅-동작) |
 | **루프 상태 지속성** | `.caw/loop_state.json`으로 중단/재개 가능 | [USER_GUIDE.md](./USER_GUIDE.md#생성-아티팩트) |
 
 ---
@@ -152,11 +169,13 @@ Claude Code의 핵심 기능에 대한 참조 문서입니다.
 
 | 버전 | 날짜 | 주요 변경 |
 |------|------|----------|
-| **1.7.0** | 2026-01-21 | `/cw:loop` 자율 실행, Gemini CLI 통합, 6개 신규 스킬 |
-| 1.6.0 | 2025-01-19 | Tidy First, Git Worktree, Serena 동기화 |
-| 1.5.0 | 2025-01-15 | Ralph Loop 지속적 개선 |
-| 1.4.0 | 2025-01-10 | 모델 라우팅, 티어별 에이전트, `/cw:auto` |
+| **1.9.0** | 2026-01-23 | `--with-guidelines`, `--deep` 플래그, 템플릿 시스템 |
+| 1.8.0 | 2026-01-22 | OMC 통합, QA Loop, UltraQA, Research Mode |
+| 1.7.0 | 2026-01-21 | `/cw:loop` 자율 실행, Gemini CLI 통합, 6개 신규 스킬 |
+| 1.6.0 | 2026-01-19 | Tidy First, Git Worktree, Serena 동기화 |
+| 1.5.0 | 2026-01-15 | Ralph Loop 지속적 개선 |
+| 1.4.0 | 2026-01-10 | 모델 라우팅, 티어별 에이전트, `/cw:auto` |
 
 ---
 
-*마지막 업데이트: 2026-01-21*
+*마지막 업데이트: 2026-01-23*
