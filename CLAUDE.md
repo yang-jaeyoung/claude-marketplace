@@ -19,61 +19,61 @@ claude-marketplace/
 
 ## Cross-Platform Compatibility
 
-> ⚠️ **필수**: 모든 코드, 스크립트, hook 명령은 **macOS, Linux, Windows** 모두에서 동작해야 합니다.
+> ⚠️ **Required**: All code, scripts, and hook commands must work on **macOS, Linux, and Windows**.
 
-### 경로 처리
-| 항목 | Windows | macOS/Linux | 권장 방식 |
-|------|---------|-------------|-----------|
-| 경로 구분자 | `\` | `/` | `/` 사용 (Node.js/Python 자동 처리) |
-| 경로 결합 | 직접 결합 금지 | 직접 결합 금지 | `path.join()` 또는 `os.path.join()` |
+### Path Handling
+| Item | Windows | macOS/Linux | Recommended |
+|------|---------|-------------|-------------|
+| Path separator | `\` | `/` | Use `/` (Node.js/Python handle automatically) |
+| Path joining | Do not join directly | Do not join directly | Use `path.join()` or `os.path.join()` |
 
-### 쉘 명령어
+### Shell Commands
 ```json
-// ❌ 플랫폼 종속적 - 사용 금지
+// ❌ Platform-specific - Do not use
 { "command": "cat file.txt" }           // Unix only
 { "command": "type file.txt" }          // Windows only
 { "command": "rm -rf dist/" }           // Unix only
 
-// ✅ 크로스플랫폼 - Python 또는 Node.js 사용
-// ⚠️ 중요: macOS에서 `python`은 alias일 수 있어 hook에서 인식 불가 → `python3` 사용 필수
+// ✅ Cross-platform - Use Python or Node.js
+// ⚠️ Important: On macOS, `python` may be an alias not recognized in hooks → use `python3`
 { "command": "python3 -c \"print(open('file.txt').read())\"" }
 { "command": "node -e \"console.log(require('fs').readFileSync('file.txt', 'utf8'))\"" }
 { "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/cleanup.py\"" }
 ```
 
-### Hook 스크립트 작성 규칙
-1. **쉘 스크립트(.sh) 대신 Python/Node.js 사용** - `.sh`는 Windows에서 직접 실행 불가
-2. **`python3` 명령어 사용 필수** - macOS에서 `python`은 alias일 수 있어 hook 환경에서 인식 불가
-3. **경로에 공백 대비** - 항상 따옴표로 감싸기: `"${CLAUDE_PLUGIN_ROOT}/path"`
-4. **환경변수 참조**:
-   - `$VAR` - Unix 쉘에서만 동작
-   - `%VAR%` - Windows cmd에서만 동작
-   - Python/Node.js 내에서 `os.environ` 또는 `process.env` 사용 권장
+### Hook Script Guidelines
+1. **Use Python/Node.js instead of shell scripts (.sh)** - `.sh` files cannot run directly on Windows
+2. **Use `python3` command** - On macOS, `python` may be an alias not recognized in hook environments
+3. **Handle spaces in paths** - Always wrap paths in quotes: `"${CLAUDE_PLUGIN_ROOT}/path"`
+4. **Environment variable references**:
+   - `$VAR` - Works only in Unix shells
+   - `%VAR%` - Works only in Windows cmd
+   - Recommended: Use `os.environ` or `process.env` within Python/Node.js
 
-### 플러그인 캐시 주의사항
-> ⚠️ **중요**: 플러그인 수정 후 변경사항이 반영되지 않으면 **캐시 삭제** 필요
+### Plugin Cache Notes
+> ⚠️ **Important**: If changes are not reflected after modifying a plugin, you need to **clear the cache**
 
-Claude Code는 설치된 플러그인을 `~/.claude/plugins/cache/`에 캐싱합니다.
-로컬 또는 marketplace 버전을 수정해도 캐시된 버전이 계속 사용될 수 있습니다.
+Claude Code caches installed plugins in `~/.claude/plugins/cache/`.
+Even after modifying local or marketplace versions, the cached version may continue to be used.
 
 ```bash
-# 특정 플러그인 캐시 삭제
+# Clear specific plugin cache
 rm -rf ~/.claude/plugins/cache/<marketplace-name>/<plugin-name>/
 
-# 예: context-aware-workflow 캐시 삭제
+# Example: Clear context-aware-workflow cache
 rm -rf ~/.claude/plugins/cache/jyyang-claude-marketplace/cw/
 
-# 전체 캐시 삭제 (주의: 모든 플러그인 재다운로드 필요)
+# Clear all cache (Warning: requires re-downloading all plugins)
 rm -rf ~/.claude/plugins/cache/
 ```
 
-캐시 삭제 후 Claude Code를 재시작하면 최신 버전이 로드됩니다.
+After clearing the cache, restart Claude Code to load the latest version.
 
-### 줄바꿈 처리
-- 저장소는 `.gitattributes`로 LF 강제 권장
-- 스크립트에서 텍스트 파일 작성 시 명시적으로 `\n` 사용
+### Line Ending Handling
+- Repositories should enforce LF via `.gitattributes`
+- When writing text files in scripts, explicitly use `\n`
 
-### 예제: 크로스플랫폼 Hook 스크립트
+### Example: Cross-Platform Hook Script
 ```python
 #!/usr/bin/env python3
 # hooks/scripts/example.py
@@ -81,11 +81,11 @@ import os
 import sys
 from pathlib import Path
 
-# 크로스플랫폼 경로 처리
+# Cross-platform path handling
 plugin_root = Path(__file__).parent.parent.parent
 config_file = plugin_root / "config" / "settings.json"
 
-# 환경변수 접근
+# Environment variable access
 project_dir = os.environ.get("CLAUDE_PROJECT_DIR", ".")
 
 print(f"Config: {config_file}")
@@ -126,7 +126,7 @@ Every plugin must have:
 
 ### plugin.json Schema
 
-> ⚠️ **중요**: plugin.json은 **아래 4개 필드만** 허용됩니다. 다른 필드 추가 시 플러그인 로드 실패!
+> ⚠️ **Important**: plugin.json only allows **the 4 fields below**. Adding other fields will cause plugin load failure!
 
 ```json
 {
@@ -137,22 +137,22 @@ Every plugin must have:
 }
 ```
 
-**허용되는 필드 (Allowed fields only):**
-| 필드 | 필수 | 설명 |
-|------|------|------|
-| `name` | ✅ | 플러그인 이름 (소문자, 하이픈만 허용) |
-| `version` | ✅ | 시맨틱 버전 (예: "1.0.0") |
-| `description` | ✅ | 플러그인 설명 |
-| `mcpServers` | ❌ | MCP 서버 설정 (선택) |
+**Allowed fields only:**
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | ✅ | Plugin name (lowercase and hyphens only) |
+| `version` | ✅ | Semantic version (e.g., "1.0.0") |
+| `description` | ✅ | Plugin description |
+| `mcpServers` | ❌ | MCP server configuration (optional) |
 
-**❌ 지원되지 않는 필드 (절대 사용 금지):**
-- `author` - 지원 안 됨
-- `features` - 지원 안 됨
-- `commands` - 지원 안 됨 (commands는 `commands/*.md` 파일로 자동 인식)
-- `agents` - 지원 안 됨 (agents는 `agents/*.md` 파일로 자동 인식)
-- `skills` - 지원 안 됨 (skills는 `skills/*/SKILL.md` 파일로 자동 인식)
-- `hooks` - 지원 안 됨 (hooks는 `hooks/hooks.json` 파일로 정의)
-- 기타 커스텀 필드 - 모두 validation error 발생
+**❌ Unsupported fields (never use):**
+- `author` - Not supported
+- `features` - Not supported
+- `commands` - Not supported (commands are auto-detected from `commands/*.md` files)
+- `agents` - Not supported (agents are auto-detected from `agents/*.md` files)
+- `skills` - Not supported (skills are auto-detected from `skills/*/SKILL.md` files)
+- `hooks` - Not supported (hooks are defined in `hooks/hooks.json` file)
+- Other custom fields - All cause validation errors
 
 ### Component Patterns
 
@@ -237,34 +237,34 @@ context: fork                      # Runs in isolated context (replaces forked-c
 ```
 
 **Hook Types**:
-- `type: "command"` - Bash 명령 실행 (모든 hook event에서 지원)
-- `type: "prompt"` - LLM 기반 평가 (**`Stop`과 `SubagentStop`에서만 지원**)
+- `type: "command"` - Execute bash command (supported in all hook events)
+- `type: "prompt"` - LLM-based evaluation (**only supported in `Stop` and `SubagentStop`**)
 
-> ⚠️ **주의**: `type: "prompt"`는 `Stop`과 `SubagentStop` hook에서만 사용 가능합니다.
-> SessionStart 등 다른 이벤트에서 사용하면 "hook error"가 발생합니다.
+> ⚠️ **Note**: `type: "prompt"` can only be used in `Stop` and `SubagentStop` hooks.
+> Using it in other events like SessionStart will cause a "hook error".
 
 Available hook events: `PreToolUse`, `PermissionRequest`, `PostToolUse`, `UserPromptSubmit`, `Notification`, `Stop`, `SubagentStop`, `PreCompact`, `Setup`, `SessionStart`, `SessionEnd`.
 
-**플러그인 경로 참조 (`${CLAUDE_PLUGIN_ROOT}`)**:
+**Plugin Path Reference (`${CLAUDE_PLUGIN_ROOT}`)**:
 
-> ⚠️ **중요**: `${CLAUDE_PLUGIN_ROOT}`는 환경변수가 아닌 **Claude Code가 런타임에 치환하는 특수 변수**입니다.
+> ⚠️ **Important**: `${CLAUDE_PLUGIN_ROOT}` is not an environment variable but a **special variable that Claude Code substitutes at runtime**.
 
 ```json
-// ✅ 올바른 사용법 - command 문자열에서 직접 사용
+// ✅ Correct usage - use directly in command string
 {
   "command": "python \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/my_script.py\""
 }
 
-// ❌ 잘못된 사용법 - Python 코드 내에서 환경변수로 접근
+// ❌ Incorrect usage - accessing as environment variable in Python code
 {
   "command": "python -c \"import os; os.environ.get('CLAUDE_PLUGIN_ROOT', '.')\""
 }
 ```
 
-| 변수 | 사용 위치 | 설명 |
-|------|----------|------|
-| `${CLAUDE_PLUGIN_ROOT}` | command 문자열 | 플러그인 루트 경로 (런타임 치환) |
-| `$CLAUDE_PROJECT_DIR` | command 문자열 | 프로젝트 루트 경로 (환경변수) |
+| Variable | Usage Location | Description |
+|----------|----------------|-------------|
+| `${CLAUDE_PLUGIN_ROOT}` | command string | Plugin root path (runtime substitution) |
+| `$CLAUDE_PROJECT_DIR` | command string | Project root path (environment variable) |
 
 ## MCP Server Development
 
