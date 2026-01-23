@@ -112,10 +112,17 @@ def get_omc_plugin_paths() -> List[Path]:
     if sys.platform == 'win32':
         appdata = os.environ.get("APPDATA", "")
         localappdata = os.environ.get("LOCALAPPDATA", "")
+        programfiles = os.environ.get("PROGRAMFILES", "")
+        programfiles_x86 = os.environ.get("PROGRAMFILES(X86)", "")
+
         if appdata:
             paths.append(Path(appdata) / "Claude" / "plugins" / "oh-my-claudecode")
         if localappdata:
             paths.append(Path(localappdata) / "Claude" / "plugins" / "oh-my-claudecode")
+        if programfiles:
+            paths.append(Path(programfiles) / "Claude" / "plugins" / "oh-my-claudecode")
+        if programfiles_x86:
+            paths.append(Path(programfiles_x86) / "Claude" / "plugins" / "oh-my-claudecode")
 
     return paths
 

@@ -1,0 +1,20 @@
+# Cross-platform line ending enforcement
+# Ensures consistent LF line endings across macOS, Linux, and Windows
+
+* text=auto
+
+# Source files - enforce LF
+*.py text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.sh text eol=lf
+
+# Binary files - no text processing
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
