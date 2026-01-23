@@ -37,20 +37,35 @@ The Agent Resolver System provides seamless integration between CAW (Context-Awa
 | OMC Agent | Model | CAW Fallback | Fallback Model | Capability Difference |
 |-----------|-------|--------------|----------------|----------------------|
 | `omc:architect` | Opus | `cw:architect` | Opus | None (equivalent) |
-| `omc:researcher` | Sonnet | `cw:planner` + WebSearch | Sonnet | Manual web search |
-| `omc:scientist` | Sonnet | `cw:builder` + Bash | Sonnet | Manual data analysis |
-| `omc:explore` | Haiku | Task(Explore) | Haiku | Native explore agent |
-| `omc:executor` | Sonnet | `cw:builder` | Sonnet | Less specialized |
-| `omc:qa-tester` | Sonnet | `cw:reviewer` + Bash | Sonnet | Manual test execution |
+| `omc:architect-low` | Haiku | `cw:architect` | Sonnet | Higher tier fallback |
+| `omc:architect-medium` | Sonnet | `cw:architect` | Sonnet | None (equivalent) |
+| `omc:researcher` | Sonnet | `cw:Planner` | Sonnet | Manual web search |
+| `omc:researcher-low` | Haiku | `cw:planner-haiku` | Haiku | None (equivalent) |
+| `omc:scientist` | Sonnet | `cw:Builder` | Sonnet | Manual data analysis |
+| `omc:scientist-high` | Opus | `cw:Builder` | Sonnet | Lower tier fallback |
+| `omc:scientist-low` | Haiku | `cw:builder-haiku` | Haiku | None (equivalent) |
+| `omc:explore` | Haiku | `Explore` | Haiku | Native explore agent |
+| `omc:explore-medium` | Sonnet | `Explore` | Haiku | Lower tier fallback |
+| `omc:executor` | Sonnet | `cw:Builder` | Sonnet | Less specialized |
+| `omc:executor-high` | Opus | `cw:Builder` | Sonnet | Lower tier fallback |
+| `omc:executor-low` | Haiku | `cw:builder-haiku` | Haiku | None (equivalent) |
+| `omc:qa-tester` | Sonnet | `cw:Reviewer` | Sonnet | Manual test execution |
 | `omc:critic` | Opus | `cw:reviewer-opus` | Opus | Less focused critique |
 | `omc:analyst` | Opus | `cw:planner-opus` | Opus | Less data-focused |
-| `omc:build-fixer` | Sonnet | `cw:fixer` | Sonnet | Generic fixing |
-| `omc:security-reviewer` | Opus | `cw:reviewer-opus --security` | Opus | Security flag mode |
-| `omc:code-reviewer` | Opus | `cw:reviewer-opus --deep` | Opus | Deep review mode |
+| `omc:build-fixer` | Sonnet | `cw:Fixer` | Sonnet | Generic fixing |
+| `omc:build-fixer-low` | Haiku | `cw:fixer-haiku` | Haiku | None (equivalent) |
+| `omc:security-reviewer` | Opus | `cw:reviewer-opus` | Opus | Less security-focused |
+| `omc:security-reviewer-low` | Haiku | `cw:reviewer-haiku` | Haiku | Less security-focused |
+| `omc:code-reviewer` | Opus | `cw:reviewer-opus` | Opus | Less specialized |
+| `omc:code-reviewer-low` | Haiku | `cw:reviewer-haiku` | Haiku | Less specialized |
 | `omc:designer` | Sonnet | `cw:designer` | Sonnet | None (equivalent) |
-| `omc:writer` | Sonnet | Direct LLM | Sonnet | No specialized prompt |
-| `omc:vision` | Sonnet | Direct LLM | Sonnet | No specialized prompt |
-| `omc:tdd-guide` | Sonnet | `cw:builder` | Sonnet | Less TDD focus |
+| `omc:designer-high` | Opus | `cw:designer` | Sonnet | Lower tier fallback |
+| `omc:designer-low` | Haiku | `cw:designer` | Sonnet | Higher tier fallback |
+| `omc:writer` | Sonnet | `general-purpose` | Sonnet | No specialized prompt |
+| `omc:vision` | Sonnet | `general-purpose` | Sonnet | No specialized prompt |
+| `omc:tdd-guide` | Sonnet | `cw:Builder` | Sonnet | Less TDD focus |
+| `omc:tdd-guide-low` | Haiku | `cw:builder-haiku` | Haiku | Less TDD focus |
+| `omc:planner` | Opus | `cw:Planner` | Sonnet | Lower tier fallback |
 
 ## Detection Logic
 
@@ -89,6 +104,59 @@ The resolver checks OMC availability through multiple methods:
 }
 ```
 ```
+
+### Implementation Script
+
+The detection and resolution logic is implemented in `hooks/scripts/omc_resolver.py`.
+
+#### Key Functions
+
+| Function | Description | Returns |
+|----------|-------------|---------|
+| `detect_omc()` | Full detection with metadata | `Dict` with all fields |
+| `is_omc_available()` | Quick availability check (cached) | `bool` |
+| `resolve_agent(agent)` | Resolve with fallback | `(resolved, is_fallback, warning)` |
+| `get_fallback_map()` | Complete fallback mapping | `Dict[str, str]` |
+| `update_manifest_environment(path)` | Write to manifest | `bool` |
+
+#### CLI Usage
+
+```bash
+# Check OMC detection status
+python hooks/scripts/omc_resolver.py
+
+# Resolve an agent
+python hooks/scripts/omc_resolver.py resolve omc:architect
+
+# Show all fallback mappings
+python hooks/scripts/omc_resolver.py fallbacks
+
+# Update context_manifest.json
+python hooks/scripts/omc_resolver.py update-manifest
+
+# Enable debug output
+set OMC_DEBUG=enabled && python hooks/scripts/omc_resolver.py
+```
+
+#### Usage in Skills/Commands
+
+```python
+# Import and use in Python
+from omc_resolver import resolve_agent, is_omc_available
+
+if is_omc_available():
+    agent = "omc:architect"
+else:
+    agent, _, _ = resolve_agent("omc:architect")
+    # agent = "cw:architect" (fallback)
+```
+
+#### Environment Variables
+
+| Variable | Values | Description |
+|----------|--------|-------------|
+| `OMC_ENABLED` | `true`, `1`, `enabled` | Force OMC as available |
+| `OMC_DEBUG` | `enabled`, `true`, `1` | Enable debug logging to stderr |
 
 ### Resolution Algorithm
 
