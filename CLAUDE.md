@@ -35,15 +35,17 @@ claude-marketplace/
 { "command": "rm -rf dist/" }           // Unix only
 
 // ✅ 크로스플랫폼 - Python 또는 Node.js 사용
-{ "command": "python -c \"print(open('file.txt').read())\"" }
+// ⚠️ 중요: macOS에서 `python`은 alias일 수 있어 hook에서 인식 불가 → `python3` 사용 필수
+{ "command": "python3 -c \"print(open('file.txt').read())\"" }
 { "command": "node -e \"console.log(require('fs').readFileSync('file.txt', 'utf8'))\"" }
-{ "command": "python \"${CLAUDE_PLUGIN_ROOT}/scripts/cleanup.py\"" }
+{ "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/cleanup.py\"" }
 ```
 
 ### Hook 스크립트 작성 규칙
 1. **쉘 스크립트(.sh) 대신 Python/Node.js 사용** - `.sh`는 Windows에서 직접 실행 불가
-2. **경로에 공백 대비** - 항상 따옴표로 감싸기: `"${CLAUDE_PLUGIN_ROOT}/path"`
-3. **환경변수 참조**:
+2. **`python3` 명령어 사용 필수** - macOS에서 `python`은 alias일 수 있어 hook 환경에서 인식 불가
+3. **경로에 공백 대비** - 항상 따옴표로 감싸기: `"${CLAUDE_PLUGIN_ROOT}/path"`
+4. **환경변수 참조**:
    - `$VAR` - Unix 쉘에서만 동작
    - `%VAR%` - Windows cmd에서만 동작
    - Python/Node.js 내에서 `os.environ` 또는 `process.env` 사용 권장
