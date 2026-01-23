@@ -17,6 +17,59 @@ claude-marketplace/
     └── context-aware-workflow/        # Full-featured plugin (agents, skills, hooks, commands)
 ```
 
+## Cross-Platform Compatibility
+
+> ⚠️ **필수**: 모든 코드, 스크립트, hook 명령은 **macOS, Linux, Windows** 모두에서 동작해야 합니다.
+
+### 경로 처리
+| 항목 | Windows | macOS/Linux | 권장 방식 |
+|------|---------|-------------|-----------|
+| 경로 구분자 | `\` | `/` | `/` 사용 (Node.js/Python 자동 처리) |
+| 경로 결합 | 직접 결합 금지 | 직접 결합 금지 | `path.join()` 또는 `os.path.join()` |
+
+### 쉘 명령어
+```json
+// ❌ 플랫폼 종속적 - 사용 금지
+{ "command": "cat file.txt" }           // Unix only
+{ "command": "type file.txt" }          // Windows only
+{ "command": "rm -rf dist/" }           // Unix only
+
+// ✅ 크로스플랫폼 - Python 또는 Node.js 사용
+{ "command": "python -c \"print(open('file.txt').read())\"" }
+{ "command": "node -e \"console.log(require('fs').readFileSync('file.txt', 'utf8'))\"" }
+{ "command": "python \"${CLAUDE_PLUGIN_ROOT}/scripts/cleanup.py\"" }
+```
+
+### Hook 스크립트 작성 규칙
+1. **쉘 스크립트(.sh) 대신 Python/Node.js 사용** - `.sh`는 Windows에서 직접 실행 불가
+2. **경로에 공백 대비** - 항상 따옴표로 감싸기: `"${CLAUDE_PLUGIN_ROOT}/path"`
+3. **환경변수 참조**:
+   - `$VAR` - Unix 쉘에서만 동작
+   - `%VAR%` - Windows cmd에서만 동작
+   - Python/Node.js 내에서 `os.environ` 또는 `process.env` 사용 권장
+
+### 줄바꿈 처리
+- 저장소는 `.gitattributes`로 LF 강제 권장
+- 스크립트에서 텍스트 파일 작성 시 명시적으로 `\n` 사용
+
+### 예제: 크로스플랫폼 Hook 스크립트
+```python
+#!/usr/bin/env python3
+# hooks/scripts/example.py
+import os
+import sys
+from pathlib import Path
+
+# 크로스플랫폼 경로 처리
+plugin_root = Path(__file__).parent.parent.parent
+config_file = plugin_root / "config" / "settings.json"
+
+# 환경변수 접근
+project_dir = os.environ.get("CLAUDE_PROJECT_DIR", ".")
+
+print(f"Config: {config_file}")
+```
+
 ## Build Commands
 
 ### mssql MCP Server
