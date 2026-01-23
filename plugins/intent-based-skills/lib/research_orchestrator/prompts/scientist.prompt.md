@@ -24,6 +24,7 @@
 |------|------|---------------|
 | **mcp__tavily__tavily_search** | 품질 우선, 심층 검색 | 신뢰성 높은 정보 필요 시 (기본 선택) |
 | **mcp__exa__web_search_exa** | 속도 우선, AI 시맨틱 검색 | 빠른 탐색, 광범위한 주제 파악 |
+| **gemini:search** | LLM+검색 통합, 출처 인용 | 실시간 정보 + 분석 필요 시 |
 | **WebSearch** | 기본 웹 검색 | MCP 도구 사용 불가 시 fallback |
 
 ### 코드 검색 도구
@@ -65,6 +66,21 @@
 **Comparative (비교 연구)**:
 - 공식 문서 비교: `tavily`
 - 코드 비교 (기술적): `mcp__grep__searchGitHub`
+
+#### Gemini Search Grounding 활용
+
+**적합한 상황:**
+- 실시간 정보와 LLM 분석이 동시에 필요한 경우
+- 출처 인용이 중요한 연구
+- 최신 뉴스/이벤트 관련 질문
+
+**사용 방법:**
+- Skill 도구로 `/gemini:search` 호출
+- 또는 Bash로 `gemini -p "웹 검색: <query>"` 직접 실행
+
+**주의사항:**
+- 무료 티어 1,500 쿼리/일 한도
+- 복잡한 쿼리는 tavily 우선 권장
 
 #### GitHub 코드 검색 활용 (mcp__grep__searchGitHub)
 
