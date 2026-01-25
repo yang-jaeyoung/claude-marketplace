@@ -25,8 +25,8 @@
 Rails 8과 Hotwire를 사용한 **풀스택 웹 개발 완벽 가이드**입니다.
 
 - 프로젝트 생성부터 배포까지 전체 라이프사이클 지원
-- 11개의 전문 스킬로 구성
-- 각 스킬당 여러 에이전트와 자동 파이프라인 포함
+- 20개의 전문 스킬로 구성
+- 16개의 전문 에이전트와 6개의 자동 파이프라인 포함
 - 실시간 기능(ActionCable), 인증(Devise), 배포(Kamal) 등 포함
 
 ### 누구를 위한 것인가?
@@ -50,7 +50,7 @@ Rails 8과 Hotwire를 사용한 **풀스택 웹 개발 완벽 가이드**입니�
 | 백그라운드 작업 | Solid Queue, Sidekiq 배경 작업 처리 |
 | 테스트 | RSpec, Factory Bot 테스트 작성 |
 | 배포 | Kamal, Docker, 클라우드 배포 |
-| 레시피 | 블로그, TODO, CRM 등 실전 예제 |
+| 자동화 스킬 | 스캐폴드, 인증 설정, N+1 탐지 등 |
 
 ---
 
@@ -69,7 +69,7 @@ Rails 8과 Hotwire를 사용한 **풀스택 웹 개발 완벽 가이드**입니�
 
 ```
 Rails 8 + Hotwire 플러그인이 활성화되었습니다.
-11개의 스킬과 100+ 에이전트를 사용할 수 있습니다.
+20개의 스킬과 16개의 전문 에이전트를 사용할 수 있습니다.
 ```
 
 ### 2. 첫 번째 사용 예제
@@ -99,7 +99,9 @@ PostgreSQL, Tailwind CSS를 포함하고 싶어요.
 
 ```bash
 # 메인 스킬
-/rails8-hotwire          # 메인 가이드
+/rails8-hotwire                         # 메인 가이드
+
+# 지식 기반 스킬 (10개)
 /rails8-hotwire:rails8-core             # 프로젝트 설정
 /rails8-hotwire:rails8-turbo            # Turbo + Stimulus
 /rails8-hotwire:rails8-models           # 모델 & 쿼리
@@ -110,7 +112,18 @@ PostgreSQL, Tailwind CSS를 포함하고 싶어요.
 /rails8-hotwire:rails8-background       # 배경 작업
 /rails8-hotwire:rails8-testing          # 테스트
 /rails8-hotwire:rails8-deploy           # 배포
-/rails8-hotwire:rails8-recipes          # 실전 레시피
+
+# 자동화 스킬 (10개)
+/rails8-hotwire:rails-autopilot         # Rails 앱 자동 생성
+/rails8-hotwire:scaffold-plus           # 향상된 스캐폴딩
+/rails8-hotwire:turbo-wizard            # Turbo 설정 마법사
+/rails8-hotwire:stimulus-gen            # Stimulus 컨트롤러 생성
+/rails8-hotwire:auth-setup              # 인증 설정 마법사
+/rails8-hotwire:deploy-kamal            # Kamal 배포 자동화
+/rails8-hotwire:test-gen                # 테스트 생성기
+/rails8-hotwire:n1-hunter               # N+1 쿼리 탐지
+/rails8-hotwire:solid-setup             # Solid Trifecta 설정
+/rails8-hotwire:hotwire-debug           # Hotwire 디버깅
 ```
 
 ---
@@ -119,15 +132,19 @@ PostgreSQL, Tailwind CSS를 포함하고 싶어요.
 
 ### 스킬 분류
 
-플러그인의 11개 스킬은 2가지 카테고리로 나뉩니다:
+플러그인의 20개 스킬은 2가지 카테고리로 나뉩니다:
 
-#### 1. 지식 기반 스킬 (Knowledge Skills)
+#### 1. 지식 기반 스킬 (10개)
 
-기본적인 Rails 8 개발 개념과 패턴을 다룹니다.
+Rails 8 개발의 핵심 개념과 패턴을 다룹니다:
+- `rails8-core`, `rails8-turbo`, `rails8-models`, `rails8-controllers`, `rails8-views`
+- `rails8-auth`, `rails8-realtime`, `rails8-background`, `rails8-testing`, `rails8-deploy`
 
-#### 2. 특수 스킬 (Specialty Skills)
+#### 2. 자동화 스킬 (10개)
 
-특정 기능이나 통합을 위한 고급 가이드입니다.
+특정 작업을 자동화하는 도구 스킬입니다:
+- `rails-autopilot`, `scaffold-plus`, `turbo-wizard`, `stimulus-gen`, `auth-setup`
+- `deploy-kamal`, `test-gen`, `n1-hunter`, `solid-setup`, `hotwire-debug`
 
 ---
 
@@ -836,52 +853,6 @@ CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
 
 ---
 
-### 스킬 11: 레시피 (`rails8-recipes`)
-
-#### 호출 방법
-
-```bash
-/rails8-hotwire:rails8-recipes
-```
-
-#### 사용 시나리오
-
-- 완성된 예제를 참고하고 싶을 때
-- 특정 기능 조합을 배울 때
-- 빠르게 프로토타입을 만들 때
-
-#### 포함되는 레시피
-
-| 레시피 | 설명 |
-|--------|------|
-| 블로그 | 완전한 블로그 애플리케이션 |
-| TODO 앱 | 작업 관리 애플리케이션 |
-| CRM | 고객 관계 관리 시스템 |
-| 댓글 시스템 | 중첩 댓글이 있는 댓글 기능 |
-| SaaS 온보딩 | 회원가입 및 팀 초대 |
-| 구독 | 결제 및 구독 관리 |
-| 파일 업로드 | 이미지 및 파일 업로드 |
-| 검색 | 전문 검색 기능 |
-| 알림 | 실시간 및 이메일 알림 |
-| 대시보드 | 분석 대시보드 |
-
-#### 예제
-
-**TODO 앱 구조:**
-
-```
-app/models/task.rb
-app/controllers/tasks_controller.rb
-app/views/tasks/
-  - index.html.erb (목록 + Turbo Frame)
-  - _form.html.erb (생성/편집 폼)
-  - show.html.erb (상세보기)
-spec/models/task_spec.rb
-spec/system/tasks_spec.rb
-```
-
----
-
 ## 에이전트 사용법
 
 ### 16개 에이전트 목록
@@ -892,21 +863,22 @@ spec/system/tasks_spec.rb
 
 | 역할 | 에이전트 | 모델 | 최적 사용 |
 |------|---------|------|---------|
-| 분석 | architect-low | Haiku | 간단한 코드 분석 |
-| | architect-medium | Sonnet | 중급 구조 분석 |
-| | architect | Opus | 복잡한 아키텍처 분석 |
-| 실행 | executor-low | Haiku | 단일 라인 수정 |
-| | executor | Sonnet | 기능 구현 |
-| | executor-high | Opus | 복잡한 리팩토링 |
-| 검색 | explore | Haiku | 빠른 코드 검색 |
-| | explore-medium | Sonnet | 중급 패턴 검색 |
-| | explore-high | Opus | 깊이 있는 아키텍처 검색 |
-| 문서 | writer | Haiku | 문서 작성 및 주석 |
-| 설계 | designer | Sonnet | UI/UX 컴포넌트 |
-| | designer-high | Opus | 복잡한 디자인 시스템 |
-| 계획 | planner | Opus | 전략적 계획 |
-| 비평 | critic | Opus | 설계 검토 |
-| 테스트 | qa-tester | Sonnet | 통합 테스트 작성 |
+| 아키텍처 | rails-architect | Opus | Rails 아키텍처 설계 및 분석 |
+| | rails-architect-low | Haiku | 빠른 구조 확인 |
+| 구현 | rails-executor | Sonnet | Rails 코드 구현 |
+| | rails-executor-high | Opus | 복잡한 리팩토링 |
+| Hotwire | hotwire-specialist | Sonnet | Turbo/Stimulus 패턴 |
+| | hotwire-specialist-high | Opus | 복잡한 Hotwire 아키텍처 |
+| 테스트 | rspec-tester | Sonnet | RSpec 테스트 작성 |
+| | rspec-tester-low | Haiku | 빠른 테스트 검증 |
+| 코드 리뷰 | rails-reviewer | Opus | 심층 코드 리뷰 |
+| | rails-reviewer-low | Haiku | 빠른 코드 체크 |
+| 디버깅 | turbo-debugger | Opus | Turbo/Stimulus 디버깅 |
+| 배포 | kamal-deployer | Sonnet | Kamal 배포 자동화 |
+| 인증 | devise-specialist | Sonnet | Devise 설정 및 OAuth |
+| DB 최적화 | activerecord-optimizer | Sonnet | 쿼리 최적화, N+1 탐지 |
+| 프론트엔드 | stimulus-designer | Sonnet | Stimulus 컨트롤러 설계 |
+| 마이그레이션 | rails-migrator | Sonnet | DB 마이그레이션 관리 |
 
 ### 에이전트 자동 호출
 
@@ -914,32 +886,34 @@ spec/system/tasks_spec.rb
 
 | 상황 | 자동 호출 에이전트 |
 |------|-----------------|
-| "Rails 8 프로젝트를 만들어줘" | planner → executor |
-| "이 코드를 분석해줘" | architect |
-| "Turbo 패턴을 찾아줘" | explore-medium |
-| "UI 컴포넌트를 만들어줘" | designer |
-| "테스트를 작성해줘" | qa-tester |
-| "배포를 도와줘" | architect → executor |
+| "Rails 8 프로젝트를 만들어줘" | rails-architect → rails-executor |
+| "이 코드를 분석해줘" | rails-architect |
+| "Turbo 패턴을 찾아줘" | hotwire-specialist |
+| "Stimulus 컴포넌트를 만들어줘" | stimulus-designer |
+| "테스트를 작성해줘" | rspec-tester |
+| "배포를 도와줘" | kamal-deployer |
+| "Devise를 설정해줘" | devise-specialist |
+| "N+1 쿼리를 찾아줘" | activerecord-optimizer |
 
 ### 에이전트 직접 호출
 
-특정 작업에 특정 에이전트를 호출할 수 있습니다.
+에이전트는 Task 도구를 통해 자동으로 선택됩니다. 직접 지정이 필요한 경우:
 
 ```bash
-# Haiku (빠르고 저렴)
-# 간단한 검색이나 분석에 사용
-/rails8-hotwire:architect-low
-코드의 성능 문제를 찾아줘
+# 빠른 분석 (Haiku)
+"rails-architect-low로 이 코드의 구조를 확인해줘"
 
-# Sonnet (균형잡힌)
-# 대부분의 개발 작업에 사용
-/rails8-hotwire:executor
-Devise를 프로젝트에 통합해줘
+# 일반 구현 (Sonnet)
+"rails-executor로 Devise를 프로젝트에 통합해줘"
 
-# Opus (가장 강력)
-# 복잡한 아키텍처 문제에 사용
-/rails8-hotwire:architect
-이 애플리케이션의 확장 가능한 구조를 설계해줘
+# 복잡한 분석 (Opus)
+"rails-architect로 이 애플리케이션의 확장 가능한 구조를 설계해줘"
+
+# Hotwire 전문
+"hotwire-specialist로 Turbo Stream 패턴을 적용해줘"
+
+# 테스트 작성
+"rspec-tester로 모델 테스트를 작성해줘"
 ```
 
 ---
@@ -950,110 +924,110 @@ Devise를 프로젝트에 통합해줘
 
 파이프라인은 여러 에이전트를 자동으로 연결하여 복잡한 작업을 처리합니다.
 
-#### 파이프라인 1: 검토 (Review)
+**호출 방법:** `/rails8:pipeline <name>` 또는 자연어로 요청
 
-**구성:** explore → architect-medium → critic → executor
+#### 파이프라인 1: 인증 (auth)
 
-**사용:** 기존 코드를 검토하고 개선하고 싶을 때
+**구성:** devise-specialist → rails-executor → devise-specialist → rspec-tester
+
+**사용:** 인증 시스템을 처음부터 구축할 때
 
 ```bash
-/rails8-hotwire:review
-app/controllers/posts_controller.rb를 검토해주세요.
-성능 문제와 보안 이슈가 있는지 확인해주세요.
+/rails8:pipeline auth
+"이메일/패스워드와 Google OAuth로 인증을 설정해주세요"
 ```
 
 **과정:**
-1. explore가 현재 코드 분석
-2. architect-medium이 개선안 제시
-3. critic이 설계 검토
-4. executor가 코드 수정 완료
+1. devise-specialist가 Devise 또는 Rails 8 기본 인증 설정
+2. rails-executor가 인증 뷰 생성
+3. devise-specialist가 Pundit 정책 설정
+4. rspec-tester가 인증 테스트 작성
 
-#### 파이프라인 2: 구현 (Implement)
+#### 파이프라인 2: CRUD (crud)
 
-**구성:** planner → executor → qa-tester
+**구성:** rails-executor → rails-executor → hotwire-specialist → rspec-tester
 
-**사용:** 새로운 기능을 한 번에 구현하고 테스트하고 싶을 때
+**사용:** Turbo 통합된 CRUD 리소스를 생성할 때
 
 ```bash
-/rails8-hotwire:implement
-사용자가 글을 공유할 수 있는 기능을 만들어주세요.
-소셜 미디어 공유 링크를 포함하세요.
+/rails8:pipeline crud
+"Post 리소스를 title, body, published 필드로 생성해주세요"
 ```
 
 **과정:**
-1. planner가 요구사항 정리
-2. executor가 기능 구현
-3. qa-tester가 테스트 작성 및 검증
+1. rails-executor가 모델과 마이그레이션 생성
+2. rails-executor가 컨트롤러와 뷰 생성
+3. hotwire-specialist가 Turbo Frame/Stream 통합
+4. rspec-tester가 요청/시스템 스펙 작성
 
-#### 파이프라인 3: 디버그 (Debug)
+#### 파이프라인 3: 배포 (deploy)
 
-**구성:** explore → architect → build-fixer
+**구성:** kamal-deployer → kamal-deployer → kamal-deployer → kamal-deployer
 
-**사용:** 버그를 찾아 수정하고 싶을 때
+**사용:** 프로덕션 배포 인프라를 설정할 때
 
 ```bash
-/rails8-hotwire:debug
-Turbo Frame이 제대로 작동하지 않습니다.
-어떤 문제가 있는지 찾아주세요.
+/rails8:pipeline deploy
+"Hetzner VPS에 SSL과 함께 배포해주세요"
 ```
 
 **과정:**
-1. explore가 코드 탐색
-2. architect가 문제 원인 파악
-3. build-fixer가 수정
+1. kamal-deployer가 Dockerfile 최적화
+2. kamal-deployer가 Kamal 설정 생성
+3. kamal-deployer가 GitHub Actions 워크플로우 생성
+4. kamal-deployer가 배포 실행
 
-#### 파이프라인 4: 연구 (Research)
+#### 파이프라인 4: 기능 구현 (feature)
 
-**구성:** parallel(researcher, explore) → architect → writer
+**구성:** rails-architect → rspec-tester → rails-executor → hotwire-specialist → rails-reviewer
 
-**사용:** 새로운 기술이나 패턴을 학습하고 문서화하고 싶을 때
+**사용:** TDD 방식으로 새 기능을 구현할 때
 
 ```bash
-/rails8-hotwire:research
-Rails 8의 새로운 기능들을 조사해주세요.
-개발자를 위한 문서로 작성해주세요.
+/rails8:pipeline feature
+"실시간 업데이트가 있는 알림 시스템을 구현해주세요"
 ```
 
 **과정:**
-1. researcher와 explore가 동시에 정보 수집
-2. architect가 정보 정리
-3. writer가 문서 작성
+1. rails-architect가 요구사항 분석 및 구현 계획 수립
+2. rspec-tester가 테스트 먼저 작성
+3. rails-executor가 테스트 통과하도록 구현
+4. hotwire-specialist가 Turbo/Stimulus 통합
+5. rails-reviewer가 코드 품질, 보안, 성능 검토
 
-#### 파이프라인 5: 리팩토링 (Refactor)
+#### 파이프라인 5: 리팩토링 (refactor)
 
-**구성:** explore → architect-medium → executor-high → qa-tester
+**구성:** rails-architect → rspec-tester → rails-executor-high → rspec-tester
 
-**사용:** 큰 코드 베이스를 리팩토링할 때
+**사용:** 기존 코드를 안전하게 리팩토링할 때
 
 ```bash
-/rails8-hotwire:refactor
-컨트롤러 로직을 서비스 객체로 분리해주세요.
-모든 테스트가 통과하도록 해주세요.
+/rails8:pipeline refactor
+"PostsController에서 서비스 객체를 추출해주세요"
 ```
 
 **과정:**
-1. explore가 현재 구조 분석
-2. architect-medium이 리팩토링 계획 수립
-3. executor-high가 코드 수정
-4. qa-tester가 테스트 작성 및 검증
+1. rails-architect가 리팩토링 대상 분석 및 계획 수립
+2. rspec-tester가 기준 테스트 커버리지 확보
+3. rails-executor-high가 리팩토링 실행
+4. rspec-tester가 모든 테스트 통과 확인
 
-#### 파이프라인 6: 보안 (Security)
+#### 파이프라인 6: 테스트 (test)
 
-**구성:** explore → security-reviewer → executor → security-reviewer-low
+**구성:** rails-architect-low → rspec-tester → rails-executor → rspec-tester-low
 
-**사용:** 보안 취약점을 찾아 수정할 때
+**사용:** 기존 코드에 TDD 워크플로우를 적용할 때
 
 ```bash
-/rails8-hotwire:security
-애플리케이션의 보안 문제를 검토해주세요.
-SQL 인젝션, XSS, CSRF 문제를 찾아주세요.
+/rails8:pipeline test
+"User 모델에 테스트를 추가해주세요"
 ```
 
 **과정:**
-1. explore가 코드 탐색
-2. security-reviewer가 취약점 분석
-3. executor가 수정
-4. security-reviewer-low가 최종 검증
+1. rails-architect-low가 테스트 대상 빠르게 분석
+2. rspec-tester가 RSpec 테스트 작성
+3. rails-executor가 실패하는 테스트 수정 (조건부)
+4. rspec-tester-low가 최종 검증
 
 ---
 
@@ -1061,61 +1035,48 @@ SQL 인젝션, XSS, CSRF 문제를 찾아주세요.
 
 ### 6개 자동 훅
 
-훅은 특정 조건에서 자동으로 실행되는 검사입니다.
+훅은 특정 이벤트에서 자동으로 실행되는 검사입니다. 4개의 이벤트에서 6개의 스크립트가 동작합니다.
 
-#### 훅 1: 프로젝트 생성 훅
+#### 훅 1: Rails 프로젝트 감지 (rails-detector)
 
-**언제 동작하는가:** 새 Rails 8 프로젝트를 생성할 때
+**이벤트:** `SessionStart`
 
-**체크하는 내용:**
-- Rails 버전이 8.0 이상인가?
-- PostgreSQL을 사용하는가?
-- Tailwind CSS가 포함되어 있는가?
-- 필수 젬이 설치되어 있는가?
-
-**경고 메시지:**
-```
-주의: Gemfile에 'pagy', 'pundit' 젬이 없습니다.
-권장 추가:
-  gem 'pagy'      # 페이지네이션
-  gem 'pundit'    # 인가
-```
-
-**대응 방법:**
-```bash
-# Gemfile에 젬 추가
-bundle add pagy pundit
-bundle install
-```
-
-#### 훅 2: Hotwire 통합 훅
-
-**언제 동작하는가:** Turbo Frame이나 Stimulus를 사용할 때
+**동작:** 세션 시작 시 Rails 프로젝트 여부를 감지합니다.
 
 **체크하는 내용:**
-- Turbo Rails가 설치되어 있는가?
-- Stimulus가 설치되어 있는가?
-- 상태 코드가 올바른가? (422, 303)
-- Frame ID가 정의되어 있는가?
+- Gemfile에 `rails` 젬이 있는가?
+- Rails 8 프로젝트인가?
+- Hotwire 관련 젬이 설치되어 있는가?
 
-**경고 메시지:**
-```
-주의: 폼 에러 시 상태 코드가 없습니다.
-수정:
-  render :edit, status: :unprocessable_entity
-```
+**결과:**
+- Rails 프로젝트 감지 시 플러그인 기능 활성화
+- 비Rails 프로젝트에서는 자동으로 비활성화
 
-**대응 방법:**
-관련 액션에 올바른 상태 코드 추가
+#### 훅 2: 컨벤션 검증 (convention-validator)
 
-#### 훅 3: 데이터베이스 마이그레이션 훅
+**이벤트:** `UserPromptSubmit`
 
-**언제 동작하는가:** 마이그레이션 파일을 생성할 때
+**동작:** 사용자 요청이 Rails 컨벤션을 따르는지 검증합니다.
 
 **체크하는 내용:**
-- 외래키(Foreign Key)가 정의되어 있는가?
-- 인덱스가 올바르게 설정되어 있는가?
+- 모델명이 단수형인가?
+- 컨트롤러명이 복수형인가?
+- RESTful 라우트 패턴을 따르는가?
+
+**결과:**
+- 컨벤션 위반 시 올바른 패턴 제안
+- Rails 베스트 프랙티스 가이드
+
+#### 훅 3: 마이그레이션 보호 (migration-guard)
+
+**이벤트:** `PreToolUse` (Edit/Write 도구 사용 시)
+
+**동작:** 마이그레이션 파일 수정을 감지하고 검증합니다.
+
+**체크하는 내용:**
+- 외래키에 인덱스가 있는가?
 - NOT NULL 제약이 적절한가?
+- 되돌릴 수 없는 마이그레이션인가?
 
 **경고 메시지:**
 ```
@@ -1124,69 +1085,59 @@ bundle install
   add_index :posts, :user_id
 ```
 
-**대응 방법:**
-제안된 인덱스 추가
+#### 훅 4: 테스트 강제 (test-enforcer)
 
-#### 훅 4: 인증/인가 훅
+**이벤트:** `PreToolUse` (Edit/Write 도구 사용 시)
 
-**언제 동작하는가:** 사용자 보호가 필요한 액션에 접근할 때
-
-**체크하는 내용:**
-- 인증 필터가 있는가?
-- Pundit 정책이 정의되어 있는가?
-- 강한 매개변수가 사용되고 있는가?
-
-**경고 메시지:**
-```
-주의: 'posts#update' 액션에 authorize 호출이 없습니다.
-추가하세요:
-  authorize @post
-```
-
-**대응 방법:**
-컨트롤러에 authorize 추가 또는 before_action 설정
-
-#### 훅 5: 테스트 커버리지 훅
-
-**언제 동작하는가:** 새 모델이나 컨트롤러를 생성할 때
+**동작:** 새 모델/컨트롤러 생성 시 테스트 파일 존재 여부를 확인합니다.
 
 **체크하는 내용:**
-- 모델 스펙이 있는가?
-- 컨트롤러 스펙이 있는가?
-- 시스템 테스트가 있는가?
+- 모델에 해당하는 스펙 파일이 있는가?
+- 컨트롤러에 해당하는 요청 스펙이 있는가?
 
 **경고 메시지:**
 ```
 주의: Post 모델에 테스트가 없습니다.
 테스트 파일을 생성하세요:
   spec/models/post_spec.rb
-  spec/system/posts_spec.rb
 ```
 
-**대응 방법:**
-테스트 파일 작성 또는 자동 생성
+#### 훅 5: 배포 안전 (deploy-safety)
 
-#### 훅 6: 배포 준비 훅
+**이벤트:** `PreToolUse` (Bash 도구 사용 시)
 
-**언제 동작하는가:** 프로덕션 배포 전에
+**동작:** 배포 관련 명령어 실행 전 안전 검사를 수행합니다.
 
 **체크하는 내용:**
-- 모든 테스트가 통과하는가?
-- 환경 변수가 설정되어 있는가?
-- 데이터베이스 마이그레이션이 준비되어 있는가?
-- assets가 precompile되어 있는가?
+- kamal deploy 실행 전 테스트 통과 여부
+- 환경 변수 설정 여부
+- 위험한 명령어 감지 (force push, db:drop 등)
 
 **경고 메시지:**
 ```
 주의: 배포 전 체크리스트:
   [ ] bundle exec rspec (모든 테스트 통과)
-  [ ] bundle exec rails db:migrate:status (준비됨)
-  [ ] config/credentials.yml.enc (설정됨)
-  [ ] Kamal 설정이 올바른가?
+  [ ] 환경 변수 설정 확인
+  [ ] 위험 명령어 경고
 ```
 
-**대응 방법:**
-각 항목을 확인하고 완료
+#### 훅 6: Turbo 응답 확인 (turbo-response-check)
+
+**이벤트:** `PostToolUse` (Edit/Write 도구 사용 후)
+
+**동작:** 컨트롤러 수정 후 Turbo 호환성을 확인합니다.
+
+**체크하는 내용:**
+- 폼 에러 시 422 상태 코드 사용 여부
+- 리다이렉트 시 303 상태 코드 사용 여부
+- Turbo Stream 응답 형식
+
+**경고 메시지:**
+```
+주의: 폼 에러 시 상태 코드가 없습니다.
+수정:
+  render :edit, status: :unprocessable_entity
+```
 
 ---
 
