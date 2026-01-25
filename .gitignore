@@ -28,6 +28,7 @@ __pycache__/
 # Windows
 nul
 
+docs/
 plans/
 research-output/
 research-output-edge-ai/
