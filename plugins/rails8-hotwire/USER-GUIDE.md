@@ -61,8 +61,8 @@ Rails 8과 Hotwire를 사용한 **풀스택 웹 개발 완벽 가이드**입니�
 플러그인이 올바르게 설치되었는지 확인합니다.
 
 ```bash
-# Claude Code에서 다음 명령어 실행
-/rails8-hotwire
+# Claude Code에서 스킬 목록 확인
+# /rails8-hotwire:rails8-core 등의 형식으로 호출
 ```
 
 플러그인이 로드되면 다음과 같은 메시지가 나타납니다:
@@ -85,10 +85,10 @@ PostgreSQL, Tailwind CSS를 포함하고 싶어요.
 또는 직접 스킬 호출:
 
 ```bash
-/rails8-core
+/rails8-hotwire:rails8-core
 
 # 또는
-/rails8:project-setup
+/rails8-hotwire:rails8-core
 ```
 
 프로젝트가 생성되고 초기 구조가 자동으로 설정됩니다.
@@ -100,17 +100,17 @@ PostgreSQL, Tailwind CSS를 포함하고 싶어요.
 ```bash
 # 메인 스킬
 /rails8-hotwire          # 메인 가이드
-/rails8-core             # 프로젝트 설정
-/rails8-turbo            # Turbo + Stimulus
-/rails8-models           # 모델 & 쿼리
-/rails8-controllers      # 컨트롤러
-/rails8-views            # 뷰 & 컴포넌트
-/rails8-auth             # 인증 & 인가
-/rails8-realtime         # 실시간 기능
-/rails8-background       # 배경 작업
-/rails8-testing          # 테스트
-/rails8-deploy           # 배포
-/rails8-recipes          # 실전 레시피
+/rails8-hotwire:rails8-core             # 프로젝트 설정
+/rails8-hotwire:rails8-turbo            # Turbo + Stimulus
+/rails8-hotwire:rails8-models           # 모델 & 쿼리
+/rails8-hotwire:rails8-controllers      # 컨트롤러
+/rails8-hotwire:rails8-views            # 뷰 & 컴포넌트
+/rails8-hotwire:rails8-auth             # 인증 & 인가
+/rails8-hotwire:rails8-realtime         # 실시간 기능
+/rails8-hotwire:rails8-background       # 배경 작업
+/rails8-hotwire:rails8-testing          # 테스트
+/rails8-hotwire:rails8-deploy           # 배포
+/rails8-hotwire:rails8-recipes          # 실전 레시피
 ```
 
 ---
@@ -136,7 +136,7 @@ PostgreSQL, Tailwind CSS를 포함하고 싶어요.
 #### 호출 방법
 
 ```bash
-/rails8-core
+/rails8-hotwire:rails8-core
 ```
 
 #### 사용 시나리오
@@ -208,7 +208,7 @@ end
 #### 호출 방법
 
 ```bash
-/rails8-turbo
+/rails8-hotwire:rails8-turbo
 ```
 
 #### 사용 시나리오
@@ -279,7 +279,7 @@ export default class extends Controller {
 #### 호출 방법
 
 ```bash
-/rails8-models
+/rails8-hotwire:rails8-models
 ```
 
 #### 사용 시나리오
@@ -352,7 +352,7 @@ end
 #### 호출 방법
 
 ```bash
-/rails8-controllers
+/rails8-hotwire:rails8-controllers
 ```
 
 #### 사용 시나리오
@@ -429,7 +429,7 @@ end
 #### 호출 방법
 
 ```bash
-/rails8-views
+/rails8-hotwire:rails8-views
 ```
 
 #### 사용 시나리오
@@ -513,7 +513,7 @@ end
 #### 호출 방법
 
 ```bash
-/rails8-auth
+/rails8-hotwire:rails8-auth
 ```
 
 #### 사용 시나리오
@@ -599,7 +599,7 @@ end
 #### 호출 방법
 
 ```bash
-/rails8-realtime
+/rails8-hotwire:rails8-realtime
 ```
 
 #### 사용 시나리오
@@ -657,7 +657,7 @@ end
 #### 호출 방법
 
 ```bash
-/rails8-background
+/rails8-hotwire:rails8-background
 ```
 
 #### 사용 시나리오
@@ -715,7 +715,7 @@ end
 #### 호출 방법
 
 ```bash
-/rails8-testing
+/rails8-hotwire:rails8-testing
 ```
 
 #### 사용 시나리오
@@ -783,7 +783,7 @@ end
 #### 호출 방법
 
 ```bash
-/rails8-deploy
+/rails8-hotwire:rails8-deploy
 ```
 
 #### 사용 시나리오
@@ -841,7 +841,7 @@ CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
 #### 호출 방법
 
 ```bash
-/rails8-recipes
+/rails8-hotwire:rails8-recipes
 ```
 
 #### 사용 시나리오
