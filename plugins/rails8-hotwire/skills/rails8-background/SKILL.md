@@ -1,14 +1,13 @@
-# rails8-background
+---
+name: rails8-background
+description: Solid Queue, ActiveJob, 백그라운드 처리 가이드
+allowed-tools: Read, Glob, Grep
+---
 
-Background Jobs Skill
-
-## Invocation
-`/rails8:background`
-
-## Description
-Guides Solid Queue, ActiveJob, and background processing.
+# Rails 8 Background - Background Jobs Skill
 
 ## Topics
+
 - Solid Queue setup (Rails 8 default)
 - ActiveJob basics
 - Job scheduling
@@ -18,6 +17,7 @@ Guides Solid Queue, ActiveJob, and background processing.
 - Async email sending
 
 ## Quick Start
+
 ```ruby
 # config/application.rb
 config.active_job.queue_adapter = :solid_queue
@@ -37,13 +37,16 @@ ProcessOrderJob.perform_later(order.id)
 ```
 
 ## Knowledge Reference
+
 For comprehensive documentation, see:
 - **[knowledge/background/SKILL.md](../../knowledge/background/SKILL.md)**: Full job patterns, Solid Queue, and Sidekiq setup
 
 ## Related Agents
+
 - `rails-executor`: Job implementation
 - `rails-architect`: Queue architecture
 
 ## Related Skills
+
 - [rails8-realtime](../rails8-realtime/SKILL.md): Real-time notifications from jobs
 - [rails8-deploy](../rails8-deploy/SKILL.md): Production queue setup

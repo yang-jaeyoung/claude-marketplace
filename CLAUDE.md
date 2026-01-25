@@ -14,7 +14,8 @@ claude-marketplace/
 └── plugins/
     ├── codex-cli/                     # Pure markdown plugin (commands only)
     ├── mssql/                         # MCP server plugin (TypeScript)
-    └── context-aware-workflow/        # Full-featured plugin (agents, skills, hooks, commands)
+    ├── context-aware-workflow/        # Full-featured plugin (agents, skills, hooks, commands)
+    └── rails8-hotwire/                # Rails 8 + Hotwire full-stack development plugin
 ```
 
 ## Cross-Platform Compatibility
@@ -306,3 +307,6 @@ await server.connect(transport);
 - [caw/reflect.md](plugins/context-aware-workflow/skills/reflect/SKILL.md) - Skill example (Ralph Loop)
 - [caw/model-routing.md](plugins/context-aware-workflow/_shared/model-routing.md) - Model routing documentation
 - [test_plugin_structure.py](plugins/context-aware-workflow/tests/test_plugin_structure.py) - Structure validation tests
+- [rails8-hotwire/rails-architect.md](plugins/rails8-hotwire/agents/rails-architect.md) - Rails agent example (Opus tier)
+- [rails8-hotwire/hooks.json](plugins/rails8-hotwire/hooks/hooks.json) - Automated hooks example
+- [rails8-hotwire/rails-autopilot](plugins/rails8-hotwire/skills/rails-autopilot/SKILL.md) - Automation skill example

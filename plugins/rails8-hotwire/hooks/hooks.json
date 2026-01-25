@@ -1,44 +1,59 @@
 {
-  "hooks": [
-    {
-      "name": "rails-detector",
-      "event": "SessionStart",
-      "script": "./scripts/rails-detector.mjs",
-      "description": "Rails 프로젝트 감지 및 컨텍스트 주입"
-    },
-    {
-      "name": "convention-validator",
-      "event": "UserPromptSubmit",
-      "script": "./scripts/convention-validator.mjs",
-      "description": "Rails 안티패턴 감지 및 경고"
-    },
-    {
-      "name": "migration-guard",
-      "event": "PreToolUse",
-      "tools": ["Edit", "Write"],
-      "script": "./scripts/migration-guard.mjs",
-      "description": "위험한 마이그레이션 차단"
-    },
-    {
-      "name": "test-enforcer",
-      "event": "PreToolUse",
-      "tools": ["Edit", "Write"],
-      "script": "./scripts/test-enforcer.mjs",
-      "description": "테스트 작성 강제 알림"
-    },
-    {
-      "name": "turbo-response-check",
-      "event": "PostToolUse",
-      "tools": ["Edit", "Write"],
-      "script": "./scripts/turbo-response-check.mjs",
-      "description": "Turbo 응답 형식 검증"
-    },
-    {
-      "name": "deploy-safety",
-      "event": "PreToolUse",
-      "tools": ["Bash"],
-      "script": "./scripts/deploy-safety.mjs",
-      "description": "배포 명령 안전성 검사"
-    }
-  ]
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/rails-detector.mjs\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/convention-validator.mjs\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/migration-guard.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/test-enforcer.mjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/deploy-safety.mjs\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/turbo-response-check.mjs\""
+          }
+        ]
+      }
+    ]
+  }
 }

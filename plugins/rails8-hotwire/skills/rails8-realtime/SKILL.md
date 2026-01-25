@@ -1,14 +1,13 @@
-# rails8-realtime
+---
+name: rails8-realtime
+description: ActionCable, Turbo Streams 브로드캐스팅, 실시간 기능 가이드
+allowed-tools: Read, Glob, Grep
+---
 
-Real-time Features Skill
-
-## Invocation
-`/rails8:realtime`
-
-## Description
-Guides ActionCable, Turbo Streams broadcasting, and real-time features.
+# Rails 8 Realtime - Real-time Features Skill
 
 ## Topics
+
 - ActionCable channels
 - Turbo Stream broadcasting
 - Solid Cable setup (Redis-free)
@@ -18,6 +17,7 @@ Guides ActionCable, Turbo Streams broadcasting, and real-time features.
 - Collaborative editing
 
 ## Quick Start
+
 ```ruby
 # Model with automatic broadcasting
 class Message < ApplicationRecord
@@ -30,14 +30,17 @@ end
 ```
 
 ## Knowledge Reference
+
 For comprehensive documentation, see:
 - **[knowledge/realtime/SKILL.md](../../knowledge/realtime/SKILL.md)**: Full real-time patterns and ActionCable setup
 
 ## Related Agents
+
 - `hotwire-specialist-high`: Complex real-time patterns
 - `rails-architect`: Real-time architecture
 
 ## Related Skills
+
 - [rails8-turbo](../rails8-turbo/SKILL.md): Turbo Streams basics
 - [rails8-background](../rails8-background/SKILL.md): Async broadcasting
 - [rails8-deploy](../rails8-deploy/SKILL.md): Redis/Solid Cable deployment

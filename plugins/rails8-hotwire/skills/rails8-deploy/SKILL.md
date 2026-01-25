@@ -1,14 +1,13 @@
-# rails8-deploy
+---
+name: rails8-deploy
+description: Kamal 2, Docker, CI/CD 배포 가이드
+allowed-tools: Read, Glob, Grep
+---
 
-Deployment Skill
-
-## Invocation
-`/rails8:deploy`
-
-## Description
-Guides Kamal 2, Docker, and CI/CD deployment.
+# Rails 8 Deploy - Deployment Skill
 
 ## Topics
+
 - Kamal 2 configuration
 - Docker image optimization
 - Zero-downtime deployment
@@ -19,6 +18,7 @@ Guides Kamal 2, Docker, and CI/CD deployment.
 - Monitoring and logging
 
 ## Quick Start
+
 ```bash
 # Install Kamal
 gem install kamal
@@ -31,6 +31,7 @@ kamal deploy
 ```
 
 ## Knowledge Reference
+
 For comprehensive documentation, see:
 - **[knowledge/deploy/SKILL.md](../../knowledge/deploy/SKILL.md)**: Full deployment guide
 - **[knowledge/deploy/kamal/](../../knowledge/deploy/kamal/)**: Kamal configuration
@@ -38,9 +39,11 @@ For comprehensive documentation, see:
 - **[knowledge/deploy/platforms/](../../knowledge/deploy/platforms/)**: Platform-specific guides
 
 ## Related Agents
+
 - `kamal-deployer`: Deployment specialist
 - `rails-architect`: Infrastructure architecture
 
 ## Related Skills
+
 - [rails8-background](../rails8-background/SKILL.md): Job queue deployment
 - [rails8-realtime](../rails8-realtime/SKILL.md): WebSocket deployment

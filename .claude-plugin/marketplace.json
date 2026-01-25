@@ -74,6 +74,25 @@
         "feedback"
       ],
       "category": "productivity"
+    },
+    {
+      "name": "rails8-hotwire",
+      "description": "Rails 8 + Hotwire full-stack development plugin with specialized agents, hooks, and skills for modern Rails development",
+      "source": "./plugins/rails8-hotwire",
+      "version": "1.0.0",
+      "author": {
+        "name": "urd"
+      },
+      "keywords": [
+        "rails",
+        "ruby",
+        "hotwire",
+        "turbo",
+        "stimulus",
+        "kamal",
+        "full-stack"
+      ],
+      "category": "web-development"
     }
   ]
 }

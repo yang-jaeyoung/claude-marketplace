@@ -92,3 +92,4 @@ When rules diverge from actual code patterns, propose an update immediately. Ens
 - **[AZ Skill Pack](./plugins/az-skill-pack/AGENTS.md)** — Brainstorming, security audit, documentation generation.
 - **[Codex CLI](./plugins/codex-cli/AGENTS.md)** — Codex CLI integration commands.
 - **[Gemini CLI](./plugins/gemini-cli/AGENTS.md)** — Gemini CLI integration commands.
+- **[Rails 8 + Hotwire](./plugins/rails8-hotwire/AGENTS.md)** — Rails 8 full-stack development with Hotwire, specialized agents, and automated hooks.

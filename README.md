@@ -12,6 +12,7 @@ Personal Claude Code plugins marketplace by jyyang.
 | [gemini-cli](./plugins/gemini-cli) | 1.0.0 | Google Gemini CLI integration for code review and documentation |
 | [intent-based-skills](./plugins/intent-based-skills) | 1.0.0 | Intent-based skill framework for consistent and verifiable task execution |
 | [mssql](./plugins/mssql) | 1.0.0 | MS SQL Server integration with Windows Authentication |
+| [rails8-hotwire](./plugins/rails8-hotwire) | 1.0.0 | Rails 8 + Hotwire full-stack development with specialized agents, hooks, and skills |
 
 ## Installation
 
