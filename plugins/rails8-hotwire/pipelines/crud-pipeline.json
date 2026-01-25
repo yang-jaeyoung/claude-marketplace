@@ -1,0 +1,39 @@
+{
+  "name": "crud-pipeline",
+  "description": "CRUD 리소스 생성 파이프라인",
+  "stages": [
+    {
+      "name": "model-gen",
+      "agent": "rails-executor",
+      "model": "sonnet",
+      "prompt": "모델과 마이그레이션을 생성합니다.",
+      "outputs": ["model", "migration"]
+    },
+    {
+      "name": "scaffold",
+      "agent": "rails-executor",
+      "model": "sonnet",
+      "prompt": "컨트롤러와 뷰를 생성합니다.",
+      "inputs": ["model"],
+      "outputs": ["controller", "views"]
+    },
+    {
+      "name": "turbo",
+      "agent": "hotwire-specialist",
+      "model": "sonnet",
+      "prompt": "Turbo Frame/Stream을 통합합니다.",
+      "inputs": ["controller", "views"],
+      "outputs": ["turbo_views"]
+    },
+    {
+      "name": "specs",
+      "agent": "rspec-tester",
+      "model": "sonnet",
+      "prompt": "Request와 System spec을 작성합니다.",
+      "inputs": ["model", "controller"],
+      "outputs": ["request_specs", "system_specs"]
+    }
+  ],
+  "triggers": ["crud", "resource"],
+  "invocation": "/rails8:pipeline crud"
+}

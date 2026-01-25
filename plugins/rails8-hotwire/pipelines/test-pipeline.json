@@ -1,0 +1,40 @@
+{
+  "name": "test-pipeline",
+  "description": "TDD 워크플로우 파이프라인",
+  "stages": [
+    {
+      "name": "analyze",
+      "agent": "rails-architect-low",
+      "model": "haiku",
+      "prompt": "테스트 대상 코드를 분석합니다.",
+      "outputs": ["analysis"]
+    },
+    {
+      "name": "specs",
+      "agent": "rspec-tester",
+      "model": "sonnet",
+      "prompt": "RSpec 테스트를 작성합니다.",
+      "inputs": ["analysis"],
+      "outputs": ["specs"]
+    },
+    {
+      "name": "fix",
+      "agent": "rails-executor",
+      "model": "sonnet",
+      "prompt": "테스트가 실패하면 코드를 수정합니다.",
+      "inputs": ["specs"],
+      "outputs": ["fixes"],
+      "condition": "specs.failures > 0"
+    },
+    {
+      "name": "verify",
+      "agent": "rspec-tester-low",
+      "model": "haiku",
+      "prompt": "모든 테스트가 통과하는지 확인합니다.",
+      "inputs": ["specs", "fixes"],
+      "outputs": ["verification"]
+    }
+  ],
+  "triggers": ["test", "tdd"],
+  "invocation": "/rails8:pipeline test"
+}

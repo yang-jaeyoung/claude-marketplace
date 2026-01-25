@@ -1,0 +1,18 @@
+{
+  "name": "rails8-hotwire",
+  "version": "1.0.0",
+  "description": "Rails 8 + Hotwire full-stack development plugin with specialized agents, hooks, and skills",
+  "author": "Rails Master",
+  "namespace": "rails8",
+  "main": "agents/",
+  "skills": "skills/",
+  "hooks": "hooks/hooks.json",
+  "pipelines": "pipelines/",
+  "templates": "templates/",
+  "knowledge": "knowledge/",
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  "keywords": ["rails", "ruby", "hotwire", "turbo", "stimulus", "kamal"],
+  "repository": "https://github.com/rails-master/rails8-hotwire-plugin"
+}

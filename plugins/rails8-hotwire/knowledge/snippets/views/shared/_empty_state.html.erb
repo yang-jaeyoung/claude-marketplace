@@ -1,0 +1,53 @@
+<%# app/views/shared/_empty_state.html.erb %>
+<%# 빈 상태 표시 %>
+<%#
+  사용법:
+  <% if @posts.empty? %>
+    <%= render "shared/empty_state",
+               title: "게시글이 없습니다",
+               description: "첫 번째 게시글을 작성해보세요.",
+               action_text: "새 게시글",
+               action_path: new_post_path %>
+  <% end %>
+%>
+
+<% title ||= "데이터가 없습니다" %>
+<% description ||= nil %>
+<% action_text ||= nil %>
+<% action_path ||= nil %>
+<% icon ||= "document" %>
+
+<div class="text-center py-12 px-4">
+  <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+    <% case icon.to_s %>
+    <% when "document" %>
+      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+    <% when "search" %>
+      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    <% when "inbox" %>
+      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+      </svg>
+    <% end %>
+  </div>
+
+  <h3 class="text-lg font-medium text-gray-900 mb-1"><%= title %></h3>
+
+  <% if description.present? %>
+    <p class="text-gray-500 mb-4"><%= description %></p>
+  <% end %>
+
+  <% if action_text.present? && action_path.present? %>
+    <%= link_to action_path,
+                class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" do %>
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      <%= action_text %>
+    <% end %>
+  <% end %>
+</div>

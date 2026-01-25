@@ -1,0 +1,39 @@
+{
+  "name": "auth-pipeline",
+  "description": "인증 설정 파이프라인",
+  "stages": [
+    {
+      "name": "devise-setup",
+      "agent": "devise-specialist",
+      "model": "sonnet",
+      "prompt": "Devise 또는 Rails 8 내장 인증을 설정합니다.",
+      "outputs": ["auth_config", "user_model"]
+    },
+    {
+      "name": "views",
+      "agent": "rails-executor",
+      "model": "sonnet",
+      "prompt": "인증 관련 뷰를 생성합니다.",
+      "inputs": ["auth_config"],
+      "outputs": ["auth_views"]
+    },
+    {
+      "name": "policies",
+      "agent": "devise-specialist",
+      "model": "sonnet",
+      "prompt": "Pundit 정책을 설정합니다.",
+      "inputs": ["user_model"],
+      "outputs": ["policies"]
+    },
+    {
+      "name": "specs",
+      "agent": "rspec-tester",
+      "model": "sonnet",
+      "prompt": "인증 테스트를 작성합니다.",
+      "inputs": ["auth_config", "policies"],
+      "outputs": ["auth_specs"]
+    }
+  ],
+  "triggers": ["auth", "authentication"],
+  "invocation": "/rails8:pipeline auth"
+}

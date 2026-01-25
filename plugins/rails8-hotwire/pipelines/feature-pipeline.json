@@ -1,0 +1,47 @@
+{
+  "name": "feature-pipeline",
+  "description": "TDD 기반 기능 구현 파이프라인",
+  "stages": [
+    {
+      "name": "analyze",
+      "agent": "rails-architect",
+      "model": "opus",
+      "prompt": "기능 요구사항을 분석하고 구현 계획을 수립합니다.",
+      "outputs": ["analysis", "plan"]
+    },
+    {
+      "name": "test-first",
+      "agent": "rspec-tester",
+      "model": "sonnet",
+      "prompt": "분석 결과를 바탕으로 테스트를 먼저 작성합니다.",
+      "inputs": ["analysis", "plan"],
+      "outputs": ["specs"]
+    },
+    {
+      "name": "implement",
+      "agent": "rails-executor",
+      "model": "sonnet",
+      "prompt": "테스트를 통과하도록 구현합니다.",
+      "inputs": ["specs", "plan"],
+      "outputs": ["implementation"]
+    },
+    {
+      "name": "hotwire",
+      "agent": "hotwire-specialist",
+      "model": "sonnet",
+      "prompt": "Turbo/Stimulus 통합을 추가합니다.",
+      "inputs": ["implementation"],
+      "outputs": ["hotwire_integration"]
+    },
+    {
+      "name": "review",
+      "agent": "rails-reviewer",
+      "model": "opus",
+      "prompt": "코드 품질, 보안, 성능을 검토합니다.",
+      "inputs": ["implementation", "hotwire_integration"],
+      "outputs": ["review_report"]
+    }
+  ],
+  "triggers": ["feature", "implement"],
+  "invocation": "/rails8:pipeline feature"
+}

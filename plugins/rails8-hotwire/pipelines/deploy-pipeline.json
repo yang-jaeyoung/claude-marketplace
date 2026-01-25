@@ -1,0 +1,38 @@
+{
+  "name": "deploy-pipeline",
+  "description": "배포 워크플로우 파이프라인",
+  "stages": [
+    {
+      "name": "docker-setup",
+      "agent": "kamal-deployer",
+      "model": "sonnet",
+      "prompt": "Dockerfile을 최적화합니다.",
+      "outputs": ["dockerfile"]
+    },
+    {
+      "name": "kamal-config",
+      "agent": "kamal-deployer",
+      "model": "sonnet",
+      "prompt": "Kamal 설정을 생성합니다.",
+      "outputs": ["deploy_yml"]
+    },
+    {
+      "name": "ci-setup",
+      "agent": "kamal-deployer",
+      "model": "sonnet",
+      "prompt": "GitHub Actions 워크플로우를 설정합니다.",
+      "inputs": ["deploy_yml"],
+      "outputs": ["ci_workflow"]
+    },
+    {
+      "name": "deploy",
+      "agent": "kamal-deployer",
+      "model": "sonnet",
+      "prompt": "배포를 실행합니다.",
+      "inputs": ["dockerfile", "deploy_yml", "ci_workflow"],
+      "outputs": ["deploy_result"]
+    }
+  ],
+  "triggers": ["deploy", "deployment"],
+  "invocation": "/rails8:pipeline deploy"
+}

@@ -1,0 +1,39 @@
+# config/deploy.yml - Kamal 2 배포 설정 예제
+
+service: myapp
+image: ghcr.io/myuser/myapp
+
+servers:
+  web:
+    hosts:
+      - 192.168.1.1
+    labels:
+      traefik.http.routers.myapp.rule: Host(`myapp.com`)
+
+registry:
+  server: ghcr.io
+  username: myuser
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+env:
+  clear:
+    RAILS_ENV: production
+    RAILS_LOG_TO_STDOUT: true
+  secret:
+    - RAILS_MASTER_KEY
+    - DATABASE_URL
+
+builder:
+  multiarch: false
+
+accessories:
+  db:
+    image: postgres:16
+    host: 192.168.1.1
+    port: 5432
+    env:
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data

@@ -1,0 +1,54 @@
+// Rails 8 Stimulus Controller Template
+// Custom generator template for Stimulus controllers
+// Copy to: lib/templates/stimulus/controller.js.tt
+
+import { Controller } from "@hotwired/stimulus"
+
+/**
+ * <%= class_name %> Controller
+ *
+ * Targets:
+ *   - element: Main interactive element
+ *
+ * Values:
+ *   - enabled: Boolean (default: true)
+ *
+ * Actions:
+ *   - toggle: Toggle element visibility
+ *
+ * Usage:
+ *   <div data-controller="<%= file_name %>"
+ *        data-<%= file_name %>-enabled-value="true">
+ *     <button data-action="<%= file_name %>#toggle">Toggle</button>
+ *     <div data-<%= file_name %>-target="element">Content</div>
+ *   </div>
+ */
+export default class extends Controller {
+  static targets = ["element"]
+  static values = {
+    enabled: { type: Boolean, default: true }
+  }
+  static classes = ["active", "hidden"]
+
+  connect() {
+    // Called when controller is connected to the DOM
+    console.log("<%= class_name %> controller connected")
+  }
+
+  disconnect() {
+    // Called when controller is disconnected from the DOM
+  }
+
+  toggle() {
+    if (!this.enabledValue) return
+
+    if (this.hasElementTarget) {
+      this.elementTarget.classList.toggle(this.hiddenClass)
+    }
+  }
+
+  // Value changed callback
+  enabledValueChanged(value, previousValue) {
+    console.log(`Enabled changed from ${previousValue} to ${value}`)
+  }
+}
