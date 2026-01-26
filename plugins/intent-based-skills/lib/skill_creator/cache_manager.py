@@ -3,10 +3,19 @@
 import json
 import hashlib
 import shutil
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
+
+# Windows UTF-8 지원
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
 
 
 @dataclass
@@ -228,8 +237,6 @@ class ResearchCacheManager:
 # CLI 유틸리티 함수
 def cache_cli():
     """캐시 관리 CLI."""
-    import sys
-
     manager = ResearchCacheManager()
 
     if len(sys.argv) < 2:
