@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "exported_at": "2026-01-27T09:00:00Z",
+  "instincts": [
+    {
+      "id": "prefer-grep-search-abc12345",
+      "trigger": "when searching for code patterns",
+      "action": "Use Grep instead of naive file iteration",
+      "confidence": 0.85,
+      "evidence_count": 12,
+      "domain": "preference",
+      "source": "session-observation",
+      "last_observed": "2026-01-23",
+      "created_at": "2026-01-20T08:00:00Z"
+    },
+    {
+      "id": "safe-modify-pattern-xyz99999",
+      "trigger": "when modifying critical files",
+      "action": "Create backup before making changes",
+      "confidence": 0.85,
+      "evidence_count": 12,
+      "domain": "workflow",
+      "source": "session-observation",
+      "last_observed": "2026-01-26",
+      "created_at": "2026-01-21T11:15:00Z"
+    },
+    {
+      "id": "pre-commit-check-ghi11111",
+      "trigger": "before git commit",
+      "action": "Run linters and tests to catch issues early",
+      "confidence": 0.68,
+      "evidence_count": 7,
+      "domain": "workflow",
+      "source": "session-observation",
+      "last_observed": "2026-01-27",
+      "created_at": "2026-01-23T09:45:00Z"
+    }
+  ]
+}
