@@ -16,7 +16,11 @@ Debug mode:
 """
 
 import json
+import os
+import re
+import subprocess
 import sys
+from pathlib import Path
 
 # Windows UTF-8 support
 if sys.platform == 'win32':
@@ -25,10 +29,6 @@ if sys.platform == 'win32':
         sys.stderr.reconfigure(encoding='utf-8')
     except AttributeError:
         pass
-import os
-import subprocess
-import sys
-from pathlib import Path
 from typing import Optional, List
 
 # Cache for gemini CLI availability check
@@ -233,3 +233,65 @@ def is_git_commit_command(tool_input: Optional[dict]) -> bool:
 
     command = tool_input.get("command", "")
     return "git commit" in command
+
+
+def is_gate_mode() -> bool:
+    """
+    Check if Gate mode is enabled (CAW_REVIEW_GATE=1).
+
+    Gate mode enables blocking reviews that can reject dangerous changes.
+    When disabled (default), reviews run in async notification-only mode.
+    """
+    return os.environ.get("CAW_REVIEW_GATE", "") == "1"
+
+
+def output_async_notification(source: str, message: str) -> None:
+    """
+    Output notification to stderr for async mode.
+
+    In async mode, stderr output is displayed to the user as a notification.
+    The message is truncated to prevent excessive output.
+
+    Args:
+        source: The notification source (e.g., "Gemini Review")
+        message: The notification message
+    """
+    # Truncate long messages
+    max_len = 150
+    truncated = message[:max_len] + "..." if len(message) > max_len else message
+    print(f"[{source}] {truncated}", file=sys.stderr)
+
+
+def block_result(reason: str) -> str:
+    """Return JSON block result for Gate mode rejection."""
+    return json.dumps({
+        "decision": "block",
+        "reason": reason
+    })
+
+
+def detect_critical_issues(review: str) -> Optional[str]:
+    """
+    Detect critical security issues in Gemini review response.
+
+    Returns the issue description if critical, None otherwise.
+    """
+    # Keywords indicating critical security issues
+    critical_patterns = [
+        (r"\b(sql\s*injection|sqli)\b", "SQL injection vulnerability"),
+        (r"\b(xss|cross.?site.?scripting)\b", "XSS vulnerability"),
+        (r"\b(command\s*injection|shell\s*injection)\b", "Command injection"),
+        (r"\b(path\s*traversal|directory\s*traversal)\b", "Path traversal"),
+        (r"\b(hardcoded\s*(secret|password|key|credential|token))\b", "Hardcoded credentials"),
+        (r"\b(exposed\s*(secret|password|key|api.?key|credential))\b", "Exposed credentials"),
+        (r"\b(remote\s*code\s*execution|rce)\b", "Remote code execution"),
+        (r"\b(insecure\s*deserialization)\b", "Insecure deserialization"),
+    ]
+
+    review_lower = review.lower()
+
+    for pattern, issue_name in critical_patterns:
+        if re.search(pattern, review_lower, re.IGNORECASE):
+            return issue_name
+
+    return None

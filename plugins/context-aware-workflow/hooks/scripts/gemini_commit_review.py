@@ -39,6 +39,7 @@ from gemini_utils import (
     debug_log,
     is_gemini_review_enabled,
     is_caw_active,
+    is_gate_mode,
     is_git_commit_command,
     get_tool_input,
     get_staged_diff,
@@ -47,6 +48,9 @@ from gemini_utils import (
     truncate_text,
     format_review_output,
     approve_result,
+    block_result,
+    output_async_notification,
+    detect_critical_issues,
 )
 
 
@@ -97,17 +101,44 @@ def main():
 
         debug_log(f"Reviewing {file_info}")
 
-        # Run Gemini review
+        # Run Gemini review (timeout slightly less than hook timeout of 45s)
         prompt = REVIEW_PROMPT + truncate_text(diff, 8000)
-        review = run_gemini_prompt(prompt)
+        review = run_gemini_prompt(prompt, timeout=40)
 
-        if review:
+        if not review:
+            # Gemini review failed or unavailable
+            debug_log("Gemini review returned no result")
+            print(approve_result())
+            return
+
+        # Check operation mode: Gate vs Async
+        if is_gate_mode():
+            # Gate mode: blocking review with reject capability
+            debug_log("Gate mode enabled - checking for critical issues")
+
+            critical_issue = detect_critical_issues(review)
+            if critical_issue:
+                reason = f"[Gemini Gate] {critical_issue} detected in commit ({file_info})"
+                debug_log(f"Blocking commit: {reason}")
+                print(block_result(reason))
+                return
+
+            # No critical issues - approve with context
             context_prefix = f"[Gemini Review] {file_info}"
             context = format_review_output(review, context_prefix)
             print(approve_result(context))
         else:
-            # Gemini review failed or unavailable
-            debug_log("Gemini review returned no result")
+            # Async mode: notification only, immediate approve
+            debug_log("Async mode - outputting notification")
+
+            # Format review for notification (avoid double prefix)
+            short_review = review[:120] + "..." if len(review) > 120 else review
+            short_review = " ".join(short_review.split())  # Normalize whitespace
+
+            # Output to stderr for async notification display
+            output_async_notification(f"Commit {file_info}", short_review)
+
+            # Always approve in async mode
             print(approve_result())
 
     except Exception as e:

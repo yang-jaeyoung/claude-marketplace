@@ -578,47 +578,68 @@ class TestCrossPlatformCompatibility(unittest.TestCase):
             "Single quote echo found - use 'type: prompt' instead for Windows compatibility"
         )
 
-    def test_hooks_use_prompt_for_simple_output(self):
-        """SessionStart should use prompt type, not command type with echo."""
+    def test_hooks_use_double_quotes_for_echo(self):
+        """SessionStart echo commands should use double quotes for Windows compatibility.
+
+        Note: 'type: prompt' is only supported in Stop/SubagentStop hooks per CLAUDE.md.
+        For SessionStart, we must use 'type: command' with echo.
+        """
         session_start_hooks = self.hooks_data["hooks"].get("SessionStart", [])
         for hook_group in session_start_hooks:
             for hook in hook_group.get("hooks", []):
                 if hook.get("type") == "command":
                     cmd = hook.get("command", "")
-                    self.assertFalse(
-                        cmd.startswith("echo "),
-                        "SessionStart should use 'type: prompt' for simple messages instead of echo command"
-                    )
+                    if cmd.startswith("echo "):
+                        # Must use double quotes, not single quotes
+                        self.assertNotIn(
+                            "echo '",
+                            cmd,
+                            "echo should use double quotes for Windows compatibility"
+                        )
 
-    def test_pretooluse_uses_python_inline_pattern(self):
-        """PreToolUse hooks should use Python inline pattern for cross-platform."""
+    def test_pretooluse_uses_claude_plugin_root_pattern(self):
+        """PreToolUse hooks using paths should use ${CLAUDE_PLUGIN_ROOT} pattern.
+
+        Per CLAUDE.md: ${CLAUDE_PLUGIN_ROOT} is a special variable that Claude Code
+        substitutes at runtime (not a shell environment variable).
+        This pattern works cross-platform when Claude Code processes the hook.
+        """
         pre_tool_hooks = self.hooks_data["hooks"].get("PreToolUse", [])
         for hook_group in pre_tool_hooks:
             for hook in hook_group.get("hooks", []):
                 if hook.get("type") == "command":
                     cmd = hook.get("command", "")
-                    # Should use python -c pattern, not direct script path with $CLAUDE_PLUGIN_ROOT
+                    # If referencing plugin paths, should use ${CLAUDE_PLUGIN_ROOT} pattern
+                    # (with curly braces, which Claude Code substitutes at runtime)
                     if "CLAUDE_PLUGIN_ROOT" in cmd:
                         self.assertIn(
-                            "python -c",
+                            "${CLAUDE_PLUGIN_ROOT}",
                             cmd,
-                            "Hooks using CLAUDE_PLUGIN_ROOT should use 'python -c' pattern for cross-platform compatibility"
+                            "Plugin paths should use ${CLAUDE_PLUGIN_ROOT} (with curly braces) for Claude Code substitution"
                         )
 
-    def test_no_shell_variable_in_direct_path(self):
-        """Hook commands should not use shell variable expansion in paths."""
+    def test_no_bare_shell_variable_in_path(self):
+        """Hook commands should use ${VAR} pattern, not $VAR without braces.
+
+        Per CLAUDE.md:
+        - ${CLAUDE_PLUGIN_ROOT} - Claude Code substitutes at runtime (OK)
+        - $CLAUDE_PLUGIN_ROOT - Shell variable, may not work (BAD)
+        - $CLAUDE_PROJECT_DIR - Environment variable, works in shell (OK for shell commands)
+        """
         for event_name, event_hooks in self.hooks_data["hooks"].items():
             for hook_group in event_hooks:
                 for hook in hook_group.get("hooks", []):
                     if hook.get("type") == "command":
                         cmd = hook.get("command", "")
-                        # Check for problematic pattern: python "$CLAUDE_PLUGIN_ROOT/..."
-                        # This fails on Windows because $ is not expanded
-                        self.assertNotRegex(
-                            cmd,
-                            r'python[3]?\s+"?\$CLAUDE_PLUGIN_ROOT',
-                            f"{event_name} hook uses shell variable in path - use Python os.environ.get() instead"
-                        )
+                        # Check for bare $CLAUDE_PLUGIN_ROOT without braces
+                        # This pattern won't be substituted by Claude Code
+                        import re
+                        bare_var_match = re.search(r'\$CLAUDE_PLUGIN_ROOT(?!\})', cmd)
+                        if bare_var_match and "${CLAUDE_PLUGIN_ROOT}" not in cmd:
+                            self.fail(
+                                f"{event_name} hook uses bare $CLAUDE_PLUGIN_ROOT - "
+                                "use ${{CLAUDE_PLUGIN_ROOT}} for Claude Code substitution"
+                            )
 
 
 if __name__ == "__main__":

@@ -14,7 +14,11 @@ Output format:
 """
 
 import json
+import re
+import subprocess
 import sys
+from pathlib import Path
+from typing import Optional, Tuple
 
 # Windows UTF-8 support
 if sys.platform == 'win32':
@@ -23,23 +27,15 @@ if sys.platform == 'win32':
         sys.stderr.reconfigure(encoding='utf-8')
     except AttributeError:
         pass
-import re
-import subprocess
-import sys
-from pathlib import Path
-from typing import Optional, Tuple
 
-
-def find_caw_root() -> Optional[Path]:
-    """Find .caw directory starting from current working directory."""
-    cwd = Path.cwd()
-
-    for path in [cwd, *cwd.parents]:
-        caw_dir = path / ".caw"
-        if caw_dir.is_dir():
-            return caw_dir
-
-    return None
+# Import shared utilities
+from gemini_utils import (
+    debug_log,
+    find_caw_root,
+    get_tool_input,
+    is_git_commit_command,
+    output_async_notification,
+)
 
 
 def get_staged_diff() -> str:
@@ -188,6 +184,12 @@ def get_suggested_prefix(change_type: str) -> str:
 def main():
     """Main entry point."""
     try:
+        # Check if this is a git commit command
+        tool_input = get_tool_input()
+        if not is_git_commit_command(tool_input):
+            print(json.dumps({"result": "approve"}))
+            return
+
         # Only run if CAW is active
         caw_root = find_caw_root()
         if not caw_root:
@@ -230,15 +232,15 @@ def main():
         if len(context) > 200:
             context = context[:197] + "..."
 
-        output = {
-            "result": "approve",
-            "additionalContext": context
-        }
+        # Output async notification to stderr (non-blocking info)
+        output_async_notification("Tidy First", context)
 
-        print(json.dumps(output))
+        # Always approve - this hook provides guidance, not blocks
+        print(json.dumps({"result": "approve"}))
 
-    except Exception:
-        # Silent failure - approve by default
+    except Exception as e:
+        # Log and approve by default
+        debug_log(f"Exception in commit discipline check: {e}")
         print(json.dumps({"result": "approve"}))
 
 
