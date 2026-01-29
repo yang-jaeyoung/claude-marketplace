@@ -135,9 +135,16 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" 
 
 이 명령어는 ohlcv, fundamental, market_cap을 ThreadPoolExecutor로 동시에 수집하여 3배 빠릅니다.
 
-## Ultra 분석 워크플로우 (에이전트 병렬 실행)
+## ⚠️ 필수 실행 지침 (MANDATORY EXECUTION)
 
-Ultra 모드는 전문 에이전트를 병렬로 실행하여 분석 속도를 3배 이상 향상시킵니다.
+**이 스킬이 로드되면 아래 워크플로우를 반드시 순서대로 실행하세요. 단순 참고가 아닌 실행 명령입니다!**
+
+### 실행 순서 요약
+
+1. **Phase 1**: KRX 기본 데이터 수집 (Bash - `collect_all`)
+2. **Phase 2-4**: 에이전트 병렬 실행 (**Task tool 필수 사용**)
+3. **Phase 5**: 기술분석 수행
+4. **Phase 6**: Ultra 리포트 통합 생성
 
 ### ⚠️ 중요: 스킬 vs 에이전트 구분
 
@@ -175,30 +182,26 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" 
 
 위 명령 하나로 ohlcv, fundamental, market_cap을 병렬 수집합니다.
 
-### Phase 2: 웹 스크래핑 (외부 데이터)
+### Phase 2-4: 에이전트 병렬 실행 (⚠️ 필수)
+
+**Phase 1 완료 후, 아래 3개 에이전트를 Task tool로 동시에 병렬 실행하세요!**
 
 ```
+# ✅ 반드시 하나의 메시지에서 3개의 Task tool을 동시 호출하세요:
+
 Task(
   subagent_type="quant-k:web-scraper",
   model="sonnet",
-  prompt="네이버 금융에서 {종목코드} 추가 정보 수집: 투자의견, 목표가, 뉴스 헤드라인"
+  prompt="네이버 금융에서 {종목코드} 추가 정보 수집: 투자의견, 목표가, 뉴스 헤드라인. 저장경로: {저장경로}"
 )
-```
 
----
-
-## 📊 심층 분석 단계
-
-### Phase 3: 전체 팩터 분석
-
-```
 Task(
   subagent_type="quant-k:quant-analyst",
   model="sonnet",
   prompt="""
   다음 종목의 퀀트 팩터 분석을 수행하세요:
   - 종목: {종목명} ({종목코드})
-  - 수집된 데이터: {Phase 1-2 결과}
+  - 저장경로: {저장경로}
 
   분석 항목:
   1. PER/PBR 밸류에이션 평가
@@ -207,17 +210,22 @@ Task(
   4. 투자 스코어카드 작성
   """
 )
-```
 
-### Phase 4: 확장 스크리닝 (유사 종목)
-
-```
 Task(
   subagent_type="quant-k:stock-screener",
   model="sonnet",
-  prompt="시장에서 유사한 밸류에이션을 가진 종목 20개를 찾아주세요. 조건: PER ±30%, PBR ±30%, 동일 시장"
+  prompt="시장에서 {종목명}과 유사한 밸류에이션을 가진 종목 20개를 찾아주세요. 조건: PER ±30%, PBR ±30%, 동일 시장. 저장경로: {저장경로}"
 )
 ```
+
+**⚠️ 주의사항:**
+- 3개의 Task tool 호출을 **하나의 응답에서 동시에** 실행해야 병렬 처리됩니다
+- 각 에이전트에 저장경로를 전달하여 결과가 올바른 위치에 저장되도록 합니다
+- 에이전트 완료를 기다린 후 Phase 5로 진행합니다
+
+---
+
+## 📊 심층 분석 단계
 
 ### Phase 5: 고급 기술분석
 
@@ -437,3 +445,23 @@ browser-scraper 스킬을 사용하세요:
 | 데이터 부족 | 가능한 데이터만으로 부분 리포트 |
 | 1년 데이터 없음 | 가용 기간으로 축소 |
 | 저장 실패 | 콘솔에 전체 출력 |
+
+---
+
+## ✅ 실행 체크리스트 (완료 전 확인 필수)
+
+**Ultra 분석을 완료하기 전에 모든 항목이 체크되어야 합니다:**
+
+- [ ] **Phase 1**: `collect_all` 명령으로 KRX 기본 데이터 수집 완료
+- [ ] **Phase 2**: `quant-k:web-scraper` 에이전트 실행 (Task tool 사용)
+- [ ] **Phase 3**: `quant-k:quant-analyst` 에이전트 실행 (Task tool 사용)
+- [ ] **Phase 4**: `quant-k:stock-screener` 에이전트 실행 (Task tool 사용)
+- [ ] **Phase 5**: 기술적 분석 (이동평균, RSI, MACD, 볼린저밴드) 수행
+- [ ] **Phase 6**: Ultra 리포트 통합 생성 및 저장
+
+**⚠️ 중요:** Phase 2-4는 반드시 Task tool로 에이전트를 spawn해야 합니다. 직접 분석하지 마세요!
+
+**완료 조건:**
+1. 모든 에이전트가 결과를 반환함
+2. README.md (메인 리포트)가 저장경로에 생성됨
+3. 사용자에게 리포트 위치와 요약을 안내함
