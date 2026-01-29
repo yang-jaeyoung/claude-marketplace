@@ -2,6 +2,14 @@
 name: ultra-analyze
 description: KRX-Quant 울트라 분석 모드. 모든 기능을 최대 역량으로 활용하여 심층 분석 수행. "울트라 분석", "ultra", "딥 분석", "전체 분석" 등의 요청에 자동 활성화.
 argument-hint: <종목명|종목코드> [저장경로]
+allowed-tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - Bash
+  - Task
+  - WebFetch
 ---
 
 # KRX-Quant Ultra 분석 모드
