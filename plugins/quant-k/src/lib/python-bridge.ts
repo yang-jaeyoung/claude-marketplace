@@ -125,6 +125,8 @@ export class PythonBridge extends EventEmitter {
 
         this.socket.on("connect", () => {
           this.connected = true;
+          // TCP keepalive 설정으로 유휴 연결 끊김 방지
+          this.socket!.setKeepAlive(true, 30000);
           this.emit("connected");
           resolve();
         });

@@ -20,6 +20,7 @@ import asyncio
 import json
 import os
 import signal
+import socket
 import sys
 from abc import ABC
 from typing import Any, Callable, Dict, Optional
@@ -92,7 +93,9 @@ class BaseBridge(ABC):
             if asyncio.iscoroutinefunction(handler):
                 result = await handler(params)
             else:
-                result = handler(params)
+                # 동기 핸들러는 스레드 풀에서 실행하여 이벤트 루프 블로킹 방지
+                loop = asyncio.get_event_loop()
+                result = await loop.run_in_executor(None, handler, params)
 
             return self._success_response(req_id, result)
 
@@ -129,6 +132,21 @@ class BaseBridge(ABC):
         """클라이언트 연결 처리"""
         peer = writer.get_extra_info('peername') or 'unknown'
         logger.info(f"Client connected: {peer}")
+
+        # TCP keepalive 설정으로 유휴 연결 끊김 방지
+        try:
+            sock = writer.get_extra_info('socket')
+            if sock:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                # macOS/Linux에서 keepalive 간격 설정
+                if hasattr(socket, 'TCP_KEEPIDLE'):
+                    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 30)
+                if hasattr(socket, 'TCP_KEEPINTVL'):
+                    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 10)
+                if hasattr(socket, 'TCP_KEEPCNT'):
+                    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 5)
+        except Exception as e:
+            logger.warning(f"Could not set TCP keepalive: {e}")
 
         try:
             while not self._shutdown_event.is_set():
