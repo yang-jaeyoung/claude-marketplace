@@ -22,6 +22,7 @@ class DSLParser:
         "시가총액": "MARKET_CAP",
         "배당률": "DIV",
         "배당수익률": "DIV",
+        "자기자본이익률": "ROE",
     }
 
     # 연산자 패턴
@@ -124,6 +125,12 @@ class ScreenerBridge(BaseBridge):
         # 병합
         df = fundamental.join(cap[["시가총액"]], how="inner")
         df = df.rename(columns={"시가총액": "MARKET_CAP"})
+
+        # ROE 계산 (EPS / BPS) * 100
+        # ROE = (EPS / BPS) * 100, only where BPS > 0
+        valid_mask = (df["BPS"] > 0) & (df["EPS"].notna())
+        df["ROE"] = pd.Series(index=df.index, dtype=float)
+        df.loc[valid_mask, "ROE"] = (df.loc[valid_mask, "EPS"] / df.loc[valid_mask, "BPS"]) * 100
 
         # 종목명 추가
         names = {}
