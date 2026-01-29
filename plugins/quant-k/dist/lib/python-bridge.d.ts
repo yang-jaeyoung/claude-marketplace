@@ -13,9 +13,13 @@ export declare class PythonBridge extends EventEmitter {
     private pendingRequests;
     private buffer;
     private connected;
+    private reconnecting;
+    private shouldReconnect;
     constructor(options: PythonBridgeOptions);
     start(): Promise<void>;
     private connect;
+    private scheduleReconnect;
+    private ensureConnected;
     stop(): Promise<void>;
     call<T>(method: string, params: Record<string, unknown>): Promise<T>;
     isConnected(): boolean;

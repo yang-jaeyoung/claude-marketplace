@@ -11,6 +11,8 @@ export class PythonBridge extends EventEmitter {
     pendingRequests = new Map();
     buffer = "";
     connected = false;
+    reconnecting = false;
+    shouldReconnect = true;
     constructor(options) {
         super();
         this.options = {
@@ -89,12 +91,63 @@ export class PythonBridge extends EventEmitter {
                 this.socket.on("close", () => {
                     this.connected = false;
                     this.emit("disconnected");
+                    // Auto-reconnect if process is still running
+                    if (this.shouldReconnect && this.process && !this.reconnecting) {
+                        this.scheduleReconnect();
+                    }
                 });
             };
             tryConnect();
         });
     }
+    scheduleReconnect() {
+        if (this.reconnecting || !this.shouldReconnect)
+            return;
+        this.reconnecting = true;
+        console.log(`[Bridge] Scheduling reconnect to port ${this.actualPort}...`);
+        setTimeout(async () => {
+            try {
+                await this.connect();
+                console.log(`[Bridge] Reconnected successfully`);
+            }
+            catch (err) {
+                console.error(`[Bridge] Reconnect failed:`, err);
+            }
+            finally {
+                this.reconnecting = false;
+            }
+        }, 1000);
+    }
+    async ensureConnected() {
+        if (this.connected)
+            return;
+        // Wait for reconnection if in progress
+        if (this.reconnecting) {
+            const maxWait = 5000;
+            const startTime = Date.now();
+            while (this.reconnecting && Date.now() - startTime < maxWait) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            if (this.connected)
+                return;
+        }
+        // Try to reconnect if not connected
+        if (!this.connected && this.actualPort > 0 && this.process) {
+            this.scheduleReconnect();
+            // Wait for reconnection
+            const maxWait = 5000;
+            const startTime = Date.now();
+            while (!this.connected && Date.now() - startTime < maxWait) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+        if (!this.connected) {
+            throw new Error("Not connected and reconnection failed");
+        }
+    }
     async stop() {
+        // Prevent auto-reconnect during shutdown
+        this.shouldReconnect = false;
         // Send shutdown command
         if (this.connected) {
             try {
@@ -123,8 +176,10 @@ export class PythonBridge extends EventEmitter {
         this.connected = false;
     }
     async call(method, params) {
+        // Auto-reconnect if disconnected
+        await this.ensureConnected();
         if (!this.socket || !this.connected) {
-            throw new Error("Not connected");
+            throw new Error("Not connected after reconnection attempt");
         }
         const id = `req_${++this.requestId}`;
         const request = {
