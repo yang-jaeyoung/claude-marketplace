@@ -40,6 +40,38 @@ Python과 pykrx가 필요합니다. 처음 사용 시 `/quant-k:setup`을 실행
 
 ## 데이터 수집 명령어
 
+### pykrx DataFrame 컬럼 레퍼런스
+
+pykrx가 반환하는 DataFrame의 **실제 컬럼명**입니다. 인라인 Python 코드에서 반드시 이 컬럼명을 사용하세요.
+
+**OHLCV (get_market_ohlcv):**
+```python
+['시가', '고가', '저가', '종가', '거래량', '등락률']
+# 영문 없음! '등락률'은 전일대비 변동률 (%)
+```
+
+**Fundamental (get_market_fundamental):**
+```python
+['BPS', 'PER', 'PBR', 'EPS', 'DIV', 'DPS']
+# 영문 대문자만 사용
+```
+
+**Market Cap (get_market_cap):**
+```python
+['종가', '시가총액', '거래량', '거래대금', '상장주식수']
+# '시가총액'은 원 단위 (억원 아님)
+```
+
+**⚠️ 주의:** `ret_3m`, `momentum_3m`, `return_1m` 같은 컬럼은 **존재하지 않습니다**. 모멘텀은 직접 계산해야 합니다:
+
+```python
+# 3개월 수익률 계산 예시
+ohlcv = stock.get_market_ohlcv(start_date, end_date, ticker)
+price_now = int(ohlcv['종가'].iloc[-1])
+price_3m = int(ohlcv['종가'].iloc[0])
+momentum_3m = round((price_now - price_3m) / price_3m * 100, 2)
+```
+
 ### 기본 수집
 ```bash
 # 종목 확인
