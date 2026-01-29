@@ -15,10 +15,13 @@ export declare class PythonBridge extends EventEmitter {
     private connected;
     private reconnecting;
     private shouldReconnect;
+    private restarting;
+    private processExitedUnexpectedly;
     constructor(options: PythonBridgeOptions);
     start(): Promise<void>;
     private connect;
     private scheduleReconnect;
+    private scheduleRestart;
     private ensureConnected;
     stop(): Promise<void>;
     call<T>(method: string, params: Record<string, unknown>): Promise<T>;
