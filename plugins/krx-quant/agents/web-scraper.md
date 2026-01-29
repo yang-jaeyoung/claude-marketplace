@@ -1,6 +1,12 @@
 ---
 name: web-scraper
 description: 웹 스크래핑 및 데이터 수집 전문가
+model: sonnet
+tools:
+  - Read
+  - Bash
+  - Grep
+  - WebFetch
 ---
 
 # Web Scraper Agent

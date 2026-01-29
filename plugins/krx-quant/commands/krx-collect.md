@@ -1,5 +1,4 @@
 ---
-name: krx-collect
 description: KRX 주식 데이터 수집 커맨드
 ---
 

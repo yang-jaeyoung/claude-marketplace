@@ -93,6 +93,23 @@
         "full-stack"
       ],
       "category": "web-development"
+    },
+    {
+      "name": "krx-quant",
+      "description": "KRX 퀀트 분석 종목 발굴 플러그인",
+      "source": "./plugins/krx-quant",
+      "version": "0.1.0",
+      "author": {
+        "name": "urd"
+      },
+      "keywords": [
+        "krx",
+        "quant",
+        "stock",
+        "finance",
+        "analysis"
+      ],
+      "category": "finance"
     }
   ]
 }

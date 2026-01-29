@@ -1,5 +1,4 @@
 ---
-name: factor-analyze
 description: 퀀트 팩터 분석
 ---
 

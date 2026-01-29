@@ -1,8 +1,5 @@
 {
   "name": "krx-quant",
   "version": "0.1.0",
-  "description": "KRX 퀀트 분석 종목 발굴 플러그인",
-  "skills": "./skills/",
-  "agents": "./agents/",
-  "commands": "./commands/"
+  "description": "KRX 퀀트 분석 종목 발굴 플러그인"
 }

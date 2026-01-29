@@ -1,12 +1,8 @@
 ---
 name: browser-scraper
 description: Intelligent web scraping orchestration for Korean financial data with automatic strategy selection, pagination handling, and session persistence
-argument-hint: <URL> [query] [--mode=AUTO|MANUAL] [--discover-api] | status | resume [session-id] | list | export [session-id] | cancel [session-id]
-aliases: [scrape, extract-web, web-data]
-version: 1.0.0
-domain: data-extraction
-complexity: high
-requires-mcp: [playwright, chrome-devtools, claude-in-chrome]
+allowed-tools: Read, Bash, Grep, WebFetch
+context: fork
 ---
 
 # Browser Scraper Skill

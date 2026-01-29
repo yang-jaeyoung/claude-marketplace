@@ -1,5 +1,4 @@
 ---
-name: stock-screen
 description: 조건 기반 종목 스크리닝
 ---
 

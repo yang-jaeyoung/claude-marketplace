@@ -1,6 +1,11 @@
 ---
 name: stock-screener
 description: 종목 스크리닝 전문가
+model: sonnet
+tools:
+  - Read
+  - Bash
+  - Grep
 ---
 
 # Stock Screener Agent
