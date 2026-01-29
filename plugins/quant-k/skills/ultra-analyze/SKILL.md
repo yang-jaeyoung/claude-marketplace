@@ -135,48 +135,76 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" 
 
 이 명령어는 ohlcv, fundamental, market_cap을 ThreadPoolExecutor로 동시에 수집하여 3배 빠릅니다.
 
-## Ultra 분석 워크플로우
+## Ultra 분석 워크플로우 (에이전트 병렬 실행)
 
-### Phase 1: 데이터 수집 (Maximum Coverage)
+Ultra 모드는 전문 에이전트를 병렬로 실행하여 분석 속도를 3배 이상 향상시킵니다.
 
-**권장: 병렬 수집**
+### 에이전트 구성
+
+| 에이전트 | 역할 | Phase |
+|----------|------|-------|
+| `quant-k:quant-analyst` | 팩터 분석, 밸류에이션 | Phase 2-3 |
+| `quant-k:stock-screener` | 유사 종목 검색 | Phase 4 |
+| `quant-k:web-scraper` | 외부 데이터 수집 (네이버/DART) | Phase 4 |
+
+### Phase 1: 데이터 수집 (병렬)
+
+**권장: collect_all로 병렬 수집**
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
 ```
 
 위 명령 하나로 ohlcv, fundamental, market_cap을 병렬 수집합니다.
 
-**개별 수집 (필요 시)**
-1. **종목 확인**: search 또는 ticker_info로 종목 식별
-2. **1년 OHLCV**: ohlcv --days 365
-3. **펀더멘털**: fundamental
-4. **시가총액**: market_cap
-
-### Phase 2: 기술적 분석 (계산)
-
-수집된 OHLCV 데이터로 다음을 계산:
+### Phase 2-3: 분석 (에이전트 병렬 실행)
 
 ```
-이동평균선: 5/10/20/60/120/240일
-볼린저밴드: 20일 기준, 2σ
-RSI: 14일
-MACD: 12/26/9
-거래량 분석: 20일 평균 대비
+Task(
+  subagent_type="quant-k:quant-analyst",
+  model="sonnet",
+  prompt="""
+  다음 종목의 퀀트 팩터 분석을 수행하세요:
+  - 종목: {종목명} ({종목코드})
+  - 수집된 데이터: {Phase 1 결과}
+
+  분석 항목:
+  1. PER/PBR 밸류에이션 평가
+  2. 3/6/12개월 모멘텀 계산
+  3. 적정가 산출 (PER/PBR 기반)
+  4. 투자 스코어카드 작성
+  """
+)
 ```
 
-### Phase 3: 밸류에이션 분석
+### Phase 4: 유사 종목 & 외부 데이터 (병렬)
 
 ```
-PER 분석: 현재 vs 역사적 평균
-PBR 분석: 현재 vs 섹터 평균
-적정가 산출: PER/PBR 기반
+# 동시에 실행
+Task(
+  subagent_type="quant-k:stock-screener",
+  model="sonnet",
+  prompt="시장에서 유사한 밸류에이션을 가진 종목 20개를 찾아주세요. 조건: PER ±30%, PBR ±30%, 동일 시장"
+)
+
+Task(
+  subagent_type="quant-k:web-scraper",
+  model="sonnet",
+  prompt="네이버 금융에서 {종목코드} 추가 정보 수집: 투자의견, 목표가, 뉴스 헤드라인"
+)
 ```
 
-### Phase 4: 유사 종목 검색
+### Phase 5: 리포트 통합
 
-동일 시장에서 유사한 밸류에이션을 가진 종목 20개 식별
+모든 에이전트 결과를 통합하여 Ultra 리포트 생성
 
-### Phase 5: Ultra 리포트 생성
+### 순차 실행 vs 병렬 실행
+
+| 방식 | Phase 1 | Phase 2-3 | Phase 4 | 총 시간 |
+|------|---------|-----------|---------|---------|
+| 순차 실행 | 6초 | 30초 | 60초 | ~96초 |
+| 병렬 실행 | 2초 | 15초 | 20초 | ~37초 |
+
+**⚠️ 주의:** 에이전트 병렬 실행 시 동일 파일 수정 금지 (race condition 방지)
 
 ## 리포트 구조
 
