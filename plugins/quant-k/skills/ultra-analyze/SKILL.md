@@ -30,7 +30,7 @@ argument-hint: <종목명|종목코드> [저장경로]
 
 | 항목 | 일반 모드 | Ultra 모드 |
 |------|----------|-----------|
-| 가격 데이터 | 1년 | 3년 |
+| 가격 데이터 | 6개월 | 1년 |
 | 팩터 분석 | 6개 주요 팩터 | 15개 전체 팩터 |
 | 유사 종목 | 10개 | 30개 |
 | 섹터 분석 | 평균 비교만 | 전체 섹터 랭킹 |
@@ -46,7 +46,7 @@ argument-hint: <종목명|종목코드> [저장경로]
 
 ```mermaid
 graph LR
-    A[종목 확인] --> B[3년 OHLCV]
+    A[종목 확인] --> B[1년 OHLCV]
     A --> C[펀더멘털]
     A --> D[시가총액]
     B --> E[일봉/주봉/월봉]
@@ -59,8 +59,8 @@ graph LR
 krx_collect(dataType: "tickers", market: "KOSPI")
 krx_collect(dataType: "tickers", market: "KOSDAQ")
 
-# 1-2. 3년 가격 데이터
-krx_collect(dataType: "ohlcv", ticker: "{코드}", startDate: "3년전", endDate: "오늘")
+# 1-2. 1년 가격 데이터
+krx_collect(dataType: "ohlcv", ticker: "{코드}", startDate: "1년전", endDate: "오늘")
 
 # 1-3. 펀더멘털 (최신)
 krx_collect(dataType: "fundamental", ticker: "{코드}")
@@ -198,7 +198,7 @@ browser_scrape(
 ### 1.2 사업 영역
 ### 1.3 주요 연혁
 
-## Part 2: 주가 분석 (3년)
+## Part 2: 주가 분석 (1년)
 ### 2.1 장기 주가 추이
 ### 2.2 수익률 분석
 ### 2.3 변동성 분석
@@ -289,7 +289,7 @@ Ultra 모드는 단일 파일이 아닌 디렉토리 구조로 출력:
 ├── README.md                    # 메인 리포트
 ├── executive_summary.md         # 핵심 요약
 ├── data/
-│   ├── ohlcv_3y.csv            # 3년 가격 데이터
+│   ├── ohlcv_1y.csv            # 1년 가격 데이터
 │   ├── fundamental.json        # 펀더멘털 데이터
 │   └── factors.json            # 팩터 점수
 ├── analysis/
@@ -345,7 +345,7 @@ Ultra 모드는 단일 파일이 아닌 디렉토리 구조로 출력:
 Phase 1/6: 데이터 수집
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   ✓ 종목 확인: 동운아나텍 (094170, KOSDAQ)
-  ✓ 3년 OHLCV 수집: 756 거래일
+  ✓ 1년 OHLCV 수집: 250 거래일
   ✓ 펀더멘털 수집: PER 12.5, PBR 1.8, ROE 14.2%
   ✓ 시가총액: 2,850억원
 
@@ -425,5 +425,5 @@ Phase 6/6: 리포트 생성
 |------|------|
 | 웹 스크래핑 실패 | 해당 섹션 스킵, 나머지 분석 계속 |
 | 데이터 부족 | 가능한 데이터만으로 부분 리포트 |
-| 3년 데이터 없음 | 가용 기간으로 축소 |
+| 1년 데이터 없음 | 가용 기간으로 축소 |
 | 저장 실패 | 콘솔에 전체 출력 |
