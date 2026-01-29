@@ -16,6 +16,7 @@ import json
 import sys
 from datetime import datetime, timedelta
 from typing import Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 try:
     from pykrx import stock
@@ -23,6 +24,18 @@ try:
 except ImportError:
     print(json.dumps({"error": "pykrx not installed. Run: pip3 install pykrx pandas"}))
     sys.exit(1)
+
+# 병렬 실행 설정
+MAX_WORKERS = 10  # KRX 서버 부하 고려
+
+
+def _get_ticker_name(ticker: str) -> tuple[str, str]:
+    """ticker와 name을 반환하는 헬퍼 (병렬 실행용)"""
+    try:
+        name = stock.get_market_ticker_name(ticker)
+        return (ticker, name or "")
+    except:
+        return (ticker, "")
 
 
 def get_latest_trading_date(max_days_back: int = 10) -> str:
@@ -138,7 +151,7 @@ def get_fundamental(ticker: str) -> dict:
 
 
 def get_market_tickers(market: str = "KOSPI") -> dict:
-    """시장 전체 종목 목록 조회"""
+    """시장 전체 종목 목록 조회 (병렬 실행)"""
     try:
         if market not in ("KOSPI", "KOSDAQ", "ALL"):
             return {"error": f"Invalid market: {market}. Use KOSPI, KOSDAQ, or ALL"}
@@ -152,10 +165,19 @@ def get_market_tickers(market: str = "KOSPI") -> dict:
         else:
             tickers = [(t, market) for t in stock.get_market_ticker_list(date, market=market)]
 
+        # 병렬로 종목명 조회
         result = []
-        for ticker, mkt in tickers:
-            name = stock.get_market_ticker_name(ticker)
-            result.append({"ticker": ticker, "name": name, "market": mkt})
+        ticker_to_market = {t: m for t, m in tickers}
+
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = {executor.submit(_get_ticker_name, t): t for t, _ in tickers}
+            for future in as_completed(futures):
+                ticker, name = future.result()
+                mkt = ticker_to_market[ticker]
+                result.append({"ticker": ticker, "name": name, "market": mkt})
+
+        # ticker 순으로 정렬 (일관성)
+        result.sort(key=lambda x: x["ticker"])
 
         return {
             "market": market,
@@ -168,21 +190,33 @@ def get_market_tickers(market: str = "KOSPI") -> dict:
 
 
 def search_ticker(query: str) -> dict:
-    """종목명으로 종목코드 검색"""
+    """종목명으로 종목코드 검색 (병렬 실행)"""
     try:
         date = get_latest_trading_date()
 
-        results = []
+        # 전체 종목 수집
+        all_tickers = []
         for market in ["KOSPI", "KOSDAQ"]:
             tickers = stock.get_market_ticker_list(date, market=market)
-            for ticker in tickers:
-                name = stock.get_market_ticker_name(ticker)
-                if query.lower() in name.lower():
+            all_tickers.extend([(t, market) for t in tickers])
+
+        ticker_to_market = {t: m for t, m in all_tickers}
+
+        # 병렬로 종목명 조회
+        results = []
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = {executor.submit(_get_ticker_name, t): t for t, _ in all_tickers}
+            for future in as_completed(futures):
+                ticker, name = future.result()
+                if name and query.lower() in name.lower():
                     results.append({
                         "ticker": ticker,
                         "name": name,
-                        "market": market
+                        "market": ticker_to_market[ticker]
                     })
+
+        # ticker 순으로 정렬
+        results.sort(key=lambda x: x["ticker"])
 
         return {
             "query": query,
@@ -230,15 +264,123 @@ def get_market_cap(ticker: str) -> dict:
         return {"error": str(e)}
 
 
+def screen_market(market: str = "KOSPI", min_cap_billions: int = 0, max_results: int = 50) -> dict:
+    """시장 전체 종목 스크리닝 (펀더멘털 + 모멘텀 포함, 병렬 실행)"""
+    try:
+        date = get_latest_trading_date()
+
+        # 종목 목록
+        tickers = stock.get_market_ticker_list(date, market=market)
+
+        # 시가총액 데이터 (전체 시장)
+        cap_df = stock.get_market_cap(date, market=market)
+
+        # 펀더멘털 데이터 (전체 시장)
+        fund_df = stock.get_market_fundamental(date, market=market)
+
+        # 3개월 전 날짜
+        date_3m = (datetime.strptime(date, '%Y%m%d') - timedelta(days=90)).strftime('%Y%m%d')
+
+        def get_stock_data(ticker: str) -> dict:
+            """개별 종목 데이터 수집"""
+            try:
+                name = stock.get_market_ticker_name(ticker)
+
+                # 시가총액
+                if ticker not in cap_df.index:
+                    return None
+                cap = int(cap_df.loc[ticker, '시가총액']) // 100000000  # 억원
+
+                # 시총 필터
+                if cap < min_cap_billions:
+                    return None
+
+                # 펀더멘털
+                if ticker not in fund_df.index:
+                    return None
+                per = float(fund_df.loc[ticker, 'PER']) if pd.notna(fund_df.loc[ticker, 'PER']) else None
+                pbr = float(fund_df.loc[ticker, 'PBR']) if pd.notna(fund_df.loc[ticker, 'PBR']) else None
+                div = float(fund_df.loc[ticker, 'DIV']) if pd.notna(fund_df.loc[ticker, 'DIV']) else None
+
+                # 모멘텀 계산 (3개월 수익률)
+                try:
+                    ohlcv = stock.get_market_ohlcv(date_3m, date, ticker)
+                    if not ohlcv.empty and len(ohlcv) >= 2:
+                        price_now = ohlcv.iloc[-1]['종가']
+                        price_3m = ohlcv.iloc[0]['종가']
+                        momentum_3m = round((price_now - price_3m) / price_3m * 100, 2) if price_3m > 0 else None
+                    else:
+                        momentum_3m = None
+                except:
+                    momentum_3m = None
+
+                return {
+                    "ticker": ticker,
+                    "name": name,
+                    "market_cap_billions": cap,
+                    "per": round(per, 2) if per else None,
+                    "pbr": round(pbr, 2) if pbr else None,
+                    "div": round(div, 2) if div else None,
+                    "momentum_3m": momentum_3m
+                }
+            except:
+                return None
+
+        # 병렬로 종목 데이터 수집
+        results = []
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            futures = {executor.submit(get_stock_data, t): t for t in tickers}
+            for future in as_completed(futures):
+                data = future.result()
+                if data:
+                    results.append(data)
+
+        # 시총 순 정렬
+        results.sort(key=lambda x: x["market_cap_billions"], reverse=True)
+
+        return {
+            "market": market,
+            "date": date,
+            "total": len(results),
+            "results": results[:max_results]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+def collect_all(ticker: str, days: int = 365) -> dict:
+    """Phase 1: 모든 데이터를 병렬로 수집 (ohlcv, fundamental, market_cap)"""
+    try:
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            future_ohlcv = executor.submit(get_ohlcv, ticker, days)
+            future_fund = executor.submit(get_fundamental, ticker)
+            future_cap = executor.submit(get_market_cap, ticker)
+
+            ohlcv_result = future_ohlcv.result()
+            fund_result = future_fund.result()
+            cap_result = future_cap.result()
+
+        return {
+            "ticker": ticker,
+            "ohlcv": ohlcv_result,
+            "fundamental": fund_result,
+            "market_cap": cap_result
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
 def main():
     parser = argparse.ArgumentParser(description='quant-k KRX 데이터 유틸리티')
     parser.add_argument('command', choices=[
         'ticker_info', 'ohlcv', 'fundamental',
-        'market_tickers', 'search', 'market_cap'
+        'market_tickers', 'search', 'market_cap', 'collect_all', 'screen_market'
     ])
     parser.add_argument('arg', nargs='?', help='종목코드 또는 검색어')
     parser.add_argument('--days', type=int, default=365, help='OHLCV 조회 일수')
     parser.add_argument('--market', default='KOSPI', help='시장 (KOSPI/KOSDAQ/ALL)')
+    parser.add_argument('--min-cap', type=int, default=0, help='최소 시가총액 (억원)')
+    parser.add_argument('--max-results', type=int, default=50, help='최대 결과 수')
 
     args = parser.parse_args()
 
@@ -274,6 +416,15 @@ def main():
             print(json.dumps({"error": "종목코드 필요"}))
             return
         result = get_market_cap(args.arg)
+
+    elif args.command == 'collect_all':
+        if not args.arg:
+            print(json.dumps({"error": "종목코드 필요"}))
+            return
+        result = collect_all(args.arg, args.days)
+
+    elif args.command == 'screen_market':
+        result = screen_market(args.arg or args.market, args.min_cap, args.max_results)
 
     else:
         result = {"error": f"Unknown command: {args.command}"}

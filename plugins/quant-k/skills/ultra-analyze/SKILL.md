@@ -60,10 +60,26 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" market_tickers KOSPI
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" market_tickers KOSDAQ
 ```
 
+### 병렬 데이터 수집 (권장)
+```bash
+# Phase 1 데이터를 병렬로 수집 (ohlcv + fundamental + market_cap 동시 실행)
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
+```
+
+이 명령어는 ohlcv, fundamental, market_cap을 ThreadPoolExecutor로 동시에 수집하여 3배 빠릅니다.
+
 ## Ultra 분석 워크플로우
 
 ### Phase 1: 데이터 수집 (Maximum Coverage)
 
+**권장: 병렬 수집**
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
+```
+
+위 명령 하나로 ohlcv, fundamental, market_cap을 병렬 수집합니다.
+
+**개별 수집 (필요 시)**
 1. **종목 확인**: search 또는 ticker_info로 종목 식별
 2. **1년 OHLCV**: ohlcv --days 365
 3. **펀더멘털**: fundamental

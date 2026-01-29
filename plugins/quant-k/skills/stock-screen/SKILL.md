@@ -20,6 +20,20 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" market_tickers KOSPI
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" market_tickers KOSDAQ
 ```
 
+### 병렬 스크리닝 (권장)
+```bash
+# 시장 전체 스크리닝 (펀더멘털 + 3개월 모멘텀 포함)
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI
+
+# 시총 1000억 이상, 상위 100개
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI --min-cap 1000 --max-results 100
+
+# KOSDAQ 스크리닝
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSDAQ --min-cap 500
+```
+
+이 명령어는 펀더멘털(PER/PBR/DIV)과 3개월 모멘텀을 병렬로 수집합니다.
+
 ### 2단계: 각 종목 펀더멘털 조회
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" fundamental {종목코드}
@@ -38,6 +52,12 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" fundamental {종목코드}
 | DIV | `DIV>3` | 배당수익률 3% 초과 |
 | 시총 | `시총>1조` | 시가총액 1조 초과 |
 | 시총 | `시총<1000억` | 시가총액 1000억 미만 |
+
+### 모멘텀 조건 (screen_market 사용 시)
+| 조건 | 예시 | 설명 |
+|------|------|------|
+| 모멘텀 | `momentum_3m > 10` | 3개월 수익률 10% 초과 |
+| 모멘텀 | `momentum_3m < -10` | 3개월 수익률 -10% 미만 |
 
 ## 스크리닝 예시
 

@@ -47,6 +47,14 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" fundamental "종목코드"
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" market_cap "종목코드"
 ```
 
+### 5. 병렬 데이터 수집 (권장)
+```bash
+# Phase 1 데이터를 병렬로 수집 (ohlcv + fundamental + market_cap 동시 실행)
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
+```
+
+이 명령어 하나로 2-4번의 데이터를 동시에 수집합니다 (약 3배 빠름).
+
 ## 분석 워크플로우
 
 ### 1단계: 종목 식별
@@ -54,6 +62,13 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" market_cap "종목코드"
 - 종목코드면 ticker_info로 확인
 
 ### 2단계: 데이터 수집
+
+**권장: 병렬 수집**
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
+```
+
+**개별 수집 (필요 시)**
 1. `ticker_info` - 종목 기본정보
 2. `ohlcv --days 365` - 1년 가격 데이터
 3. `fundamental` - PER, PBR, EPS, BPS, DIV
