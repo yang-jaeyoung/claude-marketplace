@@ -72,6 +72,41 @@ price_3m = int(ohlcv['종가'].iloc[0])
 momentum_3m = round((price_now - price_3m) / price_3m * 100, 2)
 ```
 
+### 방어적 코딩 패턴
+
+pykrx API는 데이터가 없거나 오류 발생 시 **빈 DataFrame**을 반환합니다. 항상 확인하세요:
+
+```python
+from pykrx import stock
+import pandas as pd
+
+# ❌ 잘못된 코드 - 빈 DataFrame 시 KeyError 발생
+df = stock.get_market_fundamental(date, date, ticker)
+per = df['PER'].iloc[0]  # KeyError if df is empty!
+
+# ✅ 올바른 코드 - 빈 DataFrame 체크
+df = stock.get_market_fundamental(date, date, ticker)
+if df.empty:
+    per = None
+    print(f"Warning: No data for {ticker}")
+else:
+    per = float(df['PER'].iloc[0]) if pd.notna(df['PER'].iloc[0]) else None
+
+# ✅ 더 안전한 패턴 - try/except
+try:
+    df = stock.get_market_fundamental(date, date, ticker)
+    per = float(df['PER'].iloc[0]) if not df.empty and pd.notna(df['PER'].iloc[0]) else None
+except Exception as e:
+    print(f"Error fetching data: {e}")
+    per = None
+```
+
+**빈 데이터 발생 원인:**
+- 휴장일/공휴일 날짜 조회
+- 상장폐지된 종목코드
+- 오타가 있는 종목코드
+- pykrx 서버 일시 오류
+
 ### 기본 수집
 ```bash
 # 종목 확인
