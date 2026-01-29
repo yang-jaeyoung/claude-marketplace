@@ -269,6 +269,33 @@ Available hook events: `PreToolUse`, `PermissionRequest`, `PostToolUse`, `UserPr
 
 ## MCP Server Development
 
+> ⚠️ **Required**: MCP server plugins with npm dependencies **MUST** include a `Setup` hook to install dependencies. The plugin cache does not include `node_modules`, so without this hook, the MCP server will fail to connect.
+
+### Setup Hook for npm Dependencies
+
+**Every MCP server plugin must have `hooks/hooks.json`:**
+
+```json
+{
+  "hooks": {
+    "Setup": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PLUGIN_ROOT}\" && npm install --silent"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+This ensures dependencies are installed when the plugin is first loaded from the cache.
+
+### MCP Server Pattern
+
 MCP servers use `@modelcontextprotocol/sdk` with this pattern:
 
 ```typescript
