@@ -45,8 +45,6 @@ export class PythonBridge extends EventEmitter {
   private connected = false;
   private reconnecting = false;
   private shouldReconnect = true;
-  private restarting = false;
-  private processExitedUnexpectedly = false;
 
   constructor(options: PythonBridgeOptions) {
     super();
@@ -57,24 +55,27 @@ export class PythonBridge extends EventEmitter {
   }
 
   async start(): Promise<void> {
-    // Start the Python bridge process with port 0 for dynamic allocation
-    this.process = spawn("python3", [this.options.bridgeScript, "--port", "0"], {
+    // Use fixed port from options (no dynamic allocation - more stable)
+    this.actualPort = this.options.port;
+
+    // Start the Python bridge process with the fixed port
+    this.process = spawn("python3", [this.options.bridgeScript, "--port", String(this.actualPort)], {
       stdio: ["pipe", "pipe", "pipe"],
       cwd: path.dirname(this.options.bridgeScript),
     });
 
-    // Wait for the BRIDGE_PORT marker from stdout
-    const portPromise = new Promise<number>((resolve, reject) => {
+    // Wait for process to be ready
+    const readyPromise = new Promise<void>((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error("Timeout waiting for bridge port"));
-      }, 10000);
+        reject(new Error("Timeout waiting for bridge to start"));
+      }, 15000);
 
       this.process!.stdout?.on("data", (data) => {
         const output = data.toString();
-        const match = output.match(/BRIDGE_PORT:(\d+)/);
-        if (match) {
+        // Bridge prints BRIDGE_PORT when ready
+        if (output.includes("BRIDGE_PORT:")) {
           clearTimeout(timeout);
-          resolve(parseInt(match[1], 10));
+          resolve();
         }
       });
 
@@ -98,18 +99,12 @@ export class PythonBridge extends EventEmitter {
     this.process.on("exit", (code) => {
       console.log(`Bridge process exited with code ${code}`);
       this.connected = false;
-      this.process = null;
-      this.processExitedUnexpectedly = true;
       this.emit("disconnected");
-      // Auto-restart if unexpected exit
-      if (this.shouldReconnect && !this.restarting) {
-        this.scheduleRestart();
-      }
     });
 
-    // Wait for the port to be assigned
-    this.actualPort = await portPromise;
-    console.log(`Bridge assigned port: ${this.actualPort}`);
+    // Wait for the process to be ready
+    await readyPromise;
+    console.log(`Bridge started on fixed port: ${this.actualPort}`);
 
     // Connect to the socket
     await this.connect();
@@ -148,8 +143,8 @@ export class PythonBridge extends EventEmitter {
         this.socket.on("close", () => {
           this.connected = false;
           this.emit("disconnected");
-          // Try reconnect if process alive, restart only if dead
-          if (this.shouldReconnect && !this.restarting && !this.reconnecting) {
+          // With fixed ports, just reconnect to the same port
+          if (this.shouldReconnect && !this.reconnecting && this.process) {
             this.scheduleReconnect();
           }
         });
@@ -162,16 +157,8 @@ export class PythonBridge extends EventEmitter {
   private scheduleReconnect(): void {
     if (this.reconnecting || !this.shouldReconnect) return;
 
-    // If process is dead, need full restart
-    if (!this.process || this.processExitedUnexpectedly) {
-      console.log(`[Bridge] Process dead, scheduling full restart`);
-      this.scheduleRestart();
-      return;
-    }
-
-    // Process is alive - reconnect to same port
     this.reconnecting = true;
-    console.log(`[Bridge] Process alive, reconnecting to same port ${this.actualPort}...`);
+    console.log(`[Bridge] Reconnecting to fixed port ${this.actualPort}...`);
 
     setTimeout(async () => {
       try {
@@ -185,68 +172,31 @@ export class PythonBridge extends EventEmitter {
         console.log(`[Bridge] Reconnected successfully to port ${this.actualPort}`);
       } catch (err) {
         console.error(`[Bridge] Reconnect failed:`, err);
-        // Only restart if process has exited
-        if (!this.process || this.processExitedUnexpectedly) {
-          this.scheduleRestart();
-        }
       } finally {
         this.reconnecting = false;
       }
     }, 500);
   }
 
-  private scheduleRestart(): void {
-    if (this.restarting || !this.shouldReconnect) return;
-
-    this.restarting = true;
-    console.log(`[Bridge] Scheduling full process restart...`);
-
-    setTimeout(async () => {
-      try {
-        // Clean up old socket if exists
-        if (this.socket) {
-          this.socket.destroy();
-          this.socket = null;
-        }
-        // Reset state
-        this.processExitedUnexpectedly = false;
-        this.connected = false;
-        this.actualPort = 0;
-
-        // Start fresh
-        await this.start();
-        console.log(`[Bridge] Process restarted successfully on port ${this.actualPort}`);
-      } catch (err) {
-        console.error(`[Bridge] Process restart failed:`, err);
-      } finally {
-        this.restarting = false;
-      }
-    }, 2000);
-  }
-
   private async ensureConnected(): Promise<void> {
     if (this.connected) return;
 
-    // Wait for reconnect/restart if in progress
-    if (this.reconnecting || this.restarting) {
-      const maxWait = 15000;
+    // Wait for reconnect if in progress
+    if (this.reconnecting) {
+      const maxWait = 10000;
       const startTime = Date.now();
-      while ((this.reconnecting || this.restarting) && Date.now() - startTime < maxWait) {
+      while (this.reconnecting && Date.now() - startTime < maxWait) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
       if (this.connected) return;
     }
 
-    // Try reconnect if process alive, restart if dead
-    if (!this.connected) {
-      if (this.process && !this.processExitedUnexpectedly) {
-        this.scheduleReconnect();
-      } else {
-        this.scheduleRestart();
-      }
+    // Try reconnect if process alive
+    if (!this.connected && this.process) {
+      this.scheduleReconnect();
 
       // Wait for connection
-      const maxWait = 15000;
+      const maxWait = 10000;
       const startTime = Date.now();
       while (!this.connected && Date.now() - startTime < maxWait) {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -254,7 +204,7 @@ export class PythonBridge extends EventEmitter {
     }
 
     if (!this.connected) {
-      throw new Error("Not connected and reconnection/restart failed");
+      throw new Error("Not connected to bridge");
     }
   }
 
