@@ -4,6 +4,7 @@
 .worktrees/
 .plans/
 .serena/
+.omc/
 
 # IDE
 .idea/

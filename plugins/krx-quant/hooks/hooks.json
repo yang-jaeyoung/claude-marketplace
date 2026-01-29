@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Setup": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PLUGIN_ROOT}\" && npm install --silent"
+          }
+        ]
+      }
+    ]
+  }
+}
