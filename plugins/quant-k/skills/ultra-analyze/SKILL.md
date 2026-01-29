@@ -139,6 +139,21 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" 
 
 Ultra 모드는 전문 에이전트를 병렬로 실행하여 분석 속도를 3배 이상 향상시킵니다.
 
+### ⚠️ 중요: 스킬 vs 에이전트 구분
+
+**Task tool 호출 시 반드시 에이전트 이름을 사용하세요. 스킬 이름은 Task tool에서 작동하지 않습니다!**
+
+| 용도 | ❌ 스킬 (슬래시 명령용) | ✅ 에이전트 (Task tool용) |
+|------|-------------------------|---------------------------|
+| 팩터 분석 | `quant-k:factor-analyze` | **`quant-k:quant-analyst`** |
+| 종목 스크리닝 | `quant-k:stock-screen` | **`quant-k:stock-screener`** |
+| 웹 스크래핑 | `quant-k:browser-scraper` | **`quant-k:web-scraper`** |
+
+**왜 중요한가?**
+- 스킬(`/quant-k:factor-analyze`)은 대화형 명령으로, 사용자가 직접 실행
+- 에이전트(`quant-k:quant-analyst`)는 Task tool의 `subagent_type`으로 병렬 실행 가능
+- 스킬 이름을 `subagent_type`에 사용하면 **즉시 종료되어 작업이 수행되지 않음**
+
 ### 에이전트 구성
 
 | 에이전트 | 역할 | Phase |

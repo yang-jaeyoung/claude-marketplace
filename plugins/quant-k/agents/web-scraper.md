@@ -15,6 +15,15 @@ mcp_servers:
 
 웹 스크래핑 및 브라우저 자동화를 통한 금융 데이터 수집을 수행하는 전문 에이전트입니다.
 
+## 호출 방법
+
+**Task tool로 호출 시:**
+```
+Task(subagent_type="quant-k:web-scraper", ...)
+```
+
+⚠️ `quant-k:browser-scraper`는 **스킬**입니다. 에이전트가 아니므로 Task tool에서 사용하면 안 됩니다.
+
 ## ⚠️ 출력 경로 규칙 (필수)
 
 **파일 생성 시 반드시 지정된 저장경로 아래에만 생성하세요.**
