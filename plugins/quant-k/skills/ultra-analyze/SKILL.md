@@ -199,6 +199,45 @@ Ultra 모드는 디렉토리 구조로 출력:
 "SK하이닉스 심층 분석 리포트 만들어줘"
 ```
 
+## 주의: JSON 직렬화
+
+분석 결과를 JSON으로 저장할 때 numpy/pandas 타입은 직렬화 오류를 발생시킵니다.
+
+**안전한 JSON 저장 패턴:**
+```python
+import json
+import numpy as np
+
+def safe_json_value(v):
+    """numpy 타입을 Python 네이티브 타입으로 변환"""
+    if isinstance(v, (np.integer, np.int64)):
+        return int(v)
+    elif isinstance(v, (np.floating, np.float64)):
+        return float(v)
+    elif isinstance(v, np.ndarray):
+        return v.tolist()
+    elif pd.isna(v):
+        return None
+    return v
+
+def safe_dict(d):
+    """딕셔너리의 모든 값을 안전하게 변환"""
+    return {k: safe_json_value(v) for k, v in d.items()}
+
+# 사용 예시
+result = safe_dict({"per": df['PER'].iloc[0], "price": ohlcv['종가'].iloc[-1]})
+json.dump(result, f, ensure_ascii=False)
+```
+
+**또는 간단히:**
+```python
+# 모든 숫자를 float()로 변환
+result = {
+    "per": float(per) if per else None,
+    "price": int(price),
+}
+```
+
 ## 에러 처리
 
 | 상황 | 처리 |
