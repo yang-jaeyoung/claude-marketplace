@@ -21,16 +21,27 @@ allowed-tools:
 
 ## 실행 순서
 
-### Phase 1: 데이터 수집 (Maximum)
+### 📥 데이터 수집 단계
+
+#### Phase 1: KRX 기본 데이터 수집
 ```
 krx_collect(dataType: "tickers", market: "KOSPI")
 krx_collect(dataType: "tickers", market: "KOSDAQ")
-krx_collect(dataType: "ohlcv", ticker: "{코드}", startDate: "3년전", endDate: "오늘")
+krx_collect(dataType: "ohlcv", ticker: "{코드}", startDate: "1년전", endDate: "오늘")
 krx_collect(dataType: "fundamental", ticker: "{코드}")
 krx_collect(dataType: "marketcap", market: "{시장}")
 ```
 
-### Phase 2: 전체 팩터 분석 (15 Factors)
+#### Phase 2: 웹 스크래핑 (External)
+```
+browser_scrape(url: "네이버금융 종목페이지", action: "extract_table")
+browser_scrape(url: "네이버금융 재무제표", action: "extract_table")
+browser_scrape(url: "DART 공시목록", action: "extract_list")
+```
+
+### 📊 심층 분석 단계
+
+#### Phase 3: 전체 팩터 분석 (15 Factors)
 ```
 factor_analyze(
   ticker: "{코드}",
@@ -52,7 +63,7 @@ factor_analyze(
 )
 ```
 
-### Phase 3: 확장 스크리닝 (30+ 종목)
+#### Phase 4: 확장 스크리닝 (30+ 종목)
 ```
 stock_screen(
   conditions: ["시총>{시총*0.3}", "시총<{시총*3}", "PER>{PER*0.5}", "PER<{PER*2}"],
@@ -67,18 +78,13 @@ stock_screen(
 )
 ```
 
-### Phase 4: 웹 스크래핑 (External)
-```
-browser_scrape(url: "네이버금융 종목페이지", action: "extract_table")
-browser_scrape(url: "네이버금융 재무제표", action: "extract_table")
-browser_scrape(url: "DART 공시목록", action: "extract_list")
-```
-
-### Phase 5: 고급 분석
+#### Phase 5: 고급 기술분석
 - 이동평균선 (5/10/20/60/120/240일)
 - RSI, MACD
 - 밸류에이션 적정가 (PER/PBR/PSR 기준)
-- 백테스트 시뮬레이션
+- 볼린저밴드
+
+### 📝 리포트 단계
 
 ### Phase 6: Ultra 리포트 생성
 디렉토리 구조로 출력:

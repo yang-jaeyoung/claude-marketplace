@@ -143,11 +143,15 @@ Ultra 모드는 전문 에이전트를 병렬로 실행하여 분석 속도를 3
 
 | 에이전트 | 역할 | Phase |
 |----------|------|-------|
-| `quant-k:quant-analyst` | 팩터 분석, 밸류에이션 | Phase 2-3 |
+| `quant-k:web-scraper` | 외부 데이터 수집 (네이버/DART) | Phase 2 |
+| `quant-k:quant-analyst` | 팩터 분석, 밸류에이션 | Phase 3 |
 | `quant-k:stock-screener` | 유사 종목 검색 | Phase 4 |
-| `quant-k:web-scraper` | 외부 데이터 수집 (네이버/DART) | Phase 4 |
 
-### Phase 1: 데이터 수집 (병렬)
+---
+
+## 📥 데이터 수집 단계
+
+### Phase 1: KRX 기본 데이터 수집
 
 **권장: collect_all로 병렬 수집**
 ```bash
@@ -156,7 +160,21 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" 
 
 위 명령 하나로 ohlcv, fundamental, market_cap을 병렬 수집합니다.
 
-### Phase 2-3: 분석 (에이전트 병렬 실행)
+### Phase 2: 웹 스크래핑 (외부 데이터)
+
+```
+Task(
+  subagent_type="quant-k:web-scraper",
+  model="sonnet",
+  prompt="네이버 금융에서 {종목코드} 추가 정보 수집: 투자의견, 목표가, 뉴스 헤드라인"
+)
+```
+
+---
+
+## 📊 심층 분석 단계
+
+### Phase 3: 전체 팩터 분석
 
 ```
 Task(
@@ -165,7 +183,7 @@ Task(
   prompt="""
   다음 종목의 퀀트 팩터 분석을 수행하세요:
   - 종목: {종목명} ({종목코드})
-  - 수집된 데이터: {Phase 1 결과}
+  - 수집된 데이터: {Phase 1-2 결과}
 
   분석 항목:
   1. PER/PBR 밸류에이션 평가
@@ -176,33 +194,37 @@ Task(
 )
 ```
 
-### Phase 4: 유사 종목 & 외부 데이터 (병렬)
+### Phase 4: 확장 스크리닝 (유사 종목)
 
 ```
-# 동시에 실행
 Task(
   subagent_type="quant-k:stock-screener",
   model="sonnet",
   prompt="시장에서 유사한 밸류에이션을 가진 종목 20개를 찾아주세요. 조건: PER ±30%, PBR ±30%, 동일 시장"
 )
-
-Task(
-  subagent_type="quant-k:web-scraper",
-  model="sonnet",
-  prompt="네이버 금융에서 {종목코드} 추가 정보 수집: 투자의견, 목표가, 뉴스 헤드라인"
-)
 ```
 
-### Phase 5: 리포트 통합
+### Phase 5: 고급 기술분석
+
+- 이동평균선 분석 (5/10/20/60/120/240일)
+- RSI, MACD
+- 볼린저밴드
+- 지지/저항선 분석
+
+---
+
+## 📝 리포트 단계
+
+### Phase 6: Ultra 리포트 통합
 
 모든 에이전트 결과를 통합하여 Ultra 리포트 생성
 
 ### 순차 실행 vs 병렬 실행
 
-| 방식 | Phase 1 | Phase 2-3 | Phase 4 | 총 시간 |
-|------|---------|-----------|---------|---------|
-| 순차 실행 | 6초 | 30초 | 60초 | ~96초 |
-| 병렬 실행 | 2초 | 15초 | 20초 | ~37초 |
+| 방식 | Phase 1-2 | Phase 3-4 | Phase 5-6 | 총 시간 |
+|------|-----------|-----------|-----------|---------|
+| 순차 실행 | 30초 | 60초 | 30초 | ~120초 |
+| 병렬 실행 | 10초 | 20초 | 15초 | ~45초 |
 
 **⚠️ 주의:** 에이전트 병렬 실행 시 동일 파일 수정 금지 (race condition 방지)
 
