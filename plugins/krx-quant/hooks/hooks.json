@@ -6,6 +6,10 @@
           {
             "type": "command",
             "command": "cd \"${CLAUDE_PLUGIN_ROOT}\" && npm install --silent"
+          },
+          {
+            "type": "command",
+            "command": "python3 -m pip install -r \"${CLAUDE_PLUGIN_ROOT}/bridge/requirements.txt\" --quiet"
           }
         ]
       }

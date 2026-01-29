@@ -2,6 +2,8 @@
 name: stock-screener
 description: 종목 스크리닝 전문가
 model: sonnet
+mcp_servers:
+  - krx-quant
 tools:
   - Read
   - Bash

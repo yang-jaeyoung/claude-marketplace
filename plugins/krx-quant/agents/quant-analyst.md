@@ -2,6 +2,8 @@
 name: quant-analyst
 description: 퀀트 팩터 분석 전문가
 model: sonnet
+mcp_servers:
+  - krx-quant
 tools:
   - Read
   - Bash
