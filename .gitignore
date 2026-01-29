@@ -5,6 +5,7 @@
 .plans/
 .serena/
 .omc/
+.deprecated/
 
 # IDE
 .idea/
