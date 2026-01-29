@@ -6,9 +6,6 @@ allowed-tools:
   - Write
   - Glob
   - Bash
-  - mcp__quant-k__krx_collect
-  - mcp__quant-k__factor_analyze
-  - mcp__quant-k__stock_screen
 ---
 
 # 주식 종합분석 리포트

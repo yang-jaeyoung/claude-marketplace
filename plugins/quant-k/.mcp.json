@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "quant-k": {
-      "command": "node",
-      "args": ["dist/mcp-server.js"],
-      "cwd": "."
-    }
-  }
-}

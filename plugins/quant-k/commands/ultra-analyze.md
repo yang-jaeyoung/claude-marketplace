@@ -6,10 +6,6 @@ allowed-tools:
   - Write
   - Glob
   - Bash
-  - mcp__quant-k__krx_collect
-  - mcp__quant-k__factor_analyze
-  - mcp__quant-k__stock_screen
-  - mcp__quant-k__browser_scrape
 ---
 
 # KRX-Quant Ultra 분석 모드
