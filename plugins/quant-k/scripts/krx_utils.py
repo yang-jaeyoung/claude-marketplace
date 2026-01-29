@@ -25,18 +25,26 @@ except ImportError:
     sys.exit(1)
 
 
-def get_latest_trading_date(max_days_back: int = 7) -> str:
-    """최근 거래일 찾기 (주말/공휴일 제외)"""
+def get_latest_trading_date(max_days_back: int = 10) -> str:
+    """최근 유효한 거래일 찾기 (데이터가 실제로 있는 날)
+
+    장 개장 전이나 주말/공휴일에는 데이터가 0이므로,
+    실제 유효한 데이터가 있는 날짜를 찾습니다.
+    """
     today = datetime.now()
     for i in range(max_days_back):
         date = (today - timedelta(days=i)).strftime('%Y%m%d')
         try:
-            df = stock.get_market_fundamental(date, date, '005930')
+            # 시장 전체 펀더멘털로 확인 (더 빠름)
+            df = stock.get_market_fundamental(date, market="KOSPI")
             if not df.empty:
-                return date
+                # 실제 데이터가 있는지 확인 (PER > 0인 종목이 있는지)
+                if (df['PER'] > 0).any():
+                    return date
         except:
             continue
-    return today.strftime('%Y%m%d')
+    # 찾지 못하면 어제 날짜 반환 (폴백)
+    return (today - timedelta(days=1)).strftime('%Y%m%d')
 
 
 def ticker_info(ticker: str) -> dict:
