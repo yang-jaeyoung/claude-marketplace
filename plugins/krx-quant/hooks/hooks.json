@@ -2,6 +2,7 @@
   "hooks": {
     "Setup": [
       {
+        "matcher": "init",
         "hooks": [
           {
             "type": "command",
@@ -10,6 +11,17 @@
           {
             "type": "command",
             "command": "python3 -m pip install -r \"${CLAUDE_PLUGIN_ROOT}/bridge/requirements.txt\" --quiet"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const fs=require('fs'),p=require('path'),r='${CLAUDE_PLUGIN_ROOT}',m=p.join(r,'node_modules');if(!fs.existsSync(m)||fs.readdirSync(m).length<5){const{execSync:e}=require('child_process');e('npm install --silent',{cwd:r,stdio:'ignore'});console.log('krx-quant: npm dependencies installed')}\"",
+            "timeout": 60
           }
         ]
       }
