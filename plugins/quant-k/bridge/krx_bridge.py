@@ -105,7 +105,7 @@ class KrxBridge(BaseBridge):
 
             # 인덱스를 컬럼으로 변환
             df = df.reset_index()
-            df.columns = ["date", "open", "high", "low", "close", "volume", "value", "change"]
+            df.columns = ["date", "open", "high", "low", "close", "volume", "value"]
             df["date"] = df["date"].dt.strftime("%Y%m%d")
 
             # 캐시 저장 (과거 데이터만)

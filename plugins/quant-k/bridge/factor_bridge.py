@@ -18,12 +18,28 @@ class FactorBridge(BaseBridge):
         # Value Factors (낮을수록 좋음 → 역수 취해서 높을수록 좋음)
         "PER": "value",
         "PBR": "value",
+        "PSR": "value",
+        "PCR": "value",
+        "EV_EBITDA": "value",
 
         # Momentum Factors (높을수록 좋음)
         "MOM_1M": "momentum",
         "MOM_3M": "momentum",
         "MOM_6M": "momentum",
         "MOM_12M": "momentum",
+
+        # Profitability Factors (높을수록 좋음)
+        "ROE": "profitability",
+        "ROA": "profitability",
+        "GP_MARGIN": "profitability",
+        "OP_MARGIN": "profitability",
+
+        # Size Factors
+        "SIZE": "size",
+        "SIZE_INV": "size",
+
+        # Volatility
+        "VOL_20D": "volatility",
     }
 
     def __init__(self):
@@ -41,8 +57,11 @@ class FactorBridge(BaseBridge):
         return {
             "factors": list(self.FACTOR_DEFINITIONS.keys()),
             "categories": {
-                "value": ["PER", "PBR"],
+                "value": ["PER", "PBR", "PSR", "PCR", "EV_EBITDA"],
                 "momentum": ["MOM_1M", "MOM_3M", "MOM_6M", "MOM_12M"],
+                "profitability": ["ROE", "ROA", "GP_MARGIN", "OP_MARGIN"],
+                "size": ["SIZE", "SIZE_INV"],
+                "volatility": ["VOL_20D"],
             }
         }
 
@@ -118,6 +137,38 @@ class FactorBridge(BaseBridge):
 
         return df
 
+    def _calculate_profitability_factor(self, factor: str, market: str, date: str) -> pd.DataFrame:
+        """Profitability 팩터 계산 (ROE, ROA, GP_MARGIN, OP_MARGIN)"""
+        df = stock.get_market_fundamental(date, market=market)
+
+        if df.empty:
+            raise JsonRpcError(1004, f"No data available for {market} on {date}")
+
+        # ROE 계산: EPS / BPS
+        if factor == "ROE":
+            if "EPS" not in df.columns or "BPS" not in df.columns:
+                raise JsonRpcError(1201, "EPS or BPS not available for ROE calculation")
+
+            # BPS가 0이거나 음수인 경우 제외
+            valid_mask = (df["BPS"] > 0) & (df["EPS"].notna())
+            roe_values = pd.Series(index=df.index, dtype=float)
+            roe_values[valid_mask] = (df.loc[valid_mask, "EPS"] / df.loc[valid_mask, "BPS"]) * 100
+
+            result = pd.DataFrame({
+                "ticker": df.index,
+                "raw_value": roe_values,
+                "score": self._zscore(roe_values)
+            })
+
+            return result.dropna()
+
+        # ROA, GP_MARGIN, OP_MARGIN은 아직 구현되지 않음
+        elif factor in ["ROA", "GP_MARGIN", "OP_MARGIN"]:
+            raise JsonRpcError(1201, f"Factor {factor} is not yet fully implemented. Currently only ROE is supported for profitability factors.")
+
+        else:
+            raise JsonRpcError(1201, f"Unknown profitability factor: {factor}")
+
     def _zscore(self, series: pd.Series) -> pd.Series:
         """Z-score 정규화 with Winsorization"""
         if series.isna().all():
@@ -170,6 +221,8 @@ class FactorBridge(BaseBridge):
             df = self._calculate_value_factor(factor, market, date)
         elif category == "momentum":
             df = self._calculate_momentum_factor(factor, market, date)
+        elif category == "profitability":
+            df = self._calculate_profitability_factor(factor, market, date)
         else:
             raise JsonRpcError(1201, f"Factor category {category} not yet implemented")
 

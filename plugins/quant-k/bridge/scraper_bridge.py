@@ -130,15 +130,36 @@ class ScraperBridge(BaseBridge):
 
         try:
             page = await self._get_page()
-            logger.info("Capturing accessibility snapshot...")
+            logger.info("Capturing page snapshot...")
 
-            # Get accessibility tree
-            snapshot = await page.accessibility.snapshot()
+            # Use JavaScript to get page structure instead of accessibility API
+            script = """
+            (maxDepth) => {
+                function getNodeInfo(node, depth) {
+                    if (depth >= maxDepth || !node) return null;
 
-            # Simplify the tree to specified depth
-            simplified = self._simplify_tree(snapshot, max_depth)
+                    const info = {
+                        tag: node.tagName?.toLowerCase() || 'text',
+                        text: node.nodeType === 3 ? node.textContent?.trim() : null,
+                    };
 
-            return {"snapshot": simplified}
+                    if (node.id) info.id = node.id;
+                    if (node.className && typeof node.className === 'string') info.class = node.className;
+
+                    if (node.children && node.children.length > 0) {
+                        info.children = Array.from(node.children)
+                            .map(child => getNodeInfo(child, depth + 1))
+                            .filter(Boolean);
+                    }
+
+                    return info;
+                }
+                return getNodeInfo(document.body, 0);
+            }
+            """
+
+            snapshot = await page.evaluate(script, max_depth)
+            return {"snapshot": snapshot}
 
         except Exception as e:
             logger.exception("Failed to capture snapshot")
@@ -216,7 +237,8 @@ class ScraperBridge(BaseBridge):
 
             # Extract table data using JavaScript
             script = """
-            (selector, hasHeader) => {
+            (args) => {
+                const [selector, hasHeader] = args;
                 const table = document.querySelector(selector);
                 if (!table) return null;
 
@@ -249,7 +271,7 @@ class ScraperBridge(BaseBridge):
             }
             """
 
-            result = await page.evaluate(script, selector, has_header)
+            result = await page.evaluate(script, [selector, has_header])
 
             if result is None:
                 raise JsonRpcError(EXTRACTION_ERROR, f"Table not found: {selector}")
@@ -292,7 +314,8 @@ class ScraperBridge(BaseBridge):
 
             # Extract list data using JavaScript
             script = """
-            (selector, fields) => {
+            (args) => {
+                const [selector, fields] = args;
                 const items = Array.from(document.querySelectorAll(selector));
 
                 return items.map(item => {
@@ -317,7 +340,7 @@ class ScraperBridge(BaseBridge):
             }
             """
 
-            result = await page.evaluate(script, selector, fields)
+            result = await page.evaluate(script, [selector, fields])
 
             logger.info(f"Extracted {len(result)} items")
             return {"items": result}
