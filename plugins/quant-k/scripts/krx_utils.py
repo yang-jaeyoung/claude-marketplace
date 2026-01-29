@@ -83,8 +83,10 @@ def ticker_info(ticker: str) -> dict:
 
 
 def get_ohlcv(ticker: str, days: int = 365) -> dict:
-    """OHLCV 가격 데이터 조회"""
+    """OHLCV 가격 데이터 조회 (최대 1년)"""
     try:
+        # 최대 1년(365일)으로 제한
+        days = min(days, 365)
         end_date = get_latest_trading_date()
         start_date = (datetime.strptime(end_date, '%Y%m%d') - timedelta(days=days)).strftime('%Y%m%d')
 
@@ -377,7 +379,7 @@ def main():
         'market_tickers', 'search', 'market_cap', 'collect_all', 'screen_market'
     ])
     parser.add_argument('arg', nargs='?', help='종목코드 또는 검색어')
-    parser.add_argument('--days', type=int, default=365, help='OHLCV 조회 일수')
+    parser.add_argument('--days', type=int, default=365, help='OHLCV 조회 일수 (최대 365)')
     parser.add_argument('--market', default='KOSPI', help='시장 (KOSPI/KOSDAQ/ALL)')
     parser.add_argument('--min-cap', type=int, default=0, help='최소 시가총액 (억원)')
     parser.add_argument('--max-results', type=int, default=50, help='최대 결과 수')
