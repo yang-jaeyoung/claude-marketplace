@@ -238,6 +238,40 @@ result = {
 }
 ```
 
+## WebFetch 차단 사이트 처리
+
+일부 금융 사이트(예: `finance.naver.com`, `dart.fss.or.kr`)는 WebFetch로 접근이 차단됩니다.
+
+**차단된 사이트에서 데이터가 필요한 경우:**
+
+browser-scraper 스킬을 사용하세요:
+
+```bash
+# 네이버 금융 시가총액 순위
+/quant-k:browser-scraper https://finance.naver.com/sise/sise_market_sum.naver "시가총액 상위 100개"
+
+# 네이버 금융 종목 상세
+/quant-k:browser-scraper https://finance.naver.com/item/main.naver?code={종목코드} "기업 정보"
+
+# DART 공시 검색
+/quant-k:browser-scraper AUTO: https://dart.fss.or.kr "최근 공시"
+
+# KRX 데이터 포털 (API 자동 탐지)
+/quant-k:browser-scraper https://data.krx.co.kr --discover-api "종목별 시세"
+```
+
+**browser-scraper vs WebFetch:**
+
+| 도구 | 장점 | 단점 | 사용 시나리오 |
+|------|------|------|--------------|
+| WebFetch | 빠름, 간단 | 일부 사이트 차단 | 공개 API, 허용된 사이트 |
+| browser-scraper | 차단 우회, JS 렌더링 | 느림, 복잡 | 네이버, DART, KRX 등 |
+
+**권장 워크플로우:**
+1. 먼저 pykrx로 기본 데이터 수집 (`collect_all`)
+2. 추가 정보 필요 시 browser-scraper로 네이버/DART 스크래핑
+3. 결과 통합하여 리포트 생성
+
 ## 에러 처리
 
 | 상황 | 처리 |
