@@ -219,6 +219,34 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   ],
 }));
 
+// Helper function to wait for bridge connection with retry
+async function waitForBridge(
+  bridge: PythonBridge | null,
+  bridgeName: string,
+  maxWaitMs = 5000
+): Promise<PythonBridge> {
+  if (!bridge) {
+    throw new Error(`${bridgeName} not initialized`);
+  }
+
+  if (bridge.isConnected()) {
+    return bridge;
+  }
+
+  // Wait for connection with polling
+  const startTime = Date.now();
+  const pollInterval = 100;
+
+  while (Date.now() - startTime < maxWaitMs) {
+    if (bridge.isConnected()) {
+      return bridge;
+    }
+    await new Promise(resolve => setTimeout(resolve, pollInterval));
+  }
+
+  throw new Error(`${bridgeName} connection timeout after ${maxWaitMs}ms`);
+}
+
 // Handle tool calls
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
@@ -226,34 +254,32 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     switch (name) {
       case "krx_collect": {
-        if (!krxBridge?.isConnected()) {
-          throw new Error("KRX Bridge not connected");
-        }
+        const bridge = await waitForBridge(krxBridge, "KRX Bridge");
 
         const dataType = args?.dataType as string;
         let result: unknown;
 
         switch (dataType) {
           case "tickers":
-            result = await krxBridge.call("get_ticker_list", {
+            result = await bridge.call("get_ticker_list", {
               market: args?.market || "KOSPI",
             });
             break;
           case "ohlcv":
-            result = await krxBridge.call("get_ohlcv", {
+            result = await bridge.call("get_ohlcv", {
               ticker: args?.ticker,
               start: args?.startDate,
               end: args?.endDate,
             });
             break;
           case "fundamental":
-            result = await krxBridge.call("get_fundamental", {
+            result = await bridge.call("get_fundamental", {
               ticker: args?.ticker,
               date: args?.date,
             });
             break;
           case "marketcap":
-            result = await krxBridge.call("get_market_cap", {
+            result = await bridge.call("get_market_cap", {
               market: args?.market || "KOSPI",
               date: args?.date,
             });
@@ -273,22 +299,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "factor_analyze": {
-        if (!factorBridge?.isConnected()) {
-          throw new Error("Factor Bridge not connected");
-        }
+        const bridge = await waitForBridge(factorBridge, "Factor Bridge");
 
         let result: unknown;
 
         if (args?.ticker) {
           // 특정 종목 팩터 노출도
-          result = await factorBridge.call("get_factor_exposure", {
+          result = await bridge.call("get_factor_exposure", {
             ticker: args.ticker,
             factors: args?.factors,
             date: args?.date,
           });
         } else if (args?.weights && Object.keys(args.weights as object).length > 0) {
           // 복합 팩터 계산
-          result = await factorBridge.call("calculate_composite", {
+          result = await bridge.call("calculate_composite", {
             factors: args?.factors,
             weights: args?.weights,
             market: args?.market || "KOSPI",
@@ -298,7 +322,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           // 단일 팩터 순위
           const factors = args?.factors as string[];
           if (factors.length === 1) {
-            result = await factorBridge.call("rank_by_factor", {
+            result = await bridge.call("rank_by_factor", {
               factor: factors[0],
               market: args?.market || "KOSPI",
               date: args?.date,
@@ -306,7 +330,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             });
           } else {
             // 여러 팩터 계산
-            result = await factorBridge.call("calculate_composite", {
+            result = await bridge.call("calculate_composite", {
               factors: factors,
               market: args?.market || "KOSPI",
               date: args?.date,
@@ -325,11 +349,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "stock_screen": {
-        if (!screenerBridge?.isConnected()) {
-          throw new Error("Screener Bridge not connected");
-        }
+        const bridge = await waitForBridge(screenerBridge, "Screener Bridge");
 
-        const result = await screenerBridge.call("screen", {
+        const result = await bridge.call("screen", {
           conditions: args?.conditions,
           market: args?.market || "KOSPI",
           date: args?.date,
@@ -351,37 +373,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "browser_scrape": {
-        if (!scraperBridge?.isConnected()) {
-          throw new Error("Scraper Bridge not connected");
-        }
+        const bridge = await waitForBridge(scraperBridge, "Scraper Bridge");
 
         const action = args?.action as string;
         let result: unknown;
 
         switch (action) {
           case "navigate":
-            result = await scraperBridge.call("navigate", { url: args?.url });
+            result = await bridge.call("navigate", { url: args?.url });
             break;
           case "snapshot":
-            result = await scraperBridge.call("snapshot", {});
+            result = await bridge.call("snapshot", {});
             break;
           case "extract_table":
-            result = await scraperBridge.call("extract_table", {
+            result = await bridge.call("extract_table", {
               selector: args?.selector,
               has_header: args?.hasHeader ?? true
             });
             break;
           case "extract_list":
-            result = await scraperBridge.call("extract_list", {
+            result = await bridge.call("extract_list", {
               selector: args?.selector,
               fields: args?.fields
             });
             break;
           case "evaluate":
-            result = await scraperBridge.call("evaluate", { script: args?.script });
+            result = await bridge.call("evaluate", { script: args?.script });
             break;
           case "close":
-            result = await scraperBridge.call("close", {});
+            result = await bridge.call("close", {});
             break;
           default:
             throw new Error(`Unknown action: ${action}`);
