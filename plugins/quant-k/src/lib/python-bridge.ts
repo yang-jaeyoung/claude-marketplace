@@ -4,7 +4,7 @@ import { spawn, ChildProcess } from "child_process";
 import * as path from "path";
 
 interface PythonBridgeOptions {
-  port: number;
+  port: number; // Base port hint, 0 for dynamic allocation
   bridgeScript: string;
   timeout?: number;
 }
@@ -31,6 +31,7 @@ export class PythonBridge extends EventEmitter {
   private socket: Socket | null = null;
   private process: ChildProcess | null = null;
   private options: Required<PythonBridgeOptions>;
+  private actualPort: number = 0;
   private requestId = 0;
   private pendingRequests = new Map<
     string,
@@ -52,14 +53,38 @@ export class PythonBridge extends EventEmitter {
   }
 
   async start(): Promise<void> {
-    // Start the Python bridge process
-    this.process = spawn("python3", [this.options.bridgeScript], {
+    // Start the Python bridge process with port 0 for dynamic allocation
+    this.process = spawn("python3", [this.options.bridgeScript, "--port", "0"], {
       stdio: ["pipe", "pipe", "pipe"],
       cwd: path.dirname(this.options.bridgeScript),
     });
 
-    this.process.stdout?.on("data", (data) => {
-      console.log(`[Bridge stdout]: ${data}`);
+    // Wait for the BRIDGE_PORT marker from stdout
+    const portPromise = new Promise<number>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error("Timeout waiting for bridge port"));
+      }, 10000);
+
+      this.process!.stdout?.on("data", (data) => {
+        const output = data.toString();
+        const match = output.match(/BRIDGE_PORT:(\d+)/);
+        if (match) {
+          clearTimeout(timeout);
+          resolve(parseInt(match[1], 10));
+        }
+      });
+
+      this.process!.on("error", (err) => {
+        clearTimeout(timeout);
+        reject(err);
+      });
+
+      this.process!.on("exit", (code) => {
+        if (code !== 0 && !this.connected) {
+          clearTimeout(timeout);
+          reject(new Error(`Bridge process exited with code ${code}`));
+        }
+      });
     });
 
     this.process.stderr?.on("data", (data) => {
@@ -72,8 +97,9 @@ export class PythonBridge extends EventEmitter {
       this.emit("disconnected");
     });
 
-    // Wait for the socket to be ready
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Wait for the port to be assigned
+    this.actualPort = await portPromise;
+    console.log(`Bridge assigned port: ${this.actualPort}`);
 
     // Connect to the socket
     await this.connect();
@@ -85,7 +111,7 @@ export class PythonBridge extends EventEmitter {
       let retries = 0;
 
       const tryConnect = () => {
-        this.socket = createConnection({ host: '127.0.0.1', port: this.options.port });
+        this.socket = createConnection({ host: '127.0.0.1', port: this.actualPort });
 
         this.socket.on("connect", () => {
           this.connected = true;

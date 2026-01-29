@@ -15,6 +15,7 @@ JSON-RPC 2.0 over TCP 서버 베이스 클래스
         bridge = MyBridge()
         bridge.run()
 """
+import argparse
 import asyncio
 import json
 import os
@@ -162,10 +163,18 @@ class BaseBridge(ABC):
         self._server = await asyncio.start_server(
             self._handle_client,
             host='127.0.0.1',
-            port=self.port
+            port=self.port  # port=0 means OS assigns available port
         )
 
-        logger.info(f"Server started on 127.0.0.1:{self.port}")
+        # Get actual assigned port (important when port=0)
+        actual_port = self._server.sockets[0].getsockname()[1]
+        self.port = actual_port
+
+        # Print port in parseable format for Node.js to read
+        # Use stderr for logging, stdout for the port marker
+        print(f"BRIDGE_PORT:{actual_port}", flush=True)
+
+        logger.info(f"Server started on 127.0.0.1:{actual_port}")
 
         async with self._server:
             await self._shutdown_event.wait()
@@ -193,6 +202,12 @@ class BaseBridge(ABC):
 
     def run(self):
         """서버 시작 (blocking)"""
+        # Parse command line arguments
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--port', type=int, default=self.port)
+        args, _ = parser.parse_known_args()
+        self.port = args.port
+
         try:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)

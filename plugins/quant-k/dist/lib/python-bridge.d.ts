@@ -8,6 +8,7 @@ export declare class PythonBridge extends EventEmitter {
     private socket;
     private process;
     private options;
+    private actualPort;
     private requestId;
     private pendingRequests;
     private buffer;
