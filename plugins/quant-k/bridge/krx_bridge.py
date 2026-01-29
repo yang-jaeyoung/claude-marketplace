@@ -14,7 +14,7 @@ class KrxBridge(BaseBridge):
     """pykrx API 래퍼 브릿지"""
 
     def __init__(self):
-        super().__init__("/tmp/quant-k-bridge.sock")
+        super().__init__(19001)
 
         # 메서드 등록
         self.register_method("get_ticker_list", self.get_ticker_list)

@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 interface PythonBridgeOptions {
-    socketPath: string;
+    port: number;
     bridgeScript: string;
     timeout?: number;
 }

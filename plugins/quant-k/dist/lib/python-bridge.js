@@ -44,7 +44,7 @@ export class PythonBridge extends EventEmitter {
             const maxRetries = 10;
             let retries = 0;
             const tryConnect = () => {
-                this.socket = createConnection(this.options.socketPath);
+                this.socket = createConnection({ host: '127.0.0.1', port: this.options.port });
                 this.socket.on("connect", () => {
                     this.connected = true;
                     this.emit("connected");

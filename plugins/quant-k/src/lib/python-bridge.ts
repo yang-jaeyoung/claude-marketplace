@@ -4,7 +4,7 @@ import { spawn, ChildProcess } from "child_process";
 import * as path from "path";
 
 interface PythonBridgeOptions {
-  socketPath: string;
+  port: number;
   bridgeScript: string;
   timeout?: number;
 }
@@ -85,7 +85,7 @@ export class PythonBridge extends EventEmitter {
       let retries = 0;
 
       const tryConnect = () => {
-        this.socket = createConnection(this.options.socketPath);
+        this.socket = createConnection({ host: '127.0.0.1', port: this.options.port });
 
         this.socket.on("connect", () => {
           this.connected = true;

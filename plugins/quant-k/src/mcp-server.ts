@@ -22,22 +22,22 @@ async function initBridges() {
   const bridgeDir = path.join(__dirname, "..", "bridge");
 
   krxBridge = new PythonBridge({
-    socketPath: "/tmp/quant-k-bridge.sock",
+    port: 19001,
     bridgeScript: path.join(bridgeDir, "krx_bridge.py"),
   });
 
   factorBridge = new PythonBridge({
-    socketPath: "/tmp/krx-factor-bridge.sock",
+    port: 19002,
     bridgeScript: path.join(bridgeDir, "factor_bridge.py"),
   });
 
   screenerBridge = new PythonBridge({
-    socketPath: "/tmp/krx-screener-bridge.sock",
+    port: 19003,
     bridgeScript: path.join(bridgeDir, "screener_bridge.py"),
   });
 
   scraperBridge = new PythonBridge({
-    socketPath: "/tmp/krx-scraper-bridge.sock",
+    port: 19004,
     bridgeScript: path.join(bridgeDir, "scraper_bridge.py"),
   });
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-JSON-RPC 2.0 over Unix Socket 서버 베이스 클래스
+JSON-RPC 2.0 over TCP 서버 베이스 클래스
 
 사용법:
     class MyBridge(BaseBridge):
         def __init__(self):
-            super().__init__("/tmp/my-bridge.sock")
+            super().__init__(port=8765)
             self.register_method("my_method", self.handle_my_method)
 
         def handle_my_method(self, params):
@@ -40,8 +40,8 @@ class JsonRpcError(Exception):
 class BaseBridge(ABC):
     """JSON-RPC 2.0 서버 베이스 클래스"""
 
-    def __init__(self, socket_path: str):
-        self.socket_path = socket_path
+    def __init__(self, port: int):
+        self.port = port
         self._methods: Dict[str, Callable] = {}
         self._server: Optional[asyncio.AbstractServer] = None
         self._shutdown_event = asyncio.Event()
@@ -159,22 +159,13 @@ class BaseBridge(ABC):
 
     async def _run_server(self):
         """서버 실행"""
-        # 기존 소켓 파일 제거
-        if os.path.exists(self.socket_path):
-            os.unlink(self.socket_path)
-
-        # 디렉토리 생성
-        os.makedirs(os.path.dirname(self.socket_path) or '.', exist_ok=True)
-
-        self._server = await asyncio.start_unix_server(
+        self._server = await asyncio.start_server(
             self._handle_client,
-            path=self.socket_path
+            host='127.0.0.1',
+            port=self.port
         )
 
-        # 소켓 권한 설정 (소유자만 접근)
-        os.chmod(self.socket_path, 0o600)
-
-        logger.info(f"Server started on {self.socket_path}")
+        logger.info(f"Server started on 127.0.0.1:{self.port}")
 
         async with self._server:
             await self._shutdown_event.wait()
@@ -183,13 +174,17 @@ class BaseBridge(ABC):
 
     def _setup_signals(self):
         """시그널 핸들러 설정"""
-        loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_event_loop()
 
-        for sig in (signal.SIGTERM, signal.SIGINT):
-            loop.add_signal_handler(
-                sig,
-                lambda s=sig: asyncio.create_task(self._handle_signal(s))
-            )
+            for sig in (signal.SIGTERM, signal.SIGINT):
+                loop.add_signal_handler(
+                    sig,
+                    lambda s=sig: asyncio.create_task(self._handle_signal(s))
+                )
+        except NotImplementedError:
+            # Windows doesn't support add_signal_handler
+            logger.info("Signal handlers not supported on this platform")
 
     async def _handle_signal(self, sig: signal.Signals):
         """시그널 처리"""
@@ -208,7 +203,4 @@ class BaseBridge(ABC):
         except KeyboardInterrupt:
             logger.info("Interrupted by user")
         finally:
-            # 소켓 파일 정리
-            if os.path.exists(self.socket_path):
-                os.unlink(self.socket_path)
             logger.info("Server stopped")

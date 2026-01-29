@@ -27,7 +27,7 @@ class FactorBridge(BaseBridge):
     }
 
     def __init__(self):
-        super().__init__("/tmp/krx-factor-bridge.sock")
+        super().__init__(19002)
 
         self.register_method("calculate_factor", self.calculate_factor)
         self.register_method("calculate_composite", self.calculate_composite)

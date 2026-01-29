@@ -105,7 +105,7 @@ class ScreenerBridge(BaseBridge):
     """종목 스크리닝 엔진"""
 
     def __init__(self):
-        super().__init__("/tmp/krx-screener-bridge.sock")
+        super().__init__(19003)
 
         self.register_method("screen", self.screen)
         self.register_method("save_screen", self.save_screen)

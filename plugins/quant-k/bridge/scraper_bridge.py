@@ -34,7 +34,7 @@ class ScraperBridge(BaseBridge):
     """Browser automation bridge using Playwright"""
 
     def __init__(self):
-        super().__init__("/tmp/krx-scraper-bridge.sock")
+        super().__init__(19004)
         self.playwright: Optional[Playwright] = None
         self.browser: Optional[Browser] = None
         self.page: Optional[Page] = None
