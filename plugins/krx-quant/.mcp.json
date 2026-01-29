@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "krx-quant": {
-      "command": "node",
-      "args": ["dist/mcp-server.js"],
-      "cwd": "."
-    }
-  }
-}

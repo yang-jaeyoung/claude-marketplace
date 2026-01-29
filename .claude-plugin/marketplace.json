@@ -95,9 +95,9 @@
       "category": "web-development"
     },
     {
-      "name": "krx-quant",
+      "name": "quant-k",
       "description": "KRX 퀀트 분석 종목 발굴 플러그인",
-      "source": "./plugins/krx-quant",
+      "source": "./plugins/quant-k",
       "version": "0.1.0",
       "author": {
         "name": "urd"
