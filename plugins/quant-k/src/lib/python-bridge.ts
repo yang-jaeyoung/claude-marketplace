@@ -146,9 +146,9 @@ export class PythonBridge extends EventEmitter {
         this.socket.on("close", () => {
           this.connected = false;
           this.emit("disconnected");
-          // Auto-reconnect if process is still running
-          if (this.shouldReconnect && this.process && !this.reconnecting) {
-            this.scheduleReconnect();
+          // With dynamic ports, always trigger full restart on disconnect
+          if (this.shouldReconnect && !this.restarting) {
+            this.scheduleRestart();
           }
         });
       };
@@ -158,29 +158,9 @@ export class PythonBridge extends EventEmitter {
   }
 
   private scheduleReconnect(): void {
-    if (this.reconnecting || !this.shouldReconnect) return;
-
-    // If process is dead, need full restart instead
-    if (!this.process || this.processExitedUnexpectedly) {
-      this.scheduleRestart();
-      return;
-    }
-
-    this.reconnecting = true;
-    console.log(`[Bridge] Scheduling reconnect to port ${this.actualPort}...`);
-
-    setTimeout(async () => {
-      try {
-        await this.connect();
-        console.log(`[Bridge] Reconnected successfully`);
-      } catch (err) {
-        console.error(`[Bridge] Reconnect failed:`, err);
-        // If reconnect fails, try full restart
-        this.scheduleRestart();
-      } finally {
-        this.reconnecting = false;
-      }
-    }, 1000);
+    // With dynamic ports, socket-only reconnect won't work because
+    // the port changes on each process start. Always do full restart.
+    this.scheduleRestart();
   }
 
   private scheduleRestart(): void {
@@ -217,7 +197,7 @@ export class PythonBridge extends EventEmitter {
 
     // Wait for restart if in progress
     if (this.restarting) {
-      const maxWait = 15000; // Longer wait for full restart
+      const maxWait = 15000;
       const startTime = Date.now();
       while (this.restarting && Date.now() - startTime < maxWait) {
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -225,18 +205,8 @@ export class PythonBridge extends EventEmitter {
       if (this.connected) return;
     }
 
-    // Wait for reconnection if in progress
-    if (this.reconnecting) {
-      const maxWait = 5000;
-      const startTime = Date.now();
-      while (this.reconnecting && Date.now() - startTime < maxWait) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      if (this.connected) return;
-    }
-
-    // If process is dead, trigger full restart
-    if (!this.process || this.processExitedUnexpectedly) {
+    // With dynamic ports, always do full restart when disconnected
+    if (!this.connected) {
       this.scheduleRestart();
       // Wait for restart
       const maxWait = 15000;
@@ -244,22 +214,10 @@ export class PythonBridge extends EventEmitter {
       while (!this.connected && Date.now() - startTime < maxWait) {
         await new Promise(resolve => setTimeout(resolve, 200));
       }
-      if (this.connected) return;
-    }
-
-    // Try to reconnect if not connected but process is alive
-    if (!this.connected && this.actualPort > 0 && this.process) {
-      this.scheduleReconnect();
-      // Wait for reconnection
-      const maxWait = 5000;
-      const startTime = Date.now();
-      while (!this.connected && Date.now() - startTime < maxWait) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
     }
 
     if (!this.connected) {
-      throw new Error("Not connected and reconnection/restart failed");
+      throw new Error("Not connected and restart failed");
     }
   }
 
