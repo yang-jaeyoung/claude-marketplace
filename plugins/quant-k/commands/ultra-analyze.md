@@ -5,7 +5,10 @@ allowed-tools:
   - Read
   - Write
   - Glob
+  - Grep
   - Bash
+  - Task
+  - WebFetch
 ---
 
 # KRX-Quant Ultra 분석 모드
