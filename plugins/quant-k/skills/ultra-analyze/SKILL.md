@@ -16,6 +16,55 @@ allowed-tools:
 
 모든 quant-k 기능을 최대 역량으로 활용하여 심층 종합분석을 수행합니다.
 
+---
+
+## 🚨 최우선 실행 지침 (이 섹션을 반드시 먼저 읽고 따르세요)
+
+### ❌ 절대 금지 사항
+
+- Bash로 직접 모든 분석을 수행하지 마세요
+- 팩터 분석을 직접 수행하지 마세요
+- 유사 종목 검색을 직접 수행하지 마세요
+- 웹 스크래핑을 직접 수행하지 마세요
+
+### ✅ 필수 실행 패턴
+
+**Phase 1만 Bash로 실행하고, Phase 2-4는 반드시 Task tool로 에이전트를 spawn하세요!**
+
+| Phase | 실행 방법 | 도구 |
+|-------|----------|------|
+| Phase 1 | Bash로 `collect_all` 실행 | Bash |
+| Phase 2-4 | **Task tool로 에이전트 3개 동시 실행** | Task (필수!) |
+| Phase 5-6 | 결과 통합 및 리포트 생성 | Write |
+
+### 🎯 Phase 2-4: 에이전트 병렬 실행 (필수)
+
+**Phase 1 완료 직후, 반드시 아래 3개의 Task tool 호출을 하나의 응답에서 동시에 실행하세요:**
+
+**Task 1 - 웹 스크래퍼:**
+- subagent_type: `quant-k:web-scraper`
+- prompt: "네이버 금융에서 {종목코드} 추가 정보 수집: 투자의견, 목표가, 뉴스. 저장경로: {저장경로}"
+
+**Task 2 - 퀀트 분석가:**
+- subagent_type: `quant-k:quant-analyst`
+- prompt: "{종목명}({종목코드}) 퀀트 팩터 분석: PER/PBR 밸류에이션, 모멘텀, 적정가, 스코어카드. 저장경로: {저장경로}"
+
+**Task 3 - 종목 스크리너:**
+- subagent_type: `quant-k:stock-screener`
+- prompt: "{종목명}과 유사한 밸류에이션 종목 20개 검색 (PER/PBR ±30%, 동일 시장). 저장경로: {저장경로}"
+
+### ⚠️ 스킬 vs 에이전트 구분
+
+Task tool의 `subagent_type`에는 **에이전트 이름**만 사용하세요:
+
+| ❌ 스킬 (Task tool 불가) | ✅ 에이전트 (Task tool 사용) |
+|-------------------------|---------------------------|
+| `quant-k:factor-analyze` | **`quant-k:quant-analyst`** |
+| `quant-k:stock-screen` | **`quant-k:stock-screener`** |
+| `quant-k:browser-scraper` | **`quant-k:web-scraper`** |
+
+---
+
 ## 사전 요구사항
 
 Python과 pykrx가 필요합니다. 처음 사용 시 `/quant-k:setup`을 실행하세요.
@@ -142,94 +191,6 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" 
 ```
 
 이 명령어는 ohlcv, fundamental, market_cap을 ThreadPoolExecutor로 동시에 수집하여 3배 빠릅니다.
-
-## ⚠️ 필수 실행 지침 (MANDATORY EXECUTION)
-
-**이 스킬이 로드되면 아래 워크플로우를 반드시 순서대로 실행하세요. 단순 참고가 아닌 실행 명령입니다!**
-
-### 실행 순서 요약
-
-1. **Phase 1**: KRX 기본 데이터 수집 (Bash - `collect_all`)
-2. **Phase 2-4**: 에이전트 병렬 실행 (**Task tool 필수 사용**)
-3. **Phase 5**: 기술분석 수행
-4. **Phase 6**: Ultra 리포트 통합 생성
-
-### ⚠️ 중요: 스킬 vs 에이전트 구분
-
-**Task tool 호출 시 반드시 에이전트 이름을 사용하세요. 스킬 이름은 Task tool에서 작동하지 않습니다!**
-
-| 용도 | ❌ 스킬 (슬래시 명령용) | ✅ 에이전트 (Task tool용) |
-|------|-------------------------|---------------------------|
-| 팩터 분석 | `quant-k:factor-analyze` | **`quant-k:quant-analyst`** |
-| 종목 스크리닝 | `quant-k:stock-screen` | **`quant-k:stock-screener`** |
-| 웹 스크래핑 | `quant-k:browser-scraper` | **`quant-k:web-scraper`** |
-
-**왜 중요한가?**
-- 스킬(`/quant-k:factor-analyze`)은 대화형 명령으로, 사용자가 직접 실행
-- 에이전트(`quant-k:quant-analyst`)는 Task tool의 `subagent_type`으로 병렬 실행 가능
-- 스킬 이름을 `subagent_type`에 사용하면 **즉시 종료되어 작업이 수행되지 않음**
-
-### 에이전트 구성
-
-| 에이전트 | 역할 | Phase |
-|----------|------|-------|
-| `quant-k:web-scraper` | 외부 데이터 수집 (네이버/DART) | Phase 2 |
-| `quant-k:quant-analyst` | 팩터 분석, 밸류에이션 | Phase 3 |
-| `quant-k:stock-screener` | 유사 종목 검색 | Phase 4 |
-
----
-
-## 📥 데이터 수집 단계
-
-### Phase 1: KRX 기본 데이터 수집
-
-**권장: collect_all로 병렬 수집**
-```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
-```
-
-위 명령 하나로 ohlcv, fundamental, market_cap을 병렬 수집합니다.
-
-### Phase 2-4: 에이전트 병렬 실행 (⚠️ 필수)
-
-**Phase 1 완료 후, 아래 3개 에이전트를 Task tool로 동시에 병렬 실행하세요!**
-
-```
-# ✅ 반드시 하나의 메시지에서 3개의 Task tool을 동시 호출하세요:
-
-Task(
-  subagent_type="quant-k:web-scraper",
-  model="sonnet",
-  prompt="네이버 금융에서 {종목코드} 추가 정보 수집: 투자의견, 목표가, 뉴스 헤드라인. 저장경로: {저장경로}"
-)
-
-Task(
-  subagent_type="quant-k:quant-analyst",
-  model="sonnet",
-  prompt="""
-  다음 종목의 퀀트 팩터 분석을 수행하세요:
-  - 종목: {종목명} ({종목코드})
-  - 저장경로: {저장경로}
-
-  분석 항목:
-  1. PER/PBR 밸류에이션 평가
-  2. 3/6/12개월 모멘텀 계산
-  3. 적정가 산출 (PER/PBR 기반)
-  4. 투자 스코어카드 작성
-  """
-)
-
-Task(
-  subagent_type="quant-k:stock-screener",
-  model="sonnet",
-  prompt="시장에서 {종목명}과 유사한 밸류에이션을 가진 종목 20개를 찾아주세요. 조건: PER ±30%, PBR ±30%, 동일 시장. 저장경로: {저장경로}"
-)
-```
-
-**⚠️ 주의사항:**
-- 3개의 Task tool 호출을 **하나의 응답에서 동시에** 실행해야 병렬 처리됩니다
-- 각 에이전트에 저장경로를 전달하여 결과가 올바른 위치에 저장되도록 합니다
-- 에이전트 완료를 기다린 후 Phase 5로 진행합니다
 
 ---
 
