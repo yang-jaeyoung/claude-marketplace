@@ -33,13 +33,17 @@ Task(subagent_type="quant-k:stock-screener", ...)
 - 유사 종목 검색
 - 시장 분석
 
-## 데이터 수집
+## 🔄 자체 데이터 수집 (필수)
+
+**이 에이전트는 자체적으로 시장 데이터를 수집합니다** (외부 의존성 없음):
 
 ```bash
-# 시장 스크리닝 (권장)
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI --min-cap 1000 --max-results 100
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSDAQ --min-cap 500
+# 시장 스크리닝 (자체 실행)
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI --min-cap 1000 --max-results 50
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSDAQ --min-cap 500 --max-results 50
 ```
+
+⚠️ **timeout: 300000** (5분) 설정 필수 - KRX API 속도 고려
 
 ## 지원 조건
 

@@ -34,25 +34,25 @@ Task(subagent_type="quant-k:quant-analyst", ...)
 - 적정가 산출
 - 투자 스코어카드 작성
 
-## 데이터 수집
+## 🔄 자체 데이터 수집 (필수)
+
+**이 에이전트는 자체적으로 데이터를 수집합니다** (외부 의존성 없음):
 
 ```bash
-# 병렬 수집 (권장)
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all {종목코드} --days 365
-
-# 시장 스크리닝
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI --min-cap 1000
 ```
+
+⚠️ **timeout: 300000** (5분) 설정 필수 - KRX API 속도 고려
 
 **pykrx 레퍼런스:** `_shared/pykrx-reference.md` 참조
 
 ## 분석 프로토콜
 
-1. `collect_all`로 데이터 수집
+1. **데이터 수집** (`collect_all` 자체 실행)
 2. 펀더멘털 분석 (PER, PBR, DIV)
 3. 모멘텀 계산 (수익률)
 4. 밸류에이션 평가
-5. Markdown 테이블 출력
+5. `analysis/valuation.md`에 Markdown 테이블 출력
 
 ## 출력 형식
 
