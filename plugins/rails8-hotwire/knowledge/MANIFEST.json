@@ -263,6 +263,20 @@
         "standard": ["recipes/saas/subscription/SKILL.md", "recipes/saas/subscription/*.md"],
         "deep": ["recipes/saas/subscription/**/*.md"]
       }
+    },
+    "ruby4": {
+      "path": "ruby4/SKILL.md",
+      "triggers": [
+        "ruby 4", "ruby4", "ruby 4.0", "zjit", "ruby box", "ractor port",
+        "루비 4", "루비4", "지짓", "루비박스", "랙터 포트"
+      ],
+      "token_cost": "medium",
+      "requires": [],
+      "load_depth": {
+        "shallow": ["ruby4/SKILL.md"],
+        "standard": ["ruby4/SKILL.md", "ruby4/overview/*.md", "ruby4/zjit/*.md", "ruby4/ruby-box/*.md"],
+        "deep": ["ruby4/**/*.md", "ruby4/**/*.rb"]
+      }
     }
   },
   "compositions": {
@@ -309,10 +323,10 @@
     "min_trigger_score": 0.3
   },
   "metadata": {
-    "total_skills": 17,
+    "total_skills": 18,
     "total_compositions": 5,
     "languages": ["en", "ko"],
-    "last_updated": "2026-01-25",
+    "last_updated": "2026-01-31",
     "maintainer": "rails8-hotwire-skills"
   }
 }
