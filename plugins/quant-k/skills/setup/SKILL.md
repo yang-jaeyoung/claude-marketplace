@@ -12,19 +12,16 @@ description: quant-k 플러그인 환경 설정. Python과 pykrx 설치 확인.
 python3 --version  # 3.8+ 필요
 ```
 
-### 2. pykrx 설치
+### 2. 환경 확인 (pykrx, pandas, KRX 연결)
 ```bash
-python3 -c "import pykrx; print(f'pykrx {pykrx.__version__} OK')" 2>/dev/null || pip3 install pykrx
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" check_env
 ```
 
-### 3. 의존성 설치
-```bash
-pip3 install pandas numpy
-```
+이 명령은 Python, pykrx, pandas 설치 및 KRX 연결 상태를 JSON으로 반환합니다.
 
-### 4. 연결 테스트
+### 3. 의존성 미설치 시
 ```bash
-python3 -c "from pykrx import stock; print('✓ KRX 연결:', stock.get_market_ticker_name('005930'))"
+pip3 install pykrx pandas numpy
 ```
 
 ## 에러 처리

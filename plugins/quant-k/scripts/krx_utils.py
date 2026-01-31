@@ -372,11 +372,52 @@ def collect_all(ticker: str, days: int = 365) -> dict:
         return {"error": str(e)}
 
 
+def check_env() -> dict:
+    """환경 설정 확인 (Python, pykrx, KRX 연결 테스트)"""
+    import platform
+    result = {
+        "python_version": platform.python_version(),
+        "platform": platform.system(),
+        "pykrx_installed": False,
+        "pykrx_version": None,
+        "pandas_installed": False,
+        "pandas_version": None,
+        "krx_connection": False,
+        "krx_test_result": None
+    }
+
+    try:
+        import pykrx
+        result["pykrx_installed"] = True
+        result["pykrx_version"] = getattr(pykrx, '__version__', 'unknown')
+    except ImportError:
+        pass
+
+    try:
+        import pandas
+        result["pandas_installed"] = True
+        result["pandas_version"] = pandas.__version__
+    except ImportError:
+        pass
+
+    if result["pykrx_installed"]:
+        try:
+            from pykrx import stock
+            name = stock.get_market_ticker_name('005930')
+            if name:
+                result["krx_connection"] = True
+                result["krx_test_result"] = f"삼성전자 ({name})"
+        except Exception as e:
+            result["krx_test_result"] = str(e)
+
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description='quant-k KRX 데이터 유틸리티')
     parser.add_argument('command', choices=[
         'ticker_info', 'ohlcv', 'fundamental',
-        'market_tickers', 'search', 'market_cap', 'collect_all', 'screen_market'
+        'market_tickers', 'search', 'market_cap', 'collect_all', 'screen_market', 'check_env'
     ])
     parser.add_argument('arg', nargs='?', help='종목코드 또는 검색어')
     parser.add_argument('--days', type=int, default=365, help='OHLCV 조회 일수 (최대 365)')
@@ -427,6 +468,9 @@ def main():
 
     elif args.command == 'screen_market':
         result = screen_market(args.arg or args.market, args.min_cap, args.max_results)
+
+    elif args.command == 'check_env':
+        result = check_env()
 
     else:
         result = {"error": f"Unknown command: {args.command}"}

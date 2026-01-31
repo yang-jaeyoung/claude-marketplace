@@ -22,6 +22,8 @@ allowed-tools:
 
 - Bash로 직접 모든 분석을 수행하지 마세요
 - 팩터 분석/유사 종목 검색/웹 스크래핑을 직접 수행하지 마세요
+- **`python3 -c "..."` 인라인 Python 사용 금지** - Windows 호환성 문제 발생
+- 반드시 `${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py` 스크립트 파일만 사용
 
 ### ✅ 필수 실행 패턴 (완전 병렬)
 

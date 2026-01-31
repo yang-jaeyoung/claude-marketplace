@@ -45,6 +45,11 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSDAQ --min-
 
 ⚠️ **timeout: 300000** (5분) 설정 필수 - KRX API 속도 고려
 
+### ❌ 절대 금지
+
+- **`python3 -c "..."` 인라인 Python 사용 금지** - Windows 호환성 문제 발생
+- 반드시 `krx_utils.py` 스크립트 파일만 사용
+
 ## 지원 조건
 
 | 조건 | 필드 | 예시 |

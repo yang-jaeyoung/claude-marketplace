@@ -16,29 +16,18 @@ python3 --version
 
 Python 3.8 이상이 필요합니다. 없으면 설치 안내를 제공합니다.
 
-### 2단계: pykrx 설치 확인 및 설치
+### 2단계: 환경 확인 (pykrx, pandas, KRX 연결)
 
 ```bash
-python3 -c "import pykrx; print(f'pykrx {pykrx.__version__} OK')" 2>/dev/null || pip3 install pykrx
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" check_env
 ```
 
-### 3단계: 추가 의존성 설치
+이 명령은 Python, pykrx, pandas 설치 및 KRX 연결 상태를 JSON으로 반환합니다.
+
+### 3단계: 의존성 미설치 시
 
 ```bash
-pip3 install pandas numpy
-```
-
-### 4단계: 연결 테스트
-
-```python
-from pykrx import stock
-from datetime import datetime
-
-# 삼성전자로 연결 테스트
-ticker = '005930'
-date = datetime.now().strftime('%Y%m%d')
-name = stock.get_market_ticker_name(ticker)
-print(f'✓ KRX 연결 성공: {name} ({ticker})')
+pip3 install pykrx pandas numpy
 ```
 
 ## 예상 출력
