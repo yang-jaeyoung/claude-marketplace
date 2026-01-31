@@ -35,11 +35,13 @@ allowed-tools:
 
 **Phase 1 완료 직후, 아래 3개의 Task를 하나의 응답에서 동시 실행:**
 
-| 에이전트 | subagent_type | prompt 요약 |
-|----------|---------------|-------------|
-| 웹 스크래퍼 | `quant-k:web-scraper` | 네이버 금융에서 투자의견, 목표가, 뉴스 수집 |
-| 퀀트 분석가 | `quant-k:quant-analyst` | PER/PBR 밸류에이션, 모멘텀, 적정가, 스코어카드 |
-| 종목 스크리너 | `quant-k:stock-screener` | 유사 밸류에이션 종목 20개 검색 |
+| 에이전트 | subagent_type | 출력 파일 | prompt 요약 |
+|----------|---------------|-----------|-------------|
+| 웹 스크래퍼 | `quant-k:web-scraper` | `analysis/web-data.md` | 네이버 금융에서 투자의견, 목표가, 뉴스 수집 |
+| 퀀트 분석가 | `quant-k:quant-analyst` | `analysis/valuation.md` | PER/PBR 밸류에이션, 모멘텀, 적정가, 스코어카드 |
+| 종목 스크리너 | `quant-k:stock-screener` | `analysis/similar-stocks.md` | 유사 밸류에이션 종목 20개 검색 |
+
+⚠️ **파일 충돌 방지**: 각 에이전트는 **자신의 전용 파일에만** 작성. **README.md는 Phase 6에서만 생성**.
 
 ### ⚠️ 스킬 vs 에이전트
 
@@ -73,11 +75,21 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" 
 
 ```
 {저장경로}/{종목명}_ultra_{날짜}/
-├── README.md          # 메인 리포트
+├── README.md          # 메인 리포트 (Phase 6에서만 생성)
 ├── data/ohlcv.csv     # 가격 데이터
 └── analysis/
-    ├── technical.md   # 기술분석
-    └── valuation.md   # 밸류에이션
+    ├── web-data.md    # 웹 스크래퍼 출력
+    ├── valuation.md   # 퀀트 분석가 출력
+    ├── similar-stocks.md  # 스크리너 출력
+    └── technical.md   # 기술분석
+```
+
+### ⚠️ README.md 작성 전 필수 체크
+
+```
+1. Glob으로 README.md 존재 여부 확인
+2. 파일이 존재하면 → Read로 먼저 읽기
+3. 그 후 Write로 새 내용 작성
 ```
 
 **리포트 섹션:** Executive Summary → 스코어카드 → 기업개요 → 주가분석 → 기술분석 → 밸류에이션 → 유사종목 → 투자전략 → 결론

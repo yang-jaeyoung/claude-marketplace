@@ -25,6 +25,7 @@ Task(subagent_type="quant-k:quant-analyst", ...)
 - 파일은 **지정된 저장경로 아래에만** 생성
 - 프로젝트 루트 직접 파일 생성 금지
 - 저장경로 미지정 시 콘솔 출력만
+- **❌ README.md 생성 금지** → `analysis/valuation.md`에 작성
 
 ## 역할
 
