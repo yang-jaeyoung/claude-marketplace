@@ -32,13 +32,18 @@ allowed-tools:
 
 ### 🎯 Phase 1: 완전 병렬 에이전트 실행
 
-**3개의 Task를 하나의 응답에서 동시 실행:**
+⚠️ **중요: 3개 Task를 반드시 하나의 응답에서 동시 호출!**
 
 | 에이전트 | subagent_type | 출력 파일 | 내부 데이터 수집 |
 |----------|---------------|-----------|-----------------|
 | 퀀트 분석가 | `quant-k:quant-analyst` | `analysis/valuation.md` | `collect_all` (자체 실행) |
 | 종목 스크리너 | `quant-k:stock-screener` | `analysis/similar-stocks.md` | `screen_market` (자체 실행) |
 | 웹 스크래퍼 | `quant-k:web-scraper` | `analysis/web-data.md` | MCP playwright |
+
+**병렬 실행 방법:**
+1. 단일 응답에서 Task 도구 3번 호출 (순차 호출 금지!)
+2. 각 에이전트에 종목코드와 저장경로 전달
+3. 모든 에이전트 완료 대기 후 Phase 2 진행
 
 ⚡ **각 에이전트가 자체 데이터 수집** → 중앙 Phase 1 불필요 → **즉시 병렬 실행**
 
