@@ -27,19 +27,23 @@ allowed-tools:
 
 | Phase | 실행 방법 | 도구 | 비고 |
 |-------|----------|------|------|
-| Phase 1 | `collect_all` 명령 실행 | Bash | **timeout: 300000** |
-| **Phase 2-4** | **에이전트 3개 동시 실행** | **Task (필수!)** | 병렬 |
+| Phase 1 | `collect_all` 백그라운드 실행 | Bash | `run_in_background: true` |
+| Phase 2 | `web-scraper` 즉시 실행 | Task | Phase 1과 동시 |
+| Phase 3-4 | `quant-analyst` + `stock-screener` | Task | Phase 1 완료 후 |
 | Phase 5-6 | 기술분석 + 리포트 생성 | Write | - |
 
 ### 🎯 Phase 2-4: 에이전트 병렬 실행
 
-**Phase 1 완료 직후, 아래 3개의 Task를 하나의 응답에서 동시 실행:**
+| 에이전트 | subagent_type | 출력 파일 | Phase 1 필요 | 실행 시점 |
+|----------|---------------|-----------|-------------|----------|
+| 웹 스크래퍼 | `quant-k:web-scraper` | `analysis/web-data.md` | ❌ | **즉시** |
+| 퀀트 분석가 | `quant-k:quant-analyst` | `analysis/valuation.md` | ✅ | Phase 1 후 |
+| 종목 스크리너 | `quant-k:stock-screener` | `analysis/similar-stocks.md` | ✅ | Phase 1 후 |
 
-| 에이전트 | subagent_type | 출력 파일 | prompt 요약 |
-|----------|---------------|-----------|-------------|
-| 웹 스크래퍼 | `quant-k:web-scraper` | `analysis/web-data.md` | 네이버 금융에서 투자의견, 목표가, 뉴스 수집 |
-| 퀀트 분석가 | `quant-k:quant-analyst` | `analysis/valuation.md` | PER/PBR 밸류에이션, 모멘텀, 적정가, 스코어카드 |
-| 종목 스크리너 | `quant-k:stock-screener` | `analysis/similar-stocks.md` | 유사 밸류에이션 종목 20개 검색 |
+**최적 실행 순서:**
+1. Phase 1 (백그라운드) + `web-scraper` (즉시) 동시 시작
+2. `TaskOutput`으로 Phase 1 완료 확인
+3. `quant-analyst` + `stock-screener` 동시 실행
 
 ⚠️ **파일 충돌 방지**: 각 에이전트는 **자신의 전용 파일에만** 작성. **README.md는 Phase 6에서만 생성**.
 
@@ -53,17 +57,25 @@ allowed-tools:
 
 ---
 
-## Phase 1: 데이터 수집
+## Phase 1: 데이터 수집 (백그라운드)
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
 ```
 
-⚠️ **타임아웃 필수**: KRX API 속도로 인해 **timeout: 300000** (5분) 설정 필요
+### ⚡ 백그라운드 실행 (권장)
+
+화면 멈춤 방지를 위해 **백그라운드 실행** 사용:
 
 ```json
-{ "command": "python3 ...", "timeout": 300000 }
+{ "command": "python3 ...", "run_in_background": true, "timeout": 300000 }
 ```
+
+**실행 순서:**
+1. Phase 1을 `run_in_background: true`로 시작
+2. **즉시** `web-scraper` 에이전트 실행 (Phase 1 데이터 불필요)
+3. `TaskOutput`으로 Phase 1 완료 대기
+4. Phase 1 완료 후 `quant-analyst`, `stock-screener` 실행
 
 **pykrx 레퍼런스가 필요하면:** `_shared/pykrx-reference.md` 참조
 
