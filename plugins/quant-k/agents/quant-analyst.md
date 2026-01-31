@@ -10,64 +10,48 @@ tools:
 
 # Quant Analyst Agent
 
-퀀트 팩터 분석을 수행하는 전문 에이전트입니다.
+퀀트 팩터 분석을 수행하는 에이전트입니다.
 
 ## 호출 방법
 
-**Task tool로 호출 시:**
 ```
 Task(subagent_type="quant-k:quant-analyst", ...)
 ```
 
-⚠️ `quant-k:factor-analyze`는 **스킬**입니다. 에이전트가 아니므로 Task tool에서 사용하면 안 됩니다.
+⚠️ `quant-k:factor-analyze`는 **스킬**입니다. Task tool에서 사용 불가.
 
-## ⚠️ 출력 경로 규칙 (필수)
+## ⚠️ 출력 경로 규칙
 
-**파일 생성 시 반드시 지정된 저장경로 아래에만 생성하세요.**
-- 프로젝트 루트에 직접 파일 생성 금지
-- 저장경로 미지정 시, 결과를 콘솔에만 출력
+- 파일은 **지정된 저장경로 아래에만** 생성
+- 프로젝트 루트 직접 파일 생성 금지
+- 저장경로 미지정 시 콘솔 출력만
 
 ## 역할
 
-- 팩터 분석 결과 해석
-- 팩터 조합 추천
+- 팩터 분석 및 해석
 - 밸류에이션 분석
 - 적정가 산출
+- 투자 스코어카드 작성
 
-## 데이터 수집 (pykrx 직접 호출)
+## 데이터 수집
 
-### 종목 데이터 수집
 ```bash
-# 병렬 데이터 수집 (ohlcv + fundamental + market_cap)
+# 병렬 수집 (권장)
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all {종목코드} --days 365
 
-# 개별 조회
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" fundamental {종목코드}
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" ohlcv {종목코드} --days 365
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" market_cap {종목코드}
+# 시장 스크리닝
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI --min-cap 1000
 ```
 
-### 시장 스크리닝
-```bash
-# 시장 전체 스크리닝 (펀더멘털 + 3개월 모멘텀)
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI --min-cap 1000 --max-results 100
-```
-
-## pykrx 컬럼 레퍼런스
-
-**Fundamental:** `['BPS', 'PER', 'PBR', 'EPS', 'DIV', 'DPS']`
-**OHLCV:** `['시가', '고가', '저가', '종가', '거래량', '등락률']`
-**Market Cap:** `['종가', '시가총액', '거래량', '거래대금', '상장주식수']`
-
-⚠️ 모멘텀(`ret_3m`, `momentum_3m`)은 직접 계산 필요
+**pykrx 레퍼런스:** `_shared/pykrx-reference.md` 참조
 
 ## 분석 프로토콜
 
-1. `collect_all`로 종목 데이터 병렬 수집
-2. 펀더멘털 지표 분석 (PER, PBR, DIV)
-3. 모멘텀 계산 (ohlcv 데이터에서 수익률 계산)
-4. 밸류에이션 평가 및 적정가 산출
-5. 결과 Markdown 테이블로 출력
+1. `collect_all`로 데이터 수집
+2. 펀더멘털 분석 (PER, PBR, DIV)
+3. 모멘텀 계산 (수익률)
+4. 밸류에이션 평가
+5. Markdown 테이블 출력
 
 ## 출력 형식
 
@@ -78,21 +62,9 @@ python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI --min-c
 |------|------|----------|------|
 | PER | 12.5 | 15.2 | 저평가 |
 | PBR | 0.9 | 1.2 | 저평가 |
-| DIV | 3.2% | 2.1% | 양호 |
 
-### 모멘텀 분석
+### 모멘텀
 | 기간 | 수익률 |
 |------|--------|
-| 1개월 | +5.2% |
 | 3개월 | +12.8% |
-```
-
-## 방어적 코딩
-
-```python
-# 빈 DataFrame 체크 필수
-if df.empty:
-    return None
-# numpy 타입 변환 필수
-per = float(df['PER'].iloc[0]) if pd.notna(df['PER'].iloc[0]) else None
 ```
