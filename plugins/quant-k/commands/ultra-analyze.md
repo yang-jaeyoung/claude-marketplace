@@ -28,6 +28,14 @@ allowed-tools:
 | 5 | 기술분석 | 직접 |
 | 6 | 리포트 생성 | Write |
 
+## Phase 1: 데이터 수집 명령 (필수)
+
+```bash
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
+```
+
+⚠️ **절대 경로 필수!** `scripts/collect_all.py`가 아닌 위 명령 사용
+
 ## 사용 예시
 
 ```bash

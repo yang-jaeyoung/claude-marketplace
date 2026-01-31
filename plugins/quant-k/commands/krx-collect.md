@@ -44,4 +44,25 @@ KRX(한국거래소) 주식 데이터를 수집합니다.
 
 ## 출력
 
-수집된 데이터는 `.omc/quant-k/data/` 디렉토리에 Parquet 형식으로 캐시됩니다.
+수집된 데이터는 JSON 형식으로 stdout에 출력됩니다.
+
+## 실제 명령어
+
+```bash
+# 종목 목록
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" market_tickers KOSPI
+
+# 종목 검색
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" search "삼성"
+
+# 가격 데이터
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" ohlcv 005930 --days 365
+
+# 펀더멘털
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" fundamental 005930
+
+# 병렬 수집 (권장)
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all 005930 --days 365
+```
+
+⚠️ **절대 경로 필수!** 상대 경로(`scripts/...`) 사용 금지

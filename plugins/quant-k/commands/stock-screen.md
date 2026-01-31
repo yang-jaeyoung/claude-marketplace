@@ -6,6 +6,16 @@ description: 조건 기반 종목 스크리닝
 
 조건을 지정하여 종목을 필터링합니다.
 
+## 필수 명령어
+
+```bash
+# 시장 전체 스크리닝
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSPI --min-cap 1000 --max-results 100
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" screen_market KOSDAQ --min-cap 500
+```
+
+⚠️ **절대 경로 필수!** 상대 경로(`scripts/...`) 사용 금지
+
 ## 사용법
 
 ```

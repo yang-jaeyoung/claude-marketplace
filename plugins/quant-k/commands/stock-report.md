@@ -20,6 +20,18 @@ allowed-tools:
 4. **유사 종목**: 시총/PER 유사 10개
 5. **리포트 생성**: Markdown 형식
 
+## 필수 명령어
+
+```bash
+# 종목 검색
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" search "종목명"
+
+# 데이터 수집 (병렬)
+python3 "${CLAUDE_PLUGIN_ROOT}/scripts/krx_utils.py" collect_all "종목코드" --days 365
+```
+
+⚠️ **절대 경로 필수!** 상대 경로(`scripts/...`) 사용 금지
+
 ## 사용 예시
 
 ```bash
