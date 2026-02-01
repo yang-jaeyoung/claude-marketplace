@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Project:** Claude Code Plugins Marketplace
 **Purpose:** Monorepo hosting multiple Claude Code plugins for extended functionality.
-**Owner:** jyyang
+**Owner:** jaebit
 
 ## Tech Stack
 
@@ -21,7 +21,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Install marketplace
-claude plugins add github:jyyang/claude-marketplace
+claude plugins add github:jaebit/context-aware-workflow
 
 # Install specific plugin
 claude plugins install <plugin-name>
