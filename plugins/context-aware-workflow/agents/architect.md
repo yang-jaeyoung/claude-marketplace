@@ -1,7 +1,7 @@
 ---
 name: architect
 description: Design scalable system architecture with component diagrams, data models, and technical decisions
-model: opus
+model: sonnet
 tools:
   - Read
   - Write

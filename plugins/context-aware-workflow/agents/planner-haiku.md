@@ -1,5 +1,5 @@
 ---
-name: "Planner"
+name: planner
 description: "Fast planning agent for simple, single-file tasks with minimal complexity"
 model: haiku
 tier: haiku

@@ -1,5 +1,5 @@
 ---
-name: "Planner"
+name: planner
 description: "Deep architectural planning agent for complex, system-wide tasks requiring thorough analysis"
 model: opus
 tier: opus
