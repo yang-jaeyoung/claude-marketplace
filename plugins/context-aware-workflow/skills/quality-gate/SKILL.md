@@ -1,6 +1,6 @@
 ---
 name: quality-gate
-description: Validates quality criteria before marking workflow steps as complete. Use when Builder agent finishes a step to ensure code quality, tests pass, and conventions are followed.
+description: Validates quality criteria before marking workflow steps as complete
 allowed-tools: Read, Bash, Glob, Grep
 forked-context: true
 forked-context-returns: |
@@ -9,431 +9,96 @@ forked-context-returns: |
   key_errors: [Max 3 key error messages]
   action_needed: [Next step suggestions]
 triggers:
-  # NOTE: These are CAW internal triggers, NOT Claude Code hooks (hooks.json)
-  # Quality Gate is invoked by Builder agent, not by Claude Code hook system
-  BuilderComplete:
-    action: validate
-    required: true
-    condition: "requires .caw/ directory"
-
-  # Additional triggers
-  ManualRequest:
-    action: validate
-    required: false
-  PhaseTransition:
-    action: validate
-    required: true
+  BuilderComplete: { action: validate, required: true }
+  ManualRequest: { action: validate, required: false }
+  PhaseTransition: { action: validate, required: true }
 ---
 
 # Quality Gate
 
-Automated quality validation before step completion to ensure consistent code quality.
+Automated quality validation before step completion.
 
 ## Triggers
 
-This skill activates when:
-1. Builder agent marks a step as complete
-2. User runs `/cw:next` and step finishes
-3. Manual quality check request
-4. Before phase transition
+Activates when: Builder completes step, `/cw:next` finishes, manual request, phase transition
 
 ## Quality Checks
 
-### Check Categories
+| Category | Weight | Checks | Commands |
+|----------|--------|--------|----------|
+| Code Changes | Required | Files modified, changes exist | `git diff --staged` |
+| Compilation | Required | No syntax/type errors | `tsc --noEmit`, `python -m py_compile` |
+| Linting | Warning | Style rules | `eslint`, `ruff check`, `golangci-lint` |
+| Tidy First | Required | Change type separation | Structural vs behavioral check |
+| Tests | Required | Related tests pass | `jest --findRelatedTests`, `pytest` |
+| Conventions | Warning | Pattern compliance | pattern-learner skill |
 
-| Category | Weight | Checks |
-|----------|--------|--------|
-| Code Changes | Required | Files modified, changes exist |
-| Compilation | Required | No syntax/type errors |
-| Linting | Important | Style rules followed |
-| Tidy First | Important | Change type separation (Kent Beck) |
-| Tests | Important | Related tests pass |
-| Conventions | Recommended | Pattern compliance |
+## Tidy First Check (Kent Beck)
 
-### Check Details
-
-#### 1. Code Changes Verification
 ```yaml
-check: code_changes
-required: true
-validation:
-  - git_diff_exists: true
-  - files_modified: > 0
-  - no_unintended_changes: true
-```
-
-#### 2. Compilation Check
-```yaml
-check: compilation
-required: true
-commands:
-  typescript: "npx tsc --noEmit"
-  javascript: "node --check {files}"
-  python: "python -m py_compile {files}"
-  go: "go build ./..."
-```
-
-#### 3. Lint Check
-```yaml
-check: linting
-required: false  # Warning only
-commands:
-  typescript: "npx eslint {files}"
-  python: "ruff check {files}"
-  go: "golangci-lint run"
-detection:
-  - package.json → eslint
-  - pyproject.toml → ruff/flake8
-  - .golangci.yml → golangci-lint
-```
-
-#### 4. Test Check
-```yaml
-check: tests
-required: true
-commands:
-  jest: "npx jest --findRelatedTests {files}"
-  pytest: "python -m pytest {test_files}"
-  go: "go test ./..."
-detection:
-  - package.json → jest/vitest/mocha
-  - pytest.ini → pytest
-  - *_test.go → go test
-```
-
-#### 5. Convention Check
-```yaml
-check: conventions
-required: false
-validations:
-  - naming: matches project patterns
-  - structure: follows directory conventions
-  - imports: consistent with codebase
-source: pattern-learner skill
-```
-
-#### 6. Tidy First Check (Kent Beck)
-```yaml
-check: tidy_first
-required: true  # For Tidy steps, important for Build steps
-validations:
-  - step_type_match: changes match declared Type (🧹 or 🔨)
-  - no_mixed_changes: structural and behavioral not mixed
-  - commit_prefix: matches step type ([tidy] or [feat]/[fix])
-source: commit-discipline skill
-
 step_type_detection:
-  source: task_plan.md
-  table: "Steps" section
-  column: Type
-  parsing:
-    regex: '\| (\d+\.\d+) \| .* \| (🧹 Tidy|🔨 Build) \|'
-    current_step: step with Status = "🔄" (in_progress)
-  values:
-    "🧹 Tidy": tidy
-    "🧹": tidy
-    "🔨 Build": build
-    "🔨": build
-  fallback: build  # Default if type cannot be determined
+  source: task_plan.md "Steps" section
+  values: { "🧹 Tidy": tidy, "🔨 Build": build }
+
+tidy_step: no_new_exports, no_new_functions, no_logic_changes, commit_prefix: "[tidy]"
+build_step: has_tests, no_unrelated_structural, commit_prefix: "[feat]|[fix]|[test]"
+mixed_change: FAIL → "Split into separate [tidy] and [feat] commits"
 ```
 
-**Tidy Step (🧹) Validation:**
-```yaml
-tidy_step_checks:
-  - no_new_exports: true
-  - no_new_functions: true
-  - no_logic_changes: true
-  - tests_unchanged_behavior: tests pass before AND after
-  - commit_prefix: "[tidy]"
-```
+## Workflow
 
-**Build Step (🔨) Validation:**
-```yaml
-build_step_checks:
-  - has_tests: new/modified tests exist
-  - no_unrelated_structural: structural changes in target area only
-  - commit_prefix: "[feat]" | "[fix]" | "[test]"
-```
+1. **Detect Framework**: Read package.json/pyproject.toml/go.mod
+2. **Run Checks**: Code Changes → Compilation → Linting → Tidy First → Tests → Conventions
+3. **Aggregate Results**: PASSED / FAILED / PASSED_WITH_WARNINGS
+4. **Present Results**: Show check status and next action
 
-**Mixed Change Detection:**
-```yaml
-mixed_change_response:
-  detection:
-    - structural_indicators AND behavioral_indicators present
-  action:
-    - status: FAILED
-    - message: "Mixed structural and behavioral changes detected"
-    - suggestion: "Split into separate [tidy] and [feat] commits"
-```
+## Result Examples
 
-## Behavior
-
-### Step 1: Detect Framework
-
-```
-1. Read package.json, pyproject.toml, go.mod
-2. Identify test framework
-3. Identify linting tools
-4. Cache detection results
-```
-
-### Step 2: Run Checks
-
-Execute checks in order:
-
-```
-1. Code Changes → Required, fail-fast
-2. Compilation → Required, fail-fast
-3. Linting → Run, collect warnings
-4. Tidy First → Required for 🧹, important for 🔨 (early feedback)
-5. Tests → Required, fail-fast
-6. Conventions → Run, collect warnings
-```
-
-> **Note**: Tidy First runs before Tests to provide early feedback on mixed changes,
-> avoiding unnecessary test execution when commit discipline is violated.
-
-### Step 3: Aggregate Results
-
-```yaml
-result:
-  status: PASSED | FAILED | PASSED_WITH_WARNINGS
-  checks:
-    - name: code_changes
-      status: passed
-      details: "3 files modified"
-    - name: compilation
-      status: passed
-      details: "TypeScript compiled successfully"
-    - name: linting
-      status: warning
-      details: "2 warnings in auth.ts"
-    - name: tests
-      status: passed
-      details: "5 tests passed"
-  summary:
-    passed: 4
-    warnings: 1
-    failed: 0
-```
-
-### Step 4: Present Results
-
-**Passed:**
 ```
 ✅ Quality Gate: Step 2.3 PASSED
+  ✅ Code changes: 3 files | ✅ TypeScript | ✅ ESLint | ✅ Tests: 5 passed
+  → Step marked complete. Proceed? [Y/n]
 
-Checks:
-  ✅ Code changes: 3 files modified
-  ✅ TypeScript: Compiled successfully
-  ✅ ESLint: No errors
-  ✅ Tests: 5 passed, 0 failed
-  ✅ Tidy First: Build step, no mixed changes
-
-Step 2.3 will be marked as complete.
-Proceed to next step? [Y/n]
-```
-
-**Tidy Step Passed:**
-```
-✅ Quality Gate: Step 2.0 (🧹 Tidy) PASSED
-
-Checks:
-  ✅ Code changes: 2 files modified
-  ✅ TypeScript: Compiled successfully
-  ✅ Tests: All pass (no behavior change)
-  ✅ Tidy First: Structural only, valid [tidy] commit
-
-Step 2.0 will be marked as complete.
-Commit: [tidy] Rename auth variables for clarity
-```
-
-**Passed with Warnings:**
-```
 ⚠️ Quality Gate: Step 2.3 PASSED (warnings)
+  ⚠️ ESLint: 2 warnings (unused var, prefer const)
+  → [1] Proceed | [2] Fix and revalidate
 
-Checks:
-  ✅ Code changes: 3 files modified
-  ✅ TypeScript: Compiled successfully
-  ⚠️ ESLint: 2 warnings
-     └─ src/auth/jwt.ts:45 - Unused variable 'temp'
-     └─ src/auth/jwt.ts:67 - Prefer const over let
-  ✅ Tests: 5 passed, 0 failed
-
-Warnings exist but can proceed.
-[1] Proceed (ignore warnings)
-[2] Fix warnings and revalidate
-```
-
-**Failed:**
-```
 ❌ Quality Gate: Step 2.3 FAILED
+  ❌ Tests: 2 failed (auth.test.ts:23, auth.test.ts:45)
+  → Fix tests? [Y/n]
 
-Checks:
-  ✅ Code changes: 3 files modified
-  ✅ TypeScript: Compiled successfully
-  ✅ ESLint: No errors
-  ❌ Tests: 3 passed, 2 failed
-     └─ auth.test.ts:23 - Expected token to be valid
-     └─ auth.test.ts:45 - Timeout in async operation
-
-Cannot complete step due to test failures.
-Fix failed tests? [Y/n]
-```
-
-**Mixed Change Failed (Tidy First Violation):**
-```
-❌ Quality Gate: Step 2.1 FAILED
-
-Checks:
-  ✅ Code changes: 3 files modified
-  ✅ TypeScript: Compiled successfully
-  ✅ ESLint: No errors
-  ✅ Tests: 5 passed, 0 failed
-  ❌ Tidy First: Mixed changes detected!
-
-⚠️ Tidy First Violation
-
-This commit contains BOTH:
-
-Structural changes:
-  • jwt.ts:12 - Renamed `val` → `tokenPayload`
-  • jwt.ts:45 - Extracted method `parseHeader()`
-
-Behavioral changes:
-  • jwt.ts:78 - Added new `refreshToken()` function
-  • jwt.ts:95 - Modified validation logic
-
-Action Required:
-1. Split into separate commits:
-   [tidy] Rename variables and extract method
-   [feat] Add token refresh functionality
-
-2. Or run: /cw:tidy --split
-
-Cannot complete step.
+❌ Quality Gate: Step 2.1 FAILED (Tidy First Violation)
+  Mixed changes: structural (rename, extract) + behavioral (new function)
+  → Split: /cw:tidy --split or manual separation
 ```
 
 ## Framework Detection
 
-### Node.js/TypeScript
-```javascript
-// Detection from package.json
-{
-  "scripts": {
-    "test": "jest",        // → Jest
-    "lint": "eslint .",    // → ESLint
-    "typecheck": "tsc"     // → TypeScript
-  }
-}
-```
+| Language | Config File | Test | Lint | Type Check |
+|----------|-------------|------|------|------------|
+| TS/JS | package.json | jest/vitest/mocha | eslint | tsc |
+| Python | pyproject.toml | pytest | ruff/flake8 | mypy |
+| Go | go.mod | go test | golangci-lint | go vet |
 
-### Python
-```python
-# Detection from pyproject.toml
-[tool.pytest]  # → pytest
-[tool.ruff]    # → ruff
-[tool.mypy]    # → mypy
-```
-
-### Go
-```go
-// Detection from file patterns
-*_test.go      // → go test
-.golangci.yml  // → golangci-lint
-```
-
-## Configuration
-
-### `.caw/quality-gate.json` (Optional)
+## Configuration (`.caw/quality-gate.json`)
 
 ```json
 {
   "checks": {
-    "code_changes": { "required": true },
-    "compilation": { "required": true },
-    "linting": { "required": false, "fail_on_warning": false },
     "tests": { "required": true, "coverage_threshold": 80 },
-    "conventions": { "required": false }
+    "linting": { "required": false, "fail_on_warning": false }
   },
-  "timeout": {
-    "compilation": 60,
-    "tests": 300,
-    "linting": 60
-  },
-  "skip_patterns": [
-    "*.md",
-    "*.json",
-    "docs/*"
-  ]
+  "timeout": { "compilation": 60, "tests": 300 },
+  "skip_patterns": ["*.md", "docs/*"]
 }
 ```
 
 ## Integration
 
-### With Builder Agent
-
-```markdown
-## Builder Workflow with Quality Gate
-
-1. Builder completes implementation
-2. Builder calls quality-gate skill
-3. If PASSED: Update task_plan.md status
-4. If FAILED: Builder attempts fix (max 3 retries)
-5. If still FAILED: Report to user
-```
-
-### With Progress Tracker
-
-```yaml
-on_quality_gate:
-  passed:
-    - Update step status to completed
-    - Record completion time
-    - Increment completed_steps count
-  failed:
-    - Keep step status as in_progress
-    - Record failure reason
-    - Increment retry_count
-```
-
-## Retry Logic
-
-```yaml
-retry_policy:
-  max_retries: 3
-  retry_on:
-    - test_failure
-    - lint_error
-  no_retry_on:
-    - compilation_error
-    - missing_files
-  backoff:
-    initial: 0
-    strategy: immediate  # Let Builder fix first
-```
+- **Builder Agent**: PASSED → update plan, FAILED → retry (max 3), still FAILED → report
+- **Progress Tracker**: PASSED → record completion, FAILED → record failure, increment retry
 
 ## Boundaries
 
-**Will:**
-- Run automated quality checks
-- Provide clear pass/fail feedback
-- Suggest fixes for common issues
-- Integrate with project's existing tools
-
-**Will Not:**
-- Automatically fix code issues
-- Skip required checks
-- Override user decisions
-- Modify source code
-
-## Forked Context Behavior
-
-See [Forked Context Pattern](../../_shared/forked-context.md).
-
-**Returns**: `status: PASSED | FAILED | PASSED_WITH_WARNINGS` with check summary
-
-**Output Examples:**
-- `✅ Quality Gate PASSED` - Summary: N passed, M warnings
-- `❌ Quality Gate FAILED` - Key errors (max 3) + action needed
-- `key_errors: [Key errors max 3]` - Focused error list
+**Will:** Run automated checks, provide pass/fail feedback, suggest fixes, integrate existing tools
+**Won't:** Auto-fix code, skip required checks, override user decisions, modify source

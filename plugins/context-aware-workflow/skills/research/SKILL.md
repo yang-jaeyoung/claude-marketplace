@@ -21,14 +21,7 @@ forked-context: false
 
 # Research Skill
 
-Comprehensive research skill that combines internal codebase exploration with external documentation research.
-
-## Purpose
-
-This skill enables thorough research by:
-1. Analyzing the existing codebase for relevant patterns and implementations
-2. Searching external documentation and best practices
-3. Synthesizing findings into actionable recommendations
+Combines internal codebase exploration with external documentation research.
 
 ## Invocation
 
@@ -36,279 +29,82 @@ This skill enables thorough research by:
 /cw:research "<topic>" [options]
 ```
 
-## Skill Behavior
+## Workflow
 
-### 1. Query Understanding
-
-First, understand what the user is researching:
-
-```markdown
-## Query Analysis
-
-Topic: [extracted from user input]
-Type: [concept | implementation | comparison | troubleshooting]
-Scope: [internal | external | both]
-Depth: [shallow | normal | deep]
+### 1. Query Analysis
+```yaml
+Topic: [extracted]
+Type: concept | implementation | comparison | troubleshooting
+Scope: internal | external | both
+Depth: shallow | normal | deep
 ```
 
-### 2. Internal Research Phase
-
-When internal research is requested or default:
-
-```markdown
-## Internal Research Steps
-
-[1] Symbol Search
-    Use Serena find_symbol with topic keywords
-    Search for classes, functions, types related to topic
-
-[2] Pattern Search
-    Use search_for_pattern for usage patterns
-    Look for configuration files
-
-[3] Reference Analysis
-    Use find_referencing_symbols to understand usage
-    Map the dependency chain
-
-[4] Context Gathering
-    Use get_symbols_overview for relevant files
-    Read key implementations
-
-Output: Organized findings about current codebase state
+### 2. Internal Research
+```
+[1] Symbol Search: Serena find_symbol with keywords
+[2] Pattern Search: search_for_pattern for usage
+[3] Reference Analysis: find_referencing_symbols
+[4] Context: get_symbols_overview, read implementations
 ```
 
-### 3. External Research Phase
-
-When external research is requested or default:
-
-```markdown
-## External Research Steps
-
-[1] Web Search
-    Use WebSearch for documentation and articles
-    Focus on official docs, reputable sources
-
-[2] Documentation Fetch
-    Use WebFetch for detailed page content
-    Extract relevant sections
-
-[3] Library Docs (if applicable)
-    Use Context7 for library-specific documentation
-    Get code examples
-
-Output: Best practices, examples, recommendations
+### 3. External Research
+```
+[1] Web Search: WebSearch for docs/articles
+[2] Doc Fetch: WebFetch for detailed content
+[3] Library Docs: Context7 for library-specific
 ```
 
-### 4. Synthesis Phase
-
-Combine findings:
-
-```markdown
-## Synthesis Steps
-
-[1] Compare Internal vs External
-    What does our code do vs what's recommended?
-    Identify gaps and discrepancies
-
-[2] Generate Recommendations
-    Priority-ordered improvements
-    Code examples for implementation
-
-[3] Format Report
-    Structured markdown output
-    Save to .caw/research/ if requested
+### 4. Synthesis
 ```
-
-## Agent Integration
-
-### Standard Mode
-
-Use direct tools and built-in agents:
-
-```markdown
-## Research Execution
-
-Internal:
-  - Task(Explore) for fast codebase navigation
-  - Direct Serena tool calls for symbols
-  - Grep/Glob for pattern matching
-
-External:
-  - WebSearch + WebFetch for documentation
-  - Context7 for libraries
-
-Synthesis:
-  - cw:Planner for combining findings
-  - Direct LLM analysis
-```
-
-### Deep Mode (--depth deep)
-
-Use Opus-tier agents for comprehensive analysis:
-
-```markdown
-## Deep Research Execution
-
-Internal:
-  - cw:planner-opus for deep pattern analysis
-  - Comprehensive Serena symbol exploration
-
-External:
-  - Thorough documentation research
-  - Multiple source verification
-
-Synthesis:
-  - cw:planner-opus for comprehensive analysis
-  - Detailed comparative recommendations
+[1] Compare: Internal vs recommended
+[2] Recommendations: Priority-ordered
+[3] Format: Structured markdown
 ```
 
 ## Output Format
-
-### Research Report Structure
 
 ```markdown
 # Research: {Topic}
 
 ## Summary
-Brief overview of findings
+Brief overview
 
 ## Internal Analysis
-
-### Current Implementation
-- File locations
-- Key symbols
-- Patterns used
-
-### Dependencies
-- External packages
-- Internal modules
+- File locations, key symbols, patterns
+- Dependencies (external/internal)
 
 ## External Research
-
-### Best Practices
-1. Practice 1
-2. Practice 2
-
-### Documentation Sources
-- [Source 1](url)
-- [Source 2](url)
+- Best practices
+- Documentation sources
 
 ## Synthesis
-
-### Gap Analysis
 | Aspect | Current | Recommended |
 |--------|---------|-------------|
-| ... | ... | ... |
 
 ### Recommendations
-1. 🔴 High Priority: ...
-2. 🟡 Medium Priority: ...
+1. 🔴 High: ...
+2. 🟡 Medium: ...
 3. 🟢 Nice to Have: ...
-
-## Context File
-Location: .caw/research/{topic}-{date}.md
 ```
 
-## State Management
+## Mode Integration
 
-### Research Context File
-
-Location: `.caw/research/{name}.md`
-
-```markdown
-# Research Context: {Name}
-
-## Metadata
-- Created: {timestamp}
-- Topic: {topic}
-- Depth: {depth}
-- Duration: {time}
-
-## Findings
-{research content}
-
-## Usage
-Reference this in workflow:
-  /cw:start "task" --research-context {name}
-```
+| Mode | Tools |
+|------|-------|
+| Standard | Task(Explore), Serena, Grep/Glob, WebSearch, Context7 |
+| Deep | cw:planner-opus, comprehensive Serena, multi-source |
 
 ## Error Handling
 
-### No Internal Results
+| Error | Action |
+|-------|--------|
+| No internal results | Focus external, suggest terminology check |
+| No external results | Try specific terms, check official docs |
+| Rate limited | Wait 30s, use --depth shallow |
 
-```markdown
-⚠️ No matching symbols found in codebase
-
-This topic may be:
-- Not yet implemented
-- Using different terminology
-- In external dependencies only
-
-Suggestion: Focus on external research
-  /cw:research "{topic}" --external
-```
-
-### No External Results
-
-```markdown
-⚠️ Limited external documentation found
-
-Try:
-- More specific search terms
-- Different topic phrasing
-- Check official library docs directly
-```
-
-### Rate Limiting
-
-```markdown
-⚠️ Search rate limited
-
-Waiting 30 seconds before retry...
-Consider using --depth shallow for faster results
-```
-
-## Integration Points
-
-### With Planning
-
-Research can inform planning:
+## Integration
 
 ```bash
-/cw:research "authentication patterns" --save auth-research
+/cw:research "auth patterns" --save auth-research
 /cw:start "Implement OAuth" --research-context auth-research
-```
-
-### With Review
-
-Research can support code review:
-
-```bash
-/cw:research "security best practices" --external
-/cw:review --focus security
-```
-
-### With QA
-
-Research can guide quality improvements:
-
-```bash
-/cw:research "testing patterns"
-/cw:ultraqa --target test
-```
-
-## Metrics
-
-After research completion, record:
-
-```json
-{
-  "research_id": "res_20240115_103045",
-  "topic": "JWT authentication",
-  "duration_seconds": 180,
-  "internal_results": 12,
-  "external_sources": 5,
-  "recommendations": 3,
-  "saved_to": ".caw/research/jwt-auth.md"
-}
 ```

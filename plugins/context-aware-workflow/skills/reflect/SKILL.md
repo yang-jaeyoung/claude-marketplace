@@ -1,249 +1,86 @@
 ---
 name: reflect
-description: "Run Ralph Loop - continuous improvement cycle after task completion (Reflect-Analyze-Learn-Plan-Habituate)"
+description: "Run Ralph Loop - continuous improvement cycle (Reflect-Analyze-Learn-Plan-Habituate)"
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
-# /cw:reflect - Ralph Loop Skill
+# /cw:reflect - Ralph Loop
 
-Run the Ralph Loop continuous improvement cycle after completing a task or workflow.
+Continuous improvement cycle after task completion.
 
 ## Usage
 
 ```bash
-/cw:reflect              # Reflect on last completed task
-/cw:reflect --task 2.3   # Reflect on specific step
+/cw:reflect              # Last completed task
+/cw:reflect --task 2.3   # Specific step
 /cw:reflect --full       # Full workflow retrospective
 ```
 
 ## Ralph Loop Phases
 
-Execute each phase in order:
-
-### Phase 1: REFLECT (R)
-Review what happened during the task.
-
+### R - REFLECT
 ```
-📝 Reading .caw/task_plan.md for completed steps
-📝 Reading .caw/session.json for execution history
-
-Output:
-- Task summary
-- Outcome assessment (success/partial/failure)
-- Duration assessment (faster/expected/slower)
-- Blockers encountered
-- Tools and agents used
+Input: task_plan.md, session.json
+Output: Task summary, outcome (success/partial/failure), duration, blockers, tools used
 ```
 
-### Phase 2: ANALYZE (A)
-Identify patterns and issues.
-
+### A - ANALYZE
 ```
-Questions to answer:
-- What approaches worked well?
-- What didn't work as expected?
-- What were the root causes of issues?
-- Are there recurring patterns?
-
-Output:
-- List of what worked
-- List of what didn't work
-- Root cause analysis
-- Pattern identification
+Questions: What worked? What didn't? Root causes? Patterns?
+Output: Worked list, didn't work list, root causes, patterns
 ```
 
-### Phase 3: LEARN (L)
-Extract lessons from the analysis.
-
+### L - LEARN
 ```
-Questions to answer:
-- What key insights emerged?
-- What skills were improved?
-- What knowledge gaps were revealed?
-
-Output:
-- Key insights list
-- Skills improvement notes
-- Knowledge gaps to address
+Questions: Key insights? Skills improved? Knowledge gaps?
+Output: Insights, skills notes, gaps to address
 ```
 
-### Phase 4: PLAN (P)
-Plan concrete improvements.
-
+### P - PLAN
 ```
-Generate:
-- Action items with priority (high/medium/low)
-- Process changes to implement
-- Tool recommendations
-
-Output:
-- Prioritized action items
-- Process improvement suggestions
-- Tool/workflow recommendations
+Generate: Action items (high/medium/low), process changes, tool recommendations
 ```
 
-### Phase 5: HABITUATE (H)
-Apply learnings to future work.
-
+### H - HABITUATE
 ```
 Actions:
-- Update .caw/learnings.md with new insights
-- Add items to project checklists
-- Create Serena memories for persistent learnings (ENHANCED)
-
-Output:
-- New defaults established
-- Checklist additions
-- Memory updates for future sessions
+- Update .caw/learnings.md
+- Add to checklists
+- Create Serena memories
 ```
 
-#### Serena Memory Persistence (ENHANCED)
+## Serena Memory Persistence
 
-Save Ralph Loop results to Serena memory for cross-session utilization:
-
+```yaml
+workflow_patterns: Accumulated success patterns (permanent)
+ralph_learning_YYYYMMDD: Individual retrospective (90-day retention)
 ```
-# 1. Save workflow patterns (successful approaches)
-write_memory("workflow_patterns", """
-# Workflow Patterns
-
-## Last Updated
-[ISO timestamp] by Ralph Loop
-
-## Successful Approaches
-
-### [Task Type]: [Pattern Name]
-- **Context**: When to use this pattern
-- **Approach**: Step-by-step method
-- **Outcome**: Expected results
-- **Caveats**: Things to watch out for
-
-## Anti-patterns
-- [What to avoid]
-""")
-
-# 2. Save individual Ralph learning (detailed analysis)
-write_memory("ralph_learning_YYYYMMDD", """
-# Ralph Learning: [Date]
-
-## Cycle Summary
-- **Task**: [name]
-- **Outcome**: [success/partial/failure]
-- **Duration**: [faster/expected/slower]
-
-## Key Insights
-1. [insight 1]
-2. [insight 2]
-
-## Action Items
-- [ ] [action 1]
-- [ ] [action 2]
-
-## Patterns Identified
-- [pattern 1]
-- [pattern 2]
-""")
-```
-
-**Save timing**:
-- Auto-save immediately after Ralph Loop completion
-- On explicit `/cw:sync --to-serena` execution
-
-**Memory naming convention**:
-| Memory | Content | Retention |
-|--------|---------|-----------|
-| `workflow_patterns` | Accumulated success patterns | Permanent (updated) |
-| `ralph_learning_YYYYMMDD` | Individual retrospective results | Cleanup after 90 days |
 
 ## Output Format
 
 ```markdown
-## 🔄 Ralph Loop - Improvement Cycle
+## 🔄 Ralph Loop
 
-**Task**: [Task name from plan]
-**Cycle**: #[N] | **Date**: [timestamp]
+**Task**: [name] | **Cycle**: #N
 
 ### 📝 REFLECT
-- **Outcome**: ✅ Success / ⚠️ Partial / ❌ Failure
-- **Duration**: ⏱️ Faster / Expected / Slower than planned
-- **Blockers**: [list or "None"]
-- **Tools Used**: [agent/tool list]
+Outcome: ✅/⚠️/❌ | Duration: Faster/Expected/Slower
 
 ### 🔍 ANALYZE
-**What Worked**:
-- [item 1]
-- [item 2]
-
-**What Didn't Work**:
-- [item 1]
-
-**Root Causes**:
-- [cause 1]
-
-**Patterns**:
-- [pattern 1]
+Worked: [...] | Didn't Work: [...] | Root Causes: [...] | Patterns: [...]
 
 ### 💡 LEARN
-**Key Insights**:
-1. [insight]
-
-**Skills Improved**: [list]
-**Knowledge Gaps**: [list]
+Insights: [...] | Skills: [...] | Gaps: [...]
 
 ### 📋 PLAN
-| Priority | Action | Applies To |
-|----------|--------|------------|
-| 🔴 High | [action] | [scope] |
-| 🟡 Medium | [action] | [scope] |
+| Priority | Action | Scope |
+|----------|--------|-------|
+| 🔴 High | [...] | [...] |
 
 ### 🔧 HABITUATE
-**Applied Changes**:
-- ✅ Added to .caw/learnings.md
-- ✅ Updated checklist: [item]
-- ✅ Created memory: [name]
-
----
-📊 **Improvement Score**: [0.0-1.0]
-📈 **Cumulative Learnings**: [N] insights captured
-```
-
-## Integration
-
-### After Task Completion
-When a workflow step completes:
-1. Optionally prompt: "Run /cw:reflect for improvement insights?"
-2. User can run manually anytime
-
-### With Serena Memory
-Store persistent learnings:
-```
-write_memory("ralph_learning_[date]", insights)
-```
-
-### After Task Completion
-Consider running reflection after completing tasks:
-```
-💡 Task complete. Consider /cw:reflect for continuous improvement.
-```
-
-## Learnings Storage
-
-Insights are stored in `.caw/learnings.md`:
-
-```markdown
-# CAW Learnings
-
-## 2024-01-15: Auth Implementation
-- TDD approach reduced debugging time by 50%
-- Security review should happen earlier
-
-## 2024-01-14: API Refactoring
-- Batch operations more efficient than sequential
+Applied: learnings.md ✅ | checklist ✅ | memory ✅
 ```
 
 ## Auto-Reflection Triggers
 
-Consider automatic reflection when:
-- Task took 2x longer than estimated
-- Multiple blockers encountered
-- User explicitly requested deep work mode
-- Significant code changes (>500 lines)
+Consider when: 2x longer than estimated, multiple blockers, deep work mode, >500 lines changed
