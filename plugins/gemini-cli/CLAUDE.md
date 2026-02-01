@@ -7,7 +7,7 @@
 
 ## Prerequisites
 
-- Gemini CLI installed (`brew install google-gemini/tap/gemini-cli` or `npm install -g @anthropic-ai/gemini-cli`)
+- Gemini CLI installed (`brew install google-gemini/tap/gemini-cli`)
 - Authenticated via `gemini auth login`
 
 ---
@@ -26,6 +26,7 @@ gemini --version
 /gemini:commit               # Generate commit message
 /gemini:docs <file>          # Generate documentation
 /gemini:release [tag]        # Generate release notes
+/gemini:search <query>       # Web search with Search Grounding
 ```
 
 ---
@@ -57,6 +58,12 @@ Generate release notes from git commit history.
 - **Input:** Optional start tag (auto-detects if omitted)
 - **Output:** Summary, features, bug fixes, improvements, breaking changes
 
+## /gemini:search
+Web search using Google Search Grounding.
+- **Input:** Search query
+- **Output:** Search results summary, key information, source URLs
+- **Limit:** 1,500 queries/day (free tier)
+
 ---
 
 # Implementation Patterns
@@ -73,6 +80,7 @@ gemini-cli/
     commit.md        # /gemini:commit
     docs.md          # /gemini:docs
     release.md       # /gemini:release
+    search.md        # /gemini:search
 ```
 
 ## Command Definition Pattern

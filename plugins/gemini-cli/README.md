@@ -9,9 +9,6 @@ Google Gemini CLI integration for Claude Code - leveraging Gemini AI for code re
 ```bash
 # macOS (Homebrew)
 brew install google-gemini/tap/gemini-cli
-
-# Or via npm
-npm install -g @anthropic-ai/gemini-cli
 ```
 
 ### 2. Authenticate
@@ -36,7 +33,8 @@ gemini --version
 | `/gemini:review` | Run code review on staged changes or a file | `/gemini:review [file]` |
 | `/gemini:commit` | Generate commit message from staged changes | `/gemini:commit` |
 | `/gemini:docs` | Generate documentation for a file | `/gemini:docs <file>` |
-| `/gemini:release` | Generate release notes from git commits | `/gemini:release <from-tag>` |
+| `/gemini:release` | Generate release notes from git commits | `/gemini:release [from-tag]` |
+| `/gemini:search` | Web search with Google Search Grounding | `/gemini:search <query>` |
 
 ## Command Details
 
@@ -120,6 +118,23 @@ Release notes include:
 - Bug Fixes
 - Improvements
 - Breaking Changes
+
+### `/gemini:search`
+
+Web search using Google Search Grounding.
+
+```bash
+/gemini:search jQuery 4 release date 2026
+/gemini:search latest React 19 features
+/gemini:search Claude Code plugins documentation
+```
+
+Search results include:
+- Summary of findings
+- Key information
+- Source URLs
+
+**Note:** Free tier allows 1,500 queries/day.
 
 ## Configuration
 

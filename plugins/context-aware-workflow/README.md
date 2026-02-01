@@ -11,7 +11,19 @@ Context-aware workflow orchestration plugin for Claude Code. Acts as a **Context
 
 ## Features
 
-### v1.9.0 (Current)
+### v2.0.0 (Current)
+
+- **Swarm Mode** - Parallel multi-agent execution with `/cw:swarm`
+- **Pipeline Mode** - Explicit sequential stages with `/cw:pipeline`
+- **Analytics System** - Token/cost analysis with `/cw:analytics`
+- **HUD (Heads-Up Display)** - Real-time workflow metrics during execution
+- **Eco Mode** - Cost-optimized execution (30-50% savings) via `eco` keyword
+- **Tiered Agents** - Complexity-based model routing (Haiku/Sonnet/Opus)
+- **Background Heuristics** - Automatic async/foreground decision
+- **Rate Limit Handling** - Automatic wait-and-resume for rate limits
+- **Delegation Categories** - Category-based agent routing
+
+### v1.9.0
 
 - **GUIDELINES.md Generation** - Auto-generate workflow guidelines with `--with-guidelines`
 - **Deep Initialization** - Hierarchical AGENTS.md generation with `--deep`
@@ -78,9 +90,13 @@ cp -r context-aware-workflow /your/project/.claude-plugin/
 | `/cw:sync` | Synchronize CAW state with Serena memory (cross-session persistence) |
 | `/cw:worktree` | Manage Git worktrees for parallel phase execution |
 | `/cw:merge` | Merge completed worktree branches back to main |
-| `/cw:qaloop` | **QA Loop** - Build → Review → Fix cycle until quality passes (NEW) |
-| `/cw:ultraqa` | **UltraQA** - Intelligent auto QA for build/test/lint issues (NEW) |
-| `/cw:research` | **Research Mode** - Internal codebase + external docs research (NEW) |
+| `/cw:qaloop` | **QA Loop** - Build → Review → Fix cycle until quality passes |
+| `/cw:ultraqa` | **UltraQA** - Intelligent auto QA for build/test/lint issues |
+| `/cw:research` | **Research Mode** - Internal codebase + external docs research |
+| `/cw:swarm` | **Swarm Mode** - Parallel multi-agent execution (NEW) |
+| `/cw:pipeline` | **Pipeline Mode** - Sequential stages with checkpoints (NEW) |
+| `/cw:analytics` | **Analytics** - Token/cost analysis and optimization insights (NEW) |
+| `/cw:evolve` | **Evolve** - Self-improvement and evolution cycle (NEW) |
 
 ## Enhanced Initialization (v1.9.0)
 
@@ -287,6 +303,44 @@ Activate special modes by including keywords in your prompt:
 | `thinkhard`, `ultrathink` | DEEP ANALYSIS | Extended reasoning, validate before acting |
 | `quickfix`, `quick`, `fast` | MINIMAL CHANGE | Essential changes only, speed priority |
 | `research`, `investigate` | RESEARCH | Comprehensive information gathering first |
+| `eco`, `ecomode` | ECO MODE | Cost-optimized execution, forces Haiku tier |
+| `async` | ASYNC | Force background execution |
+
+## Swarm Mode (`/cw:swarm`)
+
+Execute multiple tasks in parallel using multiple agents:
+
+```bash
+/cw:swarm "task1" "task2" "task3"
+```
+
+Each task runs independently with its own agent, results are merged upon completion.
+
+## Pipeline Mode (`/cw:pipeline`)
+
+Define explicit sequential stages with checkpoints:
+
+```bash
+/cw:pipeline --stages "plan,build,review,deploy"
+```
+
+Supports stage dependencies, rollback on failure, and progress checkpoints.
+
+## Analytics (`/cw:analytics`)
+
+View token usage and cost analysis:
+
+```bash
+/cw:analytics              # Current session
+/cw:analytics --history    # Historical trends
+```
+
+## HUD (Heads-Up Display)
+
+Real-time workflow metrics during execution:
+
+- Enable: Set `CAW_HUD=enabled` environment variable
+- Displays: Current step, progress, token usage, estimated cost
 
 ## Tidy First Methodology
 
@@ -318,10 +372,22 @@ Kent Beck's **Tidy First** methodology for code quality:
 | `mode.schema.json` | `schemas/` | Mode state tracking |
 | `model-routing.schema.json` | `schemas/` | Model tier selection |
 | `last_review.schema.json` | `schemas/` | Reviewer output format |
+| `metrics.schema.json` | `schemas/` | Analytics metrics format |
 | `ralph-loop.schema.json` | `_shared/schemas/` | Continuous improvement cycle |
 | `task-plan.schema.md` | `_shared/schemas/` | Task plan document format |
 
 ## Roadmap
+
+### Completed (v2.0.0)
+- [x] **Swarm Mode** - Parallel multi-agent execution with `/cw:swarm`
+- [x] **Pipeline Mode** - Sequential stages with `/cw:pipeline`
+- [x] **Analytics System** - Token/cost analysis with `/cw:analytics`
+- [x] **HUD** - Real-time workflow metrics during execution
+- [x] **Eco Mode** - Cost-optimized execution (30-50% savings)
+- [x] **Tiered Agents** - Full Haiku/Sonnet/Opus variants for all core agents
+- [x] **Background Heuristics** - Automatic async/foreground decisions
+- [x] **Rate Limit Handling** - Automatic wait-and-resume
+- [x] **Delegation Categories** - Category-based agent routing
 
 ### Completed (v1.9.0)
 - [x] **GUIDELINES.md Generation** - Workflow guidelines with `--with-guidelines` flag
