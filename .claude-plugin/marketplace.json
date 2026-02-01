@@ -1,8 +1,8 @@
 {
-  "name": "jyyang-claude-marketplace",
+  "name": "context-aware-workflow",
   "owner": {
-    "name": "jyyang",
-    "email": "jyyang@eye.co.kr"
+    "name": "jaebit",
+    "email": "duskfalls0@gmail.com"
   },
   "plugins": [
     {
