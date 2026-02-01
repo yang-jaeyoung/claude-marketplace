@@ -10,390 +10,93 @@ Merges completed worktree branches back to the main branch and synchronizes task
 ## Usage
 
 ```bash
-# Phase-based (PRIMARY)
-/cw:merge                     # Auto-detect and merge completed worktrees
-/cw:merge --all               # Merge all phase worktrees (dependency order)
-/cw:merge phase 2             # Merge specific phase's worktree
+/cw:merge                     # Auto-detect and merge completed
+/cw:merge --all               # Merge all (dependency order)
+/cw:merge phase 2             # Merge specific phase
 /cw:merge phase 2,3           # Merge multiple phases
-
-# Step-based (Legacy)
-/cw:merge --step 2.2          # Merge specific step's worktree
-
-# Control
+/cw:merge --step 2.2          # Merge step worktree (legacy)
 /cw:merge --dry-run           # Preview without executing
 /cw:merge --abort             # Abort current merge
-/cw:merge --continue          # Continue after conflict resolution
+/cw:merge --continue          # Continue after conflict
 ```
 
-## Behavior
+## Workflow
 
-### Default Merge (`/cw:merge`)
+1. **Scan**: Find `.worktrees/phase-*` directories
+2. **Check**: Read each worktree's task_plan.md for completion
+3. **Order**: Sort by Phase Deps (topological)
+4. **Merge**: Sequential merge of each branch
+5. **Sync**: Update main `.caw/task_plan.md`
+6. **Cleanup**: Suggest `/cw:worktree clean`
 
-Auto-detects and merges all completed worktrees (both phase and step-based).
+## Output
 
-**Workflow**:
-1. **Scan Worktrees**: Find `.worktrees/phase-*` and `.worktrees/caw-step-*`
-2. **Check Completion**: Read each worktree's `.caw/task_plan.md`
-3. **Order by Dependencies**: Merge in Phase Deps order
-4. **Sequential Merge**: Merge each branch one at a time
-5. **Sync Task Plan**: Update main `.caw/task_plan.md`
-6. **Suggest Cleanup**: Recommend `/cw:worktree clean`
-
-**Output**:
 ```
 🔀 Merging Worktree Branches
 
 Scanning worktrees...
-  .worktrees/phase-2: ✅ Complete (5/5 steps)
-  .worktrees/phase-3: ✅ Complete (4/4 steps)
-  .worktrees/phase-4: 🔄 In Progress (2/3 steps, skipping)
+  .worktrees/phase-2: ✅ Complete (5/5)
+  .worktrees/phase-3: ✅ Complete (4/4)
+  .worktrees/phase-4: 🔄 In Progress (skipping)
 
-Merge order (by Phase Deps):
-  1. caw/phase-2 (Phase Deps: phase 1)
-  2. caw/phase-3 (Phase Deps: phase 1)
+Merging...
+  ✅ caw/phase-2 merged (5 files)
+  ✅ caw/phase-3 merged (4 files)
 
-Merging caw/phase-2 into main...
-  ✓ Fast-forward merge successful
-  Files changed: 5
-
-Merging caw/phase-3 into main...
-  ✓ 3-way merge successful
-  Files changed: 4
-
-Updating task_plan.md...
-  ✓ Phase 2: ✅ Complete (5/5)
-  ✓ Phase 3: ✅ Complete (4/4)
-
-📊 Summary:
-  Merged: 2 phase branches
-  Skipped: 1 (in progress)
-  Conflicts: 0
-
+📊 Summary: 2 merged, 1 skipped, 0 conflicts
 💡 Run /cw:worktree clean to remove merged worktrees
-```
-
-### Merge All (`/cw:merge --all`)
-
-Merges all phase worktrees in dependency order, regardless of completion status warning.
-
-**Use Case**: When you want to merge all completed phases at once.
-
-**Output**:
-```
-🔀 Merging All Phase Worktrees
-
-Detected worktrees:
-  ├─ phase-2: ✅ Complete (5/5 steps)
-  ├─ phase-3: ✅ Complete (4/4 steps)
-  └─ phase-4: ✅ Complete (3/3 steps)
-
-Merge order (by Phase Deps):
-  1. phase-2 (no deps among worktrees)
-  2. phase-3 (no deps among worktrees)
-  3. phase-4 (depends on phase-2, phase-3)
-
-Merging...
-  ✅ caw/phase-2 merged successfully
-     Files: src/auth/jwt.ts, src/auth/validation.ts (+3 more)
-
-  ✅ caw/phase-3 merged successfully
-     Files: src/models/user.ts, src/utils/hash.ts (+2 more)
-
-  ✅ caw/phase-4 merged successfully
-     Files: src/routes/auth.ts, tests/integration/auth.test.ts
-
-📊 Main task_plan.md updated:
-  Phase 2: ✅ Complete
-  Phase 3: ✅ Complete
-  Phase 4: ✅ Complete
-
-💡 Next: /cw:next phase 5 (if exists)
-   Or: /cw:worktree clean to remove worktrees
-```
-
-### Specific Phase Merge (`/cw:merge phase 2`)
-
-Merges only the specified phase's worktree.
-
-```
-🔀 Merging Phase 2
-
-Checking worktree status...
-  .worktrees/phase-2: ✅ Complete (5/5 steps)
-
-Merging caw/phase-2 into main...
-  ✓ Merge successful
-
-Files changed:
-  M src/auth/jwt.ts
-  M src/auth/validation.ts
-  A src/auth/middleware.ts
-  A tests/auth/jwt.test.ts
-  A tests/auth/validation.test.ts
-
-Updating task_plan.md...
-  ✓ Phase 2: ✅ Complete
-
-✅ Phase 2 merged successfully
-
-💡 Next steps:
-  /cw:merge phase 3          # Merge next phase
-  /cw:worktree clean         # Clean up
-```
-
-### Multiple Phases (`/cw:merge phase 2,3`)
-
-Merges multiple phases in dependency order.
-
-```
-🔀 Merging Phases 2, 3
-
-Checking worktree status...
-  .worktrees/phase-2: ✅ Complete
-  .worktrees/phase-3: ✅ Complete
-
-Merge order:
-  1. phase-2 (Phase Deps: phase 1)
-  2. phase-3 (Phase Deps: phase 1)
-
-Merging...
-  ✅ caw/phase-2 merged
-  ✅ caw/phase-3 merged
-
-📊 Summary: 2 phases merged
-```
-
-### Dry Run (`/cw:merge --dry-run`)
-
-Shows what would be merged without actually merging.
-
-```
-🔍 Dry Run - Merge Preview
-
-Would merge (in order):
-  1. caw/phase-2 → main
-     Status: ✅ Complete (5/5 steps)
-     Files: 5 changed
-     Conflicts: None detected
-
-  2. caw/phase-3 → main
-     Status: ✅ Complete (4/4 steps)
-     Files: 4 changed
-     Conflicts: Possible (src/types/index.ts modified in both)
-
-Would skip:
-  - caw/phase-4 (In Progress: 2/3 steps)
-
-💡 Run /cw:merge to execute
-   Or /cw:merge --all to include all
 ```
 
 ## Conflict Handling
 
-### Automatic Resolution
+| Scenario | Action |
+|----------|--------|
+| Auto-resolvable | Resolved automatically |
+| Manual required | Lists files, waits for resolution |
+| After resolution | `git add <files>` then `/cw:merge --continue` |
+| Give up | `/cw:merge --abort` |
 
-Simple conflicts are auto-resolved when possible:
-- Different sections of same file modified
-- Only one side modified a file
-- Non-overlapping changes
+## Merge Order
 
-### Manual Resolution Required
+Phases merged in topological order based on Phase Deps:
+- Phase 2, 3 (depend only on Phase 1)
+- Phase 4 (depends on Phase 2, 3)
+- Phase 5 (depends on Phase 4)
 
-When conflicts cannot be auto-resolved:
+## Task Plan Sync
 
-```
-⚠️ Merge Conflict in caw/phase-3
-
-Conflicting files:
-  src/types/index.ts
-  src/auth/index.ts
-
-To resolve:
-  1. Edit conflicting files to resolve
-  2. Run: git add <resolved-files>
-  3. Run: /cw:merge --continue
-
-Or abort with: /cw:merge --abort
-
-💡 Tip: Use VS Code or your preferred merge tool
-```
-
-### Continue After Resolution (`/cw:merge --continue`)
-
-```
-🔀 Continuing Merge
-
-Checking resolved files...
-  ✓ src/types/index.ts resolved
-  ✓ src/auth/index.ts resolved
-
-Completing merge of caw/phase-3...
-  ✓ Merge committed
-
-Continuing with remaining phases...
-  ✅ caw/phase-4 merged
-
-📊 All merges complete
-```
-
-### Abort Merge (`/cw:merge --abort`)
-
-```
-⏹️ Aborting Merge
-
-Reverting merge state...
-  ✓ Merge aborted
-  ✓ Working directory restored
-
-💡 Fix issues and try /cw:merge again
-```
-
-## Merge Order Strategy
-
-### Phase-Based Ordering
-
-Phases are merged in Phase Deps order:
-
-```
-Phase Deps:
-  Phase 2: phase 1
-  Phase 3: phase 1
-  Phase 4: phase 2, phase 3
-  Phase 5: phase 4
-
-Merge Order:
-  1. Phase 2, Phase 3 (both depend only on Phase 1)
-  2. Phase 4 (after Phase 2, 3)
-  3. Phase 5 (after Phase 4)
-
-Note: Phases with same deps can be merged in any order,
-      but we merge sequentially to avoid conflicts.
-```
-
-### Topological Sort
-
-The merge uses topological sort based on Phase Deps:
-
-```
-Input worktrees: [phase-2, phase-3, phase-4]
-
-Build dependency graph:
-  phase-2 → []
-  phase-3 → []
-  phase-4 → [phase-2, phase-3]
-
-Topological order: [phase-2, phase-3, phase-4]
-```
-
-## Task Plan Synchronization
-
-After merge, the main `.caw/task_plan.md` is updated:
-
-1. **Read Worktree State**: Get all step statuses from worktree's task_plan.md
-2. **Update Main Plan**: Set corresponding steps to their final status
-3. **Preserve Notes**: Copy any notes added during implementation
-4. **Update Phase Status**: Mark phase as complete if all steps done
-
-```markdown
-## Execution Phases
-
-### Phase 2: Core Implementation
-**Phase Deps**: phase 1
-
-| # | Step | Status | Agent | Deps | Notes |
-|---|------|--------|-------|------|-------|
-| 2.1 | JWT utility | ✅ | Builder | - | Merged from caw/phase-2 |
-| 2.2 | Token generation | ✅ | Builder | 2.1 | Merged from caw/phase-2 |
-| 2.3 | Token validation | ✅ | Builder | 2.1 | Merged from caw/phase-2 |
-```
-
-## Git Commands Executed
-
-```bash
-# Merge a phase branch
-git merge caw/phase-2 --no-edit
-
-# If conflict occurs
-git merge --abort  # For /cw:merge --abort
-
-# After conflict resolution
-git add <resolved-files>
-git merge --continue
-
-# Clean up after merge (done by /cw:worktree clean)
-git worktree remove .worktrees/phase-2
-git branch -d caw/phase-2
-```
+After merge, main task_plan.md updated:
+- Step statuses from worktree
+- Notes preserved
+- Phase marked complete if all steps done
 
 ## Edge Cases
 
-### No Completed Worktrees
+| Scenario | Behavior |
+|----------|----------|
+| No completed worktrees | Shows status, suggests completing work |
+| No worktrees exist | Suggests creating with `/cw:worktree create` |
+| Uncommitted changes | Requires commit in worktree first |
+| Phase not complete | Warns, offers partial merge option |
 
-```
-ℹ️ No worktrees ready to merge
+## Git Commands
 
-Worktree status:
-  .worktrees/phase-2: 🔄 In Progress (3/5)
-  .worktrees/phase-3: ⏳ Pending (0/4)
-
-💡 Complete work in worktrees first, then run /cw:merge
-```
-
-### No Worktrees Exist
-
-```
-ℹ️ No worktrees found
-
-No .worktrees/phase-* or .worktrees/caw-step-* directories exist.
-
-💡 Create worktrees with:
-   /cw:next --worktree phase N
-   /cw:worktree create phase N
-```
-
-### Worktree Modified but Not Committed
-
-```
-⚠️ Uncommitted changes in worktree
-
-.worktrees/phase-2 has uncommitted changes:
-  M src/auth/jwt.ts
-  M src/auth/validation.ts
-
-Please commit changes in the worktree first:
-  cd .worktrees/phase-2
-  git add -A && git commit -m "Complete Phase 2"
-```
-
-### Phase Not Complete
-
-```
-⚠️ Phase 2 is not complete
-
-Status: 🔄 In Progress (3/5 steps)
-  ✅ 2.1 JWT utility
-  ✅ 2.2 Token generation
-  ✅ 2.3 Token validation
-  🔄 2.4 Middleware (in progress)
-  ⏳ 2.5 Error handling
-
-Options:
-  [1] Wait for completion
-  [2] Merge partial (⚠️ not recommended)
-  [3] View remaining steps
+```bash
+git merge caw/phase-N --no-edit    # Merge
+git merge --abort                   # Abort
+git merge --continue                # After resolution
 ```
 
 ## Integration
 
-- **`/cw:worktree create`**: Creates worktrees that will be merged
-- **`/cw:worktree clean`**: Removes worktrees after merge
-- **`/cw:status --worktrees`**: Shows pending merge status
-- **`/cw:next`**: Continues work after merge
+- `/cw:worktree create` - Creates worktrees to merge
+- `/cw:worktree clean` - Removes after merge
+- `/cw:status --worktrees` - Shows pending merge status
 
 ## Best Practices
 
-1. **Complete all steps** in a worktree before merging
-2. **Commit frequently** in worktrees to preserve progress
-3. **Use `--dry-run`** before merging to preview changes
-4. **Merge in order** when phases have dependencies
-5. **Clean up** after merging with `/cw:worktree clean`
+1. Complete all steps before merging
+2. Commit frequently in worktrees
+3. Use `--dry-run` to preview
+4. Merge in dependency order
+5. Clean up after merging

@@ -5,193 +5,95 @@ argument-hint: "[--to-serena | --from-serena | --status]"
 
 # /cw:sync - Serena Memory Synchronization
 
-Synchronize CAW workflow knowledge with Serena MCP memory system for cross-session persistence.
+Synchronize CAW workflow knowledge with Serena MCP memory for cross-session persistence.
 
 ## Usage
 
 ```bash
-# Bidirectional sync (default)
-/cw:sync
-
-# Upload CAW knowledge to Serena
-/cw:sync --to-serena
-
-# Restore knowledge from Serena
-/cw:sync --from-serena
-
-# Check current sync status
-/cw:sync --status
-
-# Force overwrite without merge
-/cw:sync --to-serena --force
-/cw:sync --from-serena --force
-
-# Sync specific category only
-/cw:sync --category domain_knowledge
-/cw:sync --category lessons_learned
+/cw:sync                        # Bidirectional (default)
+/cw:sync --to-serena            # Upload to Serena
+/cw:sync --from-serena          # Restore from Serena
+/cw:sync --status               # Check sync status
+/cw:sync --force                # Overwrite without merge
+/cw:sync --category domain_knowledge  # Specific category
 ```
 
 ## Flags
 
 | Flag | Description |
 |------|-------------|
-| `--to-serena` | Upload CAW knowledge to Serena memory |
-| `--from-serena` | Download and restore from Serena memory |
-| `--status` | Show current sync status without making changes |
-| `--force` | Overwrite without merge (use with caution) |
-| `--category <name>` | Sync only specified category |
-| `--verbose` | Show detailed sync operations |
-
-## Behavior
-
-### Default Bidirectional Sync
-
-When invoked without flags:
-
-1. **Check both sources**:
-   - Read CAW files timestamps (`.caw/knowledge/`, `.caw/insights/`, `.caw/learnings.md`)
-   - Call `list_memories()` to get Serena memory list
-
-2. **Compare and merge**:
-   - Apply `newer_wins` strategy for each category
-   - Merge content when both have unique entries
-
-3. **Sync both directions**:
-   - Upload newer CAW content to Serena
-   - Download newer Serena content to CAW
-
-### Upload to Serena (`--to-serena`)
-
-1. Read all CAW knowledge files
-2. Aggregate by category
-3. Call Serena MCP tools:
-   ```
-   write_memory("domain_knowledge", aggregated_domain_content)
-   write_memory("lessons_learned", aggregated_lessons)
-   write_memory("workflow_patterns", aggregated_patterns)
-   ```
-4. Report upload summary
-
-### Restore from Serena (`--from-serena`)
-
-1. Call `list_memories()` to check available
-2. For each relevant memory:
-   ```
-   read_memory("domain_knowledge") → .caw/knowledge/from_serena.md
-   read_memory("lessons_learned") → .caw/learnings.md (merge)
-   read_memory("workflow_patterns") → .caw/knowledge/patterns.md
-   ```
-3. Report restoration summary
-
-### Status Check (`--status`)
-
-1. Read CAW file timestamps
-2. Call Serena `list_memories()` for metadata
-3. Compare and report status table
-4. Suggest actions if out of sync
+| `--to-serena` | Upload CAW knowledge |
+| `--from-serena` | Download from Serena |
+| `--status` | Show sync status |
+| `--force` | Overwrite without merge |
+| `--category <name>` | Sync specific category |
 
 ## Memory Categories
 
 | Category | CAW Source | Serena Memory |
 |----------|------------|---------------|
 | Domain Knowledge | `.caw/knowledge/**` | `domain_knowledge` |
-| Lessons Learned | `.caw/learnings.md`, CLAUDE.md | `lessons_learned` |
+| Lessons Learned | `.caw/learnings.md` | `lessons_learned` |
 | Workflow Patterns | `.caw/knowledge/patterns.md` | `workflow_patterns` |
 | Project Context | `context_manifest.json` | `project_onboarding` |
-| Insights | `.caw/insights/**` (persistent) | `caw_insights` |
+| Insights | `.caw/insights/**` | `caw_insights` |
 
-## Output Examples
+## Behavior
 
-### Sync Status
+### Bidirectional (Default)
 
-```markdown
+1. Compare timestamps (CAW files vs Serena memories)
+2. Apply `newer_wins` strategy
+3. Merge unique entries
+4. Sync both directions
+
+### Upload (`--to-serena`)
+
+```
+write_memory("domain_knowledge", content)
+write_memory("lessons_learned", content)
+```
+
+### Restore (`--from-serena`)
+
+```
+read_memory("domain_knowledge") → .caw/knowledge/
+read_memory("lessons_learned") → .caw/learnings.md
+```
+
+## Output
+
+```
 ## Serena Sync Status
 
-| Category | CAW Last Modified | Serena Last Modified | Status |
-|----------|-------------------|----------------------|--------|
+| Category | CAW Modified | Serena Modified | Status |
+|----------|--------------|-----------------|--------|
 | domain_knowledge | 2024-01-15 14:30 | 2024-01-14 10:00 | CAW newer |
 | lessons_learned | 2024-01-14 09:00 | 2024-01-15 16:00 | Serena newer |
-| workflow_patterns | Not found | 2024-01-10 08:00 | Serena only |
-| project_onboarding | 2024-01-15 08:00 | 2024-01-15 08:00 | In sync |
 
-**Recommendation**:
-- Run `/cw:sync` to synchronize all
-- Or `/cw:sync --from-serena --category workflow_patterns` for specific
-```
-
-### Successful Sync
-
-```markdown
-## Serena Sync Complete
-
-### Uploaded to Serena
-| Memory | Size | Action |
-|--------|------|--------|
-| domain_knowledge | 2.1 KB | Updated |
-| lessons_learned | 1.5 KB | Merged |
-
-### Downloaded from Serena
-| Memory | Size | Action |
-|--------|------|--------|
-| workflow_patterns | 3.2 KB | Restored |
-
-**Summary**:
-- 3 categories synchronized
-- 2 uploads, 1 download
-- Duration: 1.2s
-```
-
-### Sync with Errors
-
-```markdown
-## Serena Sync Partial
-
-### Successful
-| Category | Direction | Status |
-|----------|-----------|--------|
-| domain_knowledge | CAW → Serena | Updated |
-
-### Failed
-| Category | Error | Action |
-|----------|-------|--------|
-| lessons_learned | Parse error | Skipped |
-
-**Recommendation**:
-- Check `.caw/learnings.md` format
-- Retry with `/cw:sync --category lessons_learned`
+## Sync Complete
+  Uploaded: 2 | Downloaded: 1 | Duration: 1.2s
 ```
 
 ## When to Use
 
 | Scenario | Command |
 |----------|---------|
-| End of work session | `/cw:sync --to-serena` |
-| Start of new session | `/cw:sync --from-serena` |
-| Regular sync check | `/cw:sync --status` |
-| Full bidirectional sync | `/cw:sync` |
-| After major discoveries | `/cw:sync --to-serena` |
-| Team knowledge share | `/cw:sync --to-serena` |
-
-## Integration
-
-- **serena-sync skill**: This command invokes the serena-sync skill
-- **/cw:init**: Automatically checks Serena for onboarding
-- **/cw:reflect**: Can trigger sync after Ralph Loop completion
-- **SessionEnd hook**: Can auto-sync on session end (if configured)
+| End of session | `--to-serena` |
+| Start of session | `--from-serena` |
+| Regular check | `--status` |
+| After discoveries | `--to-serena` |
 
 ## Error Handling
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| "Serena not available" | MCP server not running | Check Serena MCP configuration |
-| "Memory not found" | First sync for this project | Content will be created |
-| "Parse error" | Invalid CAW file format | Fix file format, retry |
-| "Conflict detected" | Both sides modified | Use `--force` or manual merge |
+| Error | Solution |
+|-------|----------|
+| Serena not available | Check MCP configuration |
+| Memory not found | Will be created |
+| Conflict detected | Use `--force` or manual merge |
 
-## Best Practices
+## Integration
 
-1. **Sync regularly**: Run `/cw:sync --status` to check sync state
-2. **Before major changes**: Sync to Serena as backup
-3. **After learning**: Sync lessons immediately
-4. **New session**: Check for Serena context first
-5. **Team projects**: Sync to share domain knowledge
+- `/cw:init` - Checks Serena for onboarding
+- `/cw:reflect` - Can trigger sync after Ralph Loop
+- SessionEnd hook - Auto-sync if configured
