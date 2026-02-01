@@ -9,8 +9,8 @@ tools:
   - Grep
   - AskUserQuestion
 mcp_servers:
-  - context7     # UI 컴포넌트 패턴, 접근성 가이드라인 참조
-  - perplexity   # UX 트렌드, 접근성 표준 심층 연구
+  - context7     # UI component patterns, accessibility guidelines reference
+  - perplexity   # UX trends, accessibility standards deep research
 skills: pattern-learner, decision-logger
 ---
 

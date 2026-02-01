@@ -66,19 +66,19 @@ See `patterns.md` for detailed pattern matching rules.
 Use AskUserQuestion to offer workflow options:
 
 ```
-🎯 Plan Mode 완료 감지
+🎯 Plan Mode Completion Detected
 
-계획 파일: [plan file path]
-분석 결과:
-  ✅ 구현 단계: [N]개 Phase, [M]개 Step 감지
-  ✅ 파일 변경: [X]개 파일 예상
-  [✅/⚠️] 기술 결정: [documented/not found]
+Plan file: [plan file path]
+Analysis result:
+  ✅ Implementation stages: [N] Phases, [M] Steps detected
+  ✅ File changes: [X] files expected
+  [✅/⚠️] Technical decisions: [documented/not found]
 
-CAW 워크플로우 옵션:
-[1] 자동 시작 - /cw:start --from-plan 실행
-[2] 설계 먼저 - /cw:design 로 상세 설계 후 시작
-[3] 수동 진행 - 나중에 직접 시작
-[4] 계획 수정 - Plan Mode로 돌아가기
+CAW Workflow Options:
+[1] Auto start - Execute /cw:start --from-plan
+[2] Design first - Start after detailed design with /cw:design
+[3] Manual proceed - Start manually later
+[4] Edit plan - Return to Plan Mode
 ```
 
 ### Step 4: Execute Selected Option
@@ -103,29 +103,29 @@ Based on user selection:
 
 ### Plan Detected Successfully
 ```
-🎯 Plan Mode 완료 감지
+🎯 Plan Mode Completion Detected
 
-계획 파일: .claude/plans/auth-implementation.md
+Plan file: .claude/plans/auth-implementation.md
 
-📋 계획 요약:
-   제목: User Authentication with JWT
-   구현 단계: 2 Phases, 6 Steps
-   예상 파일: 5개 생성, 2개 수정
+📋 Plan Summary:
+   Title: User Authentication with JWT
+   Implementation stages: 2 Phases, 6 Steps
+   Expected files: 5 created, 2 modified
 
-💡 CAW 워크플로우로 체계적인 구현을 시작할 수 있습니다.
+💡 You can start systematic implementation with CAW workflow.
 ```
 
 ### Plan Not Suitable
 ```
-ℹ️ Plan Mode 완료 감지
+ℹ️ Plan Mode Completion Detected
 
-계획 파일이 발견되었으나 CAW 워크플로우에 적합하지 않습니다:
-  ⚠️ 구현 단계가 명확하지 않음
-  ⚠️ 파일 변경 사항 미정의
+Plan file was found but is not suitable for CAW workflow:
+  ⚠️ Implementation stages are not clear
+  ⚠️ File changes are not defined
 
-권장 사항:
-  • Plan Mode에서 구현 단계를 더 상세히 작성
-  • 또는 /cw:start "task description" 으로 새로 시작
+Recommendations:
+  • Write more detailed implementation stages in Plan Mode
+  • Or start fresh with /cw:start "task description"
 ```
 
 ## Directory Structure

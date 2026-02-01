@@ -36,15 +36,15 @@ This skill operates in two modes:
 
 ### Core Principle
 
-**Insight 생성 = 즉시 저장**
+**Insight Generation = Immediate Save**
 
-인사이트를 생성하면 같은 턴에 반드시 저장합니다.
+When you generate an insight, it must be saved in the same turn.
 
 ### Insight Generation Protocol
 
 #### Step 1: Generate Insight Block
 
-인사이트를 사용자에게 표시:
+Display the insight to the user:
 
 ```
 ★ Insight ─────────────────────────────────────────
@@ -54,7 +54,7 @@ This skill operates in two modes:
 
 #### Step 2: Immediately Save (Same Turn)
 
-인사이트 블록 출력 직후, Write 도구로 즉시 저장:
+Immediately after outputting the insight block, save it using the Write tool:
 
 ```yaml
 action: Write tool
@@ -87,8 +87,8 @@ content: |
 
 **Pattern**: `{YYYYMMDD}-{slug}.md`
 
-- date: 오늘 날짜 (예: 20260127)
-- slug: 제목에서 3-5단어, kebab-case
+- date: Today's date (e.g., 20260127)
+- slug: 3-5 words from the title, kebab-case
 
 **Examples**:
 - `20260127-jwt-token-refresh-pattern.md`
@@ -96,11 +96,11 @@ content: |
 
 ### When to Generate Insights
 
-1. **Implementation Discovery**: 구현 중 발견한 유용한 패턴
-2. **Problem Solution**: 문제 해결 과정에서 얻은 교훈
-3. **Best Practice**: 프로젝트에 특화된 모범 사례
-4. **Gotcha/Pitfall**: 주의해야 할 함정이나 실수
-5. **Architecture Decision**: 중요한 설계 결정의 근거
+1. **Implementation Discovery**: Useful patterns discovered during implementation
+2. **Problem Solution**: Lessons learned from the problem-solving process
+3. **Best Practice**: Project-specific best practices
+4. **Gotcha/Pitfall**: Traps or mistakes to watch out for
+5. **Architecture Decision**: Rationale behind important design decisions
 
 ## Part 2: Automatic Pattern Learning (Instincts)
 
@@ -269,7 +269,7 @@ Instincts feed into pattern-learner skill for higher-level analysis.
 
 ## Tag Generation Rules
 
-인사이트/인스팅트 내용을 분석하여 자동으로 태그 생성:
+Auto-generate tags by analyzing insight/instinct content:
 
 | Content Pattern | Tag |
 |-----------------|-----|
@@ -362,15 +362,15 @@ Generated dashboard is a **self-contained HTML file** at `.caw/dashboard.html` (
 ## Boundaries
 
 **Will:**
-- 인사이트 생성 시 즉시 저장
-- 도구 사용 패턴 자동 관찰
-- 패턴에서 인스팅트 생성
-- 메타데이터와 태그 자동 생성
-- 원본 내용 정확히 보존
-- 신뢰도 기반 인스팅트 관리
+- Save insights immediately upon generation
+- Automatically observe tool usage patterns
+- Generate instincts from patterns
+- Auto-generate metadata and tags
+- Preserve original content accurately
+- Manage instincts based on confidence
 
 **Will Not:**
-- 인사이트/인스팅트 내용 임의 수정
-- 사용자 확인 없이 기존 파일 덮어쓰기
-- 저신뢰도 인스팅트 자동 진화
-- 민감한 정보 관찰 로그에 저장
+- Arbitrarily modify insight/instinct content
+- Overwrite existing files without user confirmation
+- Auto-evolve low-confidence instincts
+- Store sensitive information in observation logs

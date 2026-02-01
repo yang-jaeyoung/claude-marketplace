@@ -99,10 +99,10 @@ Output:
 
 #### Serena Memory Persistence (ENHANCED)
 
-Ralph Loop 결과를 Serena 메모리에 저장하여 크로스 세션 활용:
+Save Ralph Loop results to Serena memory for cross-session utilization:
 
 ```
-# 1. Workflow patterns 저장 (성공적인 접근법)
+# 1. Save workflow patterns (successful approaches)
 write_memory("workflow_patterns", """
 # Workflow Patterns
 
@@ -121,7 +121,7 @@ write_memory("workflow_patterns", """
 - [What to avoid]
 """)
 
-# 2. Ralph learning 개별 저장 (상세 분석)
+# 2. Save individual Ralph learning (detailed analysis)
 write_memory("ralph_learning_YYYYMMDD", """
 # Ralph Learning: [Date]
 
@@ -144,15 +144,15 @@ write_memory("ralph_learning_YYYYMMDD", """
 """)
 ```
 
-**저장 시점**:
-- Ralph Loop 완료 직후 자동 저장
-- `/cw:sync --to-serena` 명시적 실행 시
+**Save timing**:
+- Auto-save immediately after Ralph Loop completion
+- On explicit `/cw:sync --to-serena` execution
 
-**메모리 명명 규칙**:
+**Memory naming convention**:
 | Memory | Content | Retention |
 |--------|---------|-----------|
-| `workflow_patterns` | 누적된 성공 패턴 | 영구 (업데이트) |
-| `ralph_learning_YYYYMMDD` | 개별 회고 결과 | 90일 후 정리 |
+| `workflow_patterns` | Accumulated success patterns | Permanent (updated) |
+| `ralph_learning_YYYYMMDD` | Individual retrospective results | Cleanup after 90 days |
 
 ## Output Format
 

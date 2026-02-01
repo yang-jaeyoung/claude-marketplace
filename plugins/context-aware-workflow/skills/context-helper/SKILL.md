@@ -4,10 +4,10 @@ description: Helps agents understand and manage context efficiently. Provides re
 allowed-tools: Read, Glob, Grep
 forked-context: true
 forked-context-returns: |
-  files: 우선순위 파일 목록 (최대 10개)
-  step_outputs: 이전 단계 요약
-  insights: 관련 인사이트 (압축)
-  dependencies: 의존성 파일 목록
+  files: Prioritized file list (max 10)
+  step_outputs: Previous step summary
+  insights: Related insights (compressed)
+  dependencies: Dependency file list
 hooks:
   AgentStartStep:
     action: provide_context

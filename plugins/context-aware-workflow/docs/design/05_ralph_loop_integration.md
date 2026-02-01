@@ -1,78 +1,78 @@
-# Option A: /cw:loop 명령어 추가 계획
+# Option A: /cw:loop Command Addition Plan
 
-dingco Ralph Loop (반복 실행 자동화)를 cw 플러그인에 통합하는 설계 문서
+Design document for integrating dingco Ralph Loop (iteration automation) into the cw plugin
 
-## 1. 개요
+## 1. Overview
 
-### 1.1 목적
+### 1.1 Purpose
 
-기존 `/cw:auto`는 단계별로 한 번씩만 실행하고 에러 시 중단됩니다.
-`/cw:loop`는 **완료 조건이 충족될 때까지 자동으로 반복 실행**하는 자율 에이전트 모드를 제공합니다.
+The existing `/cw:auto` executes each step only once and stops on error.
+`/cw:loop` provides an **autonomous agent mode that automatically repeats execution until completion conditions are met**.
 
-### 1.2 핵심 차이점
+### 1.2 Key Differences
 
-| 구분 | /cw:auto | /cw:loop (신규) |
-|------|----------|-----------------|
-| 실행 방식 | 각 단계 1회 실행 | 완료까지 반복 실행 |
-| 에러 처리 | 중단 후 수동 개입 요청 | 자동 재시도/수정 시도 |
-| 종료 조건 | 모든 단계 완료 | completion-promise 감지 |
-| 최대 실행 | 단계 수만큼 | max-iterations 제한 |
+| Aspect | /cw:auto | /cw:loop (New) |
+|--------|----------|----------------|
+| Execution Mode | Single execution per step | Repeat until complete |
+| Error Handling | Stop and request manual intervention | Auto-retry/fix attempt |
+| Exit Condition | All steps complete | completion-promise detection |
+| Max Execution | Number of steps | max-iterations limit |
 
-## 2. 명령어 사양
+## 2. Command Specification
 
-### 2.1 기본 사용법
+### 2.1 Basic Usage
 
 ```bash
-# 기본 사용
-/cw:loop "REST API 서버와 웹 클라이언트를 만들고 연동합니다. 완료되면 DONE을 출력합니다."
+# Basic usage
+/cw:loop "Create REST API server and web client with integration. Output DONE when complete."
 
-# 옵션 지정
-/cw:loop "프로젝트 구현" --max-iterations 30 --completion-promise "COMPLETE"
+# With options
+/cw:loop "Implement project" --max-iterations 30 --completion-promise "COMPLETE"
 
-# 기존 task_plan 기반 실행
+# Continue from existing task_plan
 /cw:loop --continue --max-iterations 50
 ```
 
-### 2.2 파라미터
+### 2.2 Parameters
 
-| 파라미터 | 기본값 | 설명 |
-|----------|--------|------|
-| `--max-iterations` | 20 | 최대 반복 횟수 (무한 루프 방지) |
-| `--completion-promise` | "DONE" | 작업 완료를 나타내는 키워드 |
-| `--continue` | false | 기존 task_plan.md 기반으로 계속 실행 |
-| `--auto-fix` | true | 에러 발생 시 자동 수정 시도 |
-| `--verbose` | false | 상세 진행 상황 출력 |
-| `--reflect` | true | 완료 후 Ralph Loop 회고 실행 |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--max-iterations` | 20 | Maximum iteration count (infinite loop prevention) |
+| `--completion-promise` | "DONE" | Keyword indicating task completion |
+| `--continue` | false | Continue execution based on existing task_plan.md |
+| `--auto-fix` | true | Attempt auto-fix on error |
+| `--verbose` | false | Detailed progress output |
+| `--reflect` | true | Run Ralph Loop retrospective after completion |
 
-### 2.3 완료 조건 (Exit Criteria)
+### 2.3 Exit Conditions
 
-루프가 종료되는 조건:
+Loop terminates when:
 
 ```
 EXIT_CONDITIONS:
-  1. completion-promise 키워드가 출력에 포함됨
-  2. max-iterations 도달
-  3. 사용자가 수동 중단 (Ctrl+C)
-  4. 연속 3회 동일 에러 발생 (무한 실패 방지)
-  5. task_plan.md의 모든 단계가 ✅ Complete
+  1. completion-promise keyword appears in output
+  2. max-iterations reached
+  3. User manual stop (Ctrl+C)
+  4. 3 consecutive identical errors (infinite failure prevention)
+  5. All steps in task_plan.md are ✅ Complete
 ```
 
-## 3. 구현 아키텍처
+## 3. Implementation Architecture
 
-### 3.1 파일 구조
+### 3.1 File Structure
 
 ```
 plugins/context-aware-workflow/
 ├── commands/
-│   └── loop.md                    # 신규: 명령어 정의
+│   └── loop.md                    # New: Command definition
 ├── _shared/
 │   └── schemas/
-│       └── loop-state.schema.json # 신규: 루프 상태 스키마
+│       └── loop-state.schema.json # New: Loop state schema
 └── hooks/
-    └── hooks.json                 # 수정: Stop hook 추가
+    └── hooks.json                 # Modified: Add Stop hook
 ```
 
-### 3.2 핵심 컴포넌트
+### 3.2 Core Components
 
 #### A. commands/loop.md
 
@@ -83,7 +83,7 @@ argument-hint: "<task description>"
 ---
 ```
 
-#### B. 루프 상태 관리 (.caw/loop_state.json)
+#### B. Loop State Management (.caw/loop_state.json)
 
 ```json
 {
@@ -113,43 +113,43 @@ argument-hint: "<task description>"
 }
 ```
 
-**스키마 버전 관리**
+**Schema Version Management**
 
 ```markdown
-## 버전 호환성
+## Version Compatibility
 
-schema_version 필드로 하위 호환성 관리:
-- "1.0": 초기 버전 (MVP)
-- "1.1": iteration_result.json 통합 (Phase 2)
-- "2.0": 병렬 루프 지원 (Phase 4+)
+Manage backward compatibility via schema_version field:
+- "1.0": Initial version (MVP)
+- "1.1": iteration_result.json integration (Phase 2)
+- "2.0": Parallel loop support (Phase 4+)
 
-## 마이그레이션 로직
+## Migration Logic
 
-loop_state.json 로드 시:
-1. schema_version 확인
-2. 현재 버전보다 낮으면 자동 마이그레이션
-3. 현재 버전보다 높으면 경고 + 읽기 전용 모드
+When loading loop_state.json:
+1. Check schema_version
+2. If lower than current version: auto-migrate
+3. If higher than current version: warning + read-only mode
 ```
 
-#### C. Stop Hook (완료 조건 검사)
+#### C. Stop Hook (Completion Condition Check)
 
-**구현 방식**: 파일 존재 여부 기반 조건부 활성화
+**Implementation Method**: Conditional activation based on file existence
 
-현재 cw 플러그인의 hooks.json은 문자열 매처(tool name 기반)를 사용합니다.
-`loop_active`라는 조건부 매처 대신, **commands/loop.md 내부에서 반복 로직을 직접 제어**하는 방식을 채택합니다.
+The current cw plugin's hooks.json uses string matchers (tool name based).
+Instead of a `loop_active` conditional matcher, we adopt **direct control of iteration logic within commands/loop.md**.
 
 ```markdown
-## Loop Completion Check (commands/loop.md 내 로직)
+## Loop Completion Check (logic within commands/loop.md)
 
-각 iteration 종료 시:
-1. .caw/loop_state.json 읽기
-2. 현재 iteration의 출력에서 completion_promise 검색
-3. 감지됨 → status를 'completed'로 업데이트, 루프 종료
-4. 미감지 AND iterations < max → 다음 iteration 진행
-5. max 도달 → status를 'max_iterations_reached'로 업데이트
+At end of each iteration:
+1. Read .caw/loop_state.json
+2. Search for completion_promise in current iteration output
+3. If detected → Update status to 'completed', exit loop
+4. If not detected AND iterations < max → Proceed to next iteration
+5. If max reached → Update status to 'max_iterations_reached'
 ```
 
-**대안 A: PreToolUse Hook 활용** (Phase 2)
+**Alternative A: PreToolUse Hook (Phase 2)**
 
 ```json
 {
@@ -167,14 +167,14 @@ loop_state.json 로드 시:
 }
 ```
 
-**대안 B: 전용 Loop Controller Agent** (Phase 3)
+**Alternative B: Dedicated Loop Controller Agent (Phase 3)**
 
-별도의 loop-controller 에이전트가 iteration 관리를 전담:
-- Builder 에이전트 호출/감시
-- 출력 캡처 및 completion_promise 감지
-- 상태 업데이트 및 다음 iteration 결정
+A separate loop-controller agent handles iteration management:
+- Builder agent invocation/monitoring
+- Output capture and completion_promise detection
+- State update and next iteration decision
 
-### 3.3 실행 흐름
+### 3.3 Execution Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -221,9 +221,9 @@ loop_state.json 로드 시:
         └─────────────────────────────┘
 ```
 
-## 4. 상세 설계
+## 4. Detailed Design
 
-### 4.1 Iteration 로직
+### 4.1 Iteration Logic
 
 ```markdown
 ## Single Iteration Execution
@@ -258,7 +258,7 @@ FOR each iteration:
    - If exiting: Proceed to finalization
 ```
 
-### 4.2 에러 복구 전략
+### 4.2 Error Recovery Strategy
 
 ```markdown
 ## Auto-Fix Strategy
@@ -291,34 +291,34 @@ Level 5: Abort
   - Report to user for manual intervention
 ```
 
-### 4.3 Completion Promise 감지
+### 4.3 Completion Promise Detection
 
-#### 출력 캡처 메커니즘
+#### Output Capture Mechanism
 
-Claude Code에서 에이전트 출력을 캡처하는 방법:
+Methods to capture agent output in Claude Code:
 
-**방법 1: 파일 기반 로깅 (권장)**
-
-```markdown
-## Builder 에이전트 호출 시
-
-1. Builder 실행 전: .caw/iteration_output.md 초기화
-2. Builder 에이전트 시스템 프롬프트에 추가:
-   "각 단계 완료 시 결과를 .caw/iteration_output.md에 append하세요"
-3. Builder 종료 후: .caw/iteration_output.md 읽어서 completion_promise 검색
-```
-
-**방법 2: task_plan.md 상태 기반 (보조)**
+**Method 1: File-based Logging (Recommended)**
 
 ```markdown
-## 암시적 완료 감지
+## When invoking Builder agent
 
-task_plan.md의 단계 상태를 파싱하여:
-- 모든 단계가 ✅ → 암시적 완료
-- ⏳ 또는 ❌ 존재 → 미완료
+1. Before Builder execution: Initialize .caw/iteration_output.md
+2. Add to Builder agent system prompt:
+   "Append results to .caw/iteration_output.md upon each step completion"
+3. After Builder exit: Read .caw/iteration_output.md and search for completion_promise
 ```
 
-**방법 3: 구조화된 결과 파일 (Phase 3)**
+**Method 2: task_plan.md Status-based (Supplementary)**
+
+```markdown
+## Implicit completion detection
+
+Parse step status from task_plan.md:
+- All steps ✅ → Implicit completion
+- ⏳ or ❌ exists → Not complete
+```
+
+**Method 3: Structured Result File (Phase 3)**
 
 ```json
 // .caw/iteration_result.json
@@ -334,26 +334,26 @@ task_plan.md의 단계 상태를 파싱하여:
 }
 ```
 
-#### 파일 역할 구분 (iteration_output.md vs iteration_result.json)
+#### File Role Distinction (iteration_output.md vs iteration_result.json)
 
-| 파일 | Phase | 용도 | Primary Source |
-|------|-------|------|----------------|
-| `iteration_output.md` | Phase 2+ | Human-readable 로그, completion promise 감지 | **Phase 2의 truth** |
-| `iteration_result.json` | Phase 3+ | 구조화된 분석용 데이터, 에러 추적 강화 | Phase 3 이후 보조 |
+| File | Phase | Purpose | Primary Source |
+|------|-------|---------|----------------|
+| `iteration_output.md` | Phase 2+ | Human-readable log, completion promise detection | **Phase 2 truth** |
+| `iteration_result.json` | Phase 3+ | Structured analysis data, enhanced error tracking | Phase 3+ supplementary |
 
-**결정 근거**:
-- Phase 2 (MVP): `iteration_output.md`만 사용 - Builder가 자연스럽게 작성 가능
-- Phase 3+: `iteration_result.json` 추가 - 복잡한 에러 분석, 메트릭 수집에 활용
-- `iteration_output.md`는 항상 completion promise 감지의 primary source로 유지
+**Decision Rationale**:
+- Phase 2 (MVP): Use only `iteration_output.md` - Builder can write naturally
+- Phase 3+: Add `iteration_result.json` - For complex error analysis, metrics collection
+- `iteration_output.md` remains the primary source for completion promise detection
 
-#### 감지 로직
+#### Detection Logic
 
 ```markdown
 ## Detection Logic
 
 AFTER each iteration:
 
-1. Read .caw/iteration_output.md (또는 iteration_result.json)
+1. Read .caw/iteration_output.md (or iteration_result.json)
 2. Normalize (lowercase, trim whitespace)
 3. Check if contains completion_promise (case-insensitive)
 4. Check for variations:
@@ -372,12 +372,12 @@ ALSO check for implicit completion:
   - Tests passing (if applicable)
 ```
 
-## 5. 출력 형식
+## 5. Output Format
 
-### 5.1 진행 상황 표시
+### 5.1 Progress Display
 
 ```
-🔄 /cw:loop "REST API와 웹 연동"
+🔄 /cw:loop "REST API and web integration"
 
 ══════════════════════════════════════════════════════════════
 📍 Iteration 1/20
@@ -427,7 +427,7 @@ Continuing to next iteration...
 Running /cw:reflect for continuous improvement...
 ```
 
-### 5.2 에러 종료 출력
+### 5.2 Error Exit Output
 
 ```
 🔄 /cw:loop "complex task"
@@ -455,267 +455,267 @@ Running /cw:reflect for continuous improvement...
    /cw:status
 ```
 
-## 6. 구현 순서
+## 6. Implementation Order
 
-> **설계 원칙**: Phase 1은 최소 기능으로 빠르게 검증 가능하도록 구성.
-> Hook 기반 복잡한 로직은 Phase 2 이후로 이동.
+> **Design Principle**: Phase 1 is configured for minimal functionality to enable quick validation.
+> Complex hook-based logic is deferred to Phase 2 and beyond.
 
-### Phase 1: MVP (필수) - 단순 반복 실행
-
-```
-□ 1.1 commands/loop.md 생성
-    - 명령어 정의 및 파라미터 설명
-    - 기본 반복 실행 흐름 (max_iterations 기반 종료만)
-    - Builder 에이전트 호출 로직
-
-□ 1.2 _shared/schemas/loop-state.schema.json 생성
-    - 루프 상태 JSON 스키마 정의 (schema_version 포함)
-
-□ 1.3 기본 종료 조건
-    - max_iterations 도달 시 종료
-    - task_plan.md 모든 단계 완료 시 종료 (암시적)
-    - 연속 3회 실패 시 종료
-
-목표: 파라미터 없이 `/cw:loop --continue`로 기존 task_plan 반복 실행 가능
-```
-
-### Phase 2: 완료 조건 감지 (필수)
+### Phase 1: MVP (Required) - Simple Iteration Execution
 
 ```
-□ 2.1 출력 캡처 메커니즘
-    - .caw/iteration_output.md 파일 기반 로깅
-    - Builder 에이전트 프롬프트 수정
+□ 1.1 Create commands/loop.md
+    - Command definition and parameter description
+    - Basic iteration flow (max_iterations based exit only)
+    - Builder agent invocation logic
 
-□ 2.2 completion_promise 감지
-    - iteration_output.md에서 키워드 검색
-    - 감지 시 루프 종료 및 상태 업데이트
+□ 1.2 Create _shared/schemas/loop-state.schema.json
+    - Loop state JSON schema definition (include schema_version)
 
-□ 2.3 State 관리 강화
-    - loop_state.json iterations 배열 관리
-    - 재시작 지원 (--continue)
+□ 1.3 Basic exit conditions
+    - Exit on max_iterations reached
+    - Exit on task_plan.md all steps complete (implicit)
+    - Exit on 3 consecutive failures
 
-목표: `/cw:loop "task" --completion-promise "DONE"` 동작
+Goal: `/cw:loop --continue` can iterate on existing task_plan
 ```
 
-### Phase 3: 에러 처리 (권장)
+### Phase 2: Completion Detection (Required)
 
 ```
-□ 3.1 Auto-fix 통합
-    - Fixer 에이전트 호출 (Level 1-2)
-    - 재시도 로직
+□ 2.1 Output capture mechanism
+    - .caw/iteration_output.md file-based logging
+    - Builder agent prompt modification
 
-□ 3.2 복구 전략
-    - 대안 접근법 제안 (Level 3)
-    - 스킵 & 계속 옵션 (Level 4)
+□ 2.2 completion_promise detection
+    - Keyword search in iteration_output.md
+    - Exit loop and update state on detection
 
-□ 3.3 iteration_result.json 구조화
-    - 단계별 결과 기록
-    - 에러 추적 강화
+□ 2.3 Enhanced state management
+    - Manage loop_state.json iterations array
+    - Support restart (--continue)
+
+Goal: `/cw:loop "task" --completion-promise "DONE"` works
 ```
 
-### Phase 4: 통합 및 최적화 (선택)
+### Phase 3: Error Handling (Recommended)
 
 ```
-□ 4.1 /cw:reflect 연동
-    - 루프 완료 후 자동 회고
+□ 3.1 Auto-fix integration
+    - Fixer agent invocation (Level 1-2)
+    - Retry logic
 
-□ 4.2 컨텍스트 관리
-    - iteration 5회마다 자동 정리
-    - Serena 메모리 저장
+□ 3.2 Recovery strategy
+    - Alternative approach suggestion (Level 3)
+    - Skip & continue option (Level 4)
 
-□ 4.3 테스트 작성
-    - 루프 시나리오 테스트
-    - 에지 케이스 검증
+□ 3.3 iteration_result.json structuring
+    - Step-by-step result recording
+    - Enhanced error tracking
 ```
 
-### Phase 5: 고급 기능 (향후)
+### Phase 4: Integration & Optimization (Optional)
 
 ```
-□ 5.1 /cw:auto --review-loop 통합
-    - auto.md에서 loop 로직 재사용
+□ 4.1 /cw:reflect integration
+    - Auto-retrospective after loop completion
 
-□ 5.2 PreToolUse Hook 기반 조건부 활성화
-    - 루프 활성 상태에서만 동작하는 hook
+□ 4.2 Context management
+    - Auto-cleanup every 5 iterations
+    - Serena memory storage
+
+□ 4.3 Test writing
+    - Loop scenario tests
+    - Edge case verification
+```
+
+### Phase 5: Advanced Features (Future)
+
+```
+□ 5.1 /cw:auto --review-loop integration
+    - Reuse loop logic in auto.md
+
+□ 5.2 PreToolUse Hook-based conditional activation
+    - Hook that operates only when loop is active
 
 □ 5.3 Loop Controller Agent
-    - 전용 에이전트로 iteration 관리 분리
+    - Separate iteration management to dedicated agent
 ```
 
-## 7. 기존 기능과의 관계
+## 7. Relationship with Existing Features
 
-### 7.1 /cw:auto 와의 차이
+### 7.1 Difference from /cw:auto
 
 ```
 /cw:auto:
-├─ 7단계 순차 실행
-├─ 에러 시 중단
-├─ 수동 개입 필요
-└─ 한 번에 완료 목표
+├─ 7-step sequential execution
+├─ Stop on error
+├─ Manual intervention required
+└─ Goal: Complete in one pass
 
 /cw:loop:
-├─ N회 반복 실행
-├─ 에러 시 자동 복구 시도
-├─ 자율 진행
-└─ 완료까지 반복 목표
+├─ N iteration execution
+├─ Auto-recovery on error
+├─ Autonomous progress
+└─ Goal: Repeat until complete
 ```
 
-### 7.2 /cw:reflect 와의 관계
+### 7.2 Relationship with /cw:reflect
 
 ```
-/cw:loop 완료 후:
-└─ 자동으로 /cw:reflect 호출 (--reflect 옵션)
-    └─ Ralph Loop 회고 사이클 실행
-        ├─ Reflect: 루프 실행 리뷰
-        ├─ Analyze: 반복 패턴 분석
-        ├─ Learn: 자동화 개선점 학습
-        ├─ Plan: 다음 루프 최적화
-        └─ Habituate: 학습 내용 저장
+After /cw:loop completion:
+└─ Automatically invoke /cw:reflect (--reflect option)
+    └─ Run Ralph Loop retrospective cycle
+        ├─ Reflect: Review loop execution
+        ├─ Analyze: Analyze iteration patterns
+        ├─ Learn: Learn automation improvements
+        ├─ Plan: Optimize next loop
+        └─ Habituate: Save learnings
 ```
 
-### 7.3 명명 정리
+### 7.3 Naming Clarification
 
-| 명령어 | 의미 | 출처 |
-|--------|------|------|
-| `/cw:loop` | 반복 실행 자동화 | dingco Ralph Loop |
-| `/cw:reflect` | 회고 사이클 (RALPH) | cw 기존 구현 |
-| `/cw:auto` | 단일 실행 자동화 | cw 기존 구현 |
+| Command | Meaning | Origin |
+|---------|---------|--------|
+| `/cw:loop` | Iteration automation | dingco Ralph Loop |
+| `/cw:reflect` | Retrospective cycle (RALPH) | cw existing implementation |
+| `/cw:auto` | Single-pass automation | cw existing implementation |
 
-## 8. 리스크 및 고려사항
+## 8. Risks and Considerations
 
-### 8.1 무한 루프 방지
-
-```
-안전장치:
-1. max_iterations 필수 (기본값 20)
-2. 연속 3회 동일 에러 시 중단
-3. 진행 없는 반복 3회 시 중단
-4. 사용자 중단 (Ctrl+C) 지원
-```
-
-### 8.2 리소스 관리
+### 8.1 Infinite Loop Prevention
 
 ```
-고려사항:
-- 긴 실행 시간으로 인한 컨텍스트 소진
-- API 호출 비용 증가
-- 파일 시스템 상태 관리
+Safeguards:
+1. max_iterations required (default 20)
+2. Stop on 3 consecutive identical errors
+3. Stop on 3 iterations with no progress
+4. User interrupt support (Ctrl+C)
 ```
 
-#### 컨텍스트 윈도우 관리 전략
+### 8.2 Resource Management
+
+```
+Considerations:
+- Context exhaustion from long execution
+- Increased API call costs
+- File system state management
+```
+
+#### Context Window Management Strategy
 
 ```markdown
-## Iteration별 컨텍스트 최적화
+## Per-Iteration Context Optimization
 
-각 iteration 시작 시:
-1. 이전 iteration의 상세 로그는 loop_state.json에만 유지
-2. 현재 iteration에 필요한 최소 정보만 로드:
-   - task_plan.md (현재 pending 단계만)
-   - loop_state.json (config + current_iteration만)
-3. 대화 컨텍스트가 임계치 도달 시 자동 정리 (Phase 3)
+At each iteration start:
+1. Keep previous iteration detailed logs only in loop_state.json
+2. Load only minimal info needed for current iteration:
+   - task_plan.md (only current pending steps)
+   - loop_state.json (config + current_iteration only)
+3. Auto-cleanup when conversation context reaches threshold (Phase 3)
 
-## 파일 기반 상태 분리
+## File-based State Separation
 
-컨텍스트에 유지:        파일에만 저장:
-├─ 현재 iteration 정보   ├─ 이전 iterations 상세
-├─ 현재 단계 목록        ├─ 에러 히스토리
-└─ completion config     └─ 수정 이력
+Keep in context:           Store in files only:
+├─ Current iteration info   ├─ Previous iterations detail
+├─ Current step list        ├─ Error history
+└─ completion config        └─ Modification history
 ```
 
-**컨텍스트 자동 정리 (Phase 3 구현)**:
+**Auto Context Cleanup (Phase 3 Implementation)**:
 ```
-## 자동 정리 트리거
+## Auto Cleanup Trigger
 
-구현 시점: Phase 3
+Implementation: Phase 3
 
-트리거 조건:
-- iteration 5회마다 자동 실행
-- 또는 loop_state.json에 iterations 배열 크기 > 10
+Trigger conditions:
+- Every 5 iterations auto-run
+- Or when loop_state.json iterations array size > 10
 
-정리 동작:
-1. loop_state.json의 오래된 iteration 상세를 요약으로 압축
-2. iteration_output.md 내용을 summary로 변환 후 초기화
-3. 현재 진행 상태와 최근 3 iteration만 유지
+Cleanup actions:
+1. Compress old iteration details in loop_state.json to summary
+2. Convert iteration_output.md content to summary, then reinitialize
+3. Keep only current progress and last 3 iterations
 ```
 
-#### 비용 관리
+#### Cost Management
 
 ```markdown
-## API 호출 최적화
+## API Call Optimization
 
-1. Builder 에이전트는 필요한 파일만 읽도록 제한
-2. 반복되는 컨텍스트 로드 최소화
-3. --verbose=false 기본값으로 출력 최소화
+1. Limit Builder agent to only read necessary files
+2. Minimize repeated context loading
+3. Default --verbose=false to minimize output
 
-## 예상 비용 (참고)
+## Estimated Cost (Reference)
 
-iteration당 평균:
-- Sonnet 호출: 3-5회
-- 토큰: ~10K input, ~3K output
+Per iteration average:
+- Sonnet calls: 3-5
+- Tokens: ~10K input, ~3K output
 
-20 iterations 기준:
-- 총 호출: 60-100회
-- 총 토큰: ~200K input, ~60K output
+For 20 iterations:
+- Total calls: 60-100
+- Total tokens: ~200K input, ~60K output
 ```
 
-#### 대응 방안
+#### Mitigation Measures
 
 ```
-- 각 iteration 후 상태 저장 (복구 가능)
-- 진행률 기반 중간 체크포인트
-- --max-iterations로 상한선 설정
-- iteration 5회마다 자동 컨텍스트 정리 고려 (Phase 3)
+- Save state after each iteration (recoverable)
+- Progress-based intermediate checkpoints
+- Set upper limit with --max-iterations
+- Consider auto context cleanup every 5 iterations (Phase 3)
 ```
 
-### 8.3 기존 기능 호환성
+### 8.3 Existing Feature Compatibility
 
 ```
-보장 사항:
-- 기존 /cw:auto 동작 변경 없음
-- 기존 /cw:reflect 동작 변경 없음
-- 동일한 task_plan.md 형식 사용
-- 동일한 에이전트 재사용
+Guarantees:
+- No change to existing /cw:auto behavior
+- No change to existing /cw:reflect behavior
+- Use same task_plan.md format
+- Reuse same agents
 ```
 
-## 9. 향후 확장 가능성
+## 9. Future Extension Possibilities
 
-### 9.1 병렬 루프
+### 9.1 Parallel Loops
 
 ```bash
-# 여러 태스크 동시 실행
-/cw:loop "API 개발" --worktree api &
-/cw:loop "UI 개발" --worktree ui &
+# Multiple task concurrent execution
+/cw:loop "API development" --worktree api &
+/cw:loop "UI development" --worktree ui &
 ```
 
-### 9.2 조건부 분기
+### 9.2 Conditional Branching
 
 ```bash
-# 조건에 따른 분기 실행
-/cw:loop "테스트 통과까지" --until "all tests pass"
-/cw:loop "커버리지 80% 달성" --until "coverage >= 80%"
+# Conditional branch execution
+/cw:loop "Until tests pass" --until "all tests pass"
+/cw:loop "Achieve 80% coverage" --until "coverage >= 80%"
 ```
 
-### 9.3 스케줄링
+### 9.3 Scheduling
 
 ```bash
-# 특정 시간/조건에 실행
-/cw:loop "정기 리팩토링" --schedule "weekly"
+# Scheduled execution
+/cw:loop "Regular refactoring" --schedule "weekly"
 ```
 
-## 10. 활용 사례
+## 10. Use Cases
 
-### 10.1 Review-Fix 루프
+### 10.1 Review-Fix Loop
 
-코드 리뷰에서 High 이상 심각도 이슈가 없을 때까지 자동으로 리뷰와 수정을 반복합니다.
+Automatically repeat review and fix until no High severity or above issues in code review.
 
-#### 사용법
+#### Usage
 
 ```bash
-/cw:loop "코드 리뷰 후 High 이상 이슈 수정. 이슈 없으면 REVIEW_PASSED 출력" \
+/cw:loop "Code review then fix High+ issues. Output REVIEW_PASSED if no issues" \
   --completion-promise "REVIEW_PASSED" \
   --max-iterations 10
 ```
 
-#### 내부 동작 흐름
+#### Internal Workflow
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -724,30 +724,30 @@ iteration당 평균:
                       │
                       ▼
         ┌─────────────────────────────┐
-        │  [1] /cw:review 실행        │
+        │  [1] Run /cw:review         │
         │  → .caw/review_result.json  │
         └─────────────┬───────────────┘
                       │
                       ▼
         ┌─────────────────────────────┐
-        │  [2] 결과 분석              │
-        │  ├─ Critical 이슈?          │
-        │  └─ High 이슈?              │
+        │  [2] Analyze results        │
+        │  ├─ Critical issues?        │
+        │  └─ High issues?            │
         └─────────────┬───────────────┘
                       │
               ┌───────┴───────┐
               │               │
-        있음 (≥1)         없음 (0)
+        Found (≥1)        None (0)
               │               │
               ▼               ▼
    ┌──────────────────┐  ┌──────────────────┐
-   │ [3a] /cw:fix     │  │ [3b] 출력:       │
-   │ → 이슈 수정      │  │ "REVIEW_PASSED"  │
-   │ → 다음 iteration │  │ → 루프 종료      │
+   │ [3a] /cw:fix     │  │ [3b] Output:     │
+   │ → Fix issues     │  │ "REVIEW_PASSED"  │
+   │ → Next iteration │  │ → Exit loop      │
    └──────────────────┘  └──────────────────┘
 ```
 
-#### 리뷰 결과 스키마 확장
+#### Review Result Schema Extension
 
 ```json
 // .caw/review_result.json
@@ -779,7 +779,7 @@ iteration당 평균:
 }
 ```
 
-#### 출력 예시
+#### Output Example
 
 ```
 🔄 /cw:loop "Review-Fix until clean"
@@ -826,27 +826,27 @@ Continuing to next iteration...
 • Duration: 1m 45s
 
 💡 To fix remaining issues:
-   /cw:loop "Medium 이슈까지 수정. 완료시 ALL_CLEAN" \
+   /cw:loop "Fix up to Medium issues. Output ALL_CLEAN when done" \
      --completion-promise "ALL_CLEAN"
 ```
 
-#### 확장: 조건 기반 종료 (Phase 2)
+#### Extension: Condition-based Exit (Phase 2)
 
-Phase 2에서 `--until` 파라미터를 추가하면 더 유연한 조건 지정 가능:
+Adding `--until` parameter in Phase 2 enables more flexible condition specification:
 
 ```bash
-# 표현식 기반 종료 조건
+# Expression-based exit condition
 /cw:loop review-fix \
   --until "review.issues.high == 0 && review.issues.critical == 0" \
   --max-iterations 10
 
-# 특정 임계값 기반
+# Threshold-based
 /cw:loop review-fix \
   --severity-threshold medium \
   --max-iterations 15
 ```
 
-#### loop_state.json 확장
+#### loop_state.json Extension
 
 ```json
 {
@@ -887,117 +887,117 @@ Phase 2에서 `--until` 파라미터를 추가하면 더 유연한 조건 지정
 }
 ```
 
-### 10.2 Test-Fix 루프
+### 10.2 Test-Fix Loop
 
-모든 테스트가 통과할 때까지 반복:
+Repeat until all tests pass:
 
 ```bash
-/cw:loop "테스트 실행 후 실패 수정. 전체 통과시 ALL_TESTS_PASS" \
+/cw:loop "Run tests and fix failures. Output ALL_TESTS_PASS when all pass" \
   --completion-promise "ALL_TESTS_PASS" \
   --max-iterations 15
 ```
 
-### 10.3 Build-Fix 루프
+### 10.3 Build-Fix Loop
 
-빌드 에러가 없을 때까지 반복:
+Repeat until no build errors:
 
 ```bash
-/cw:loop "빌드 실행 후 에러 수정. 성공시 BUILD_SUCCESS" \
+/cw:loop "Run build and fix errors. Output BUILD_SUCCESS on success" \
   --completion-promise "BUILD_SUCCESS" \
   --max-iterations 10
 ```
 
-### 10.4 복합 품질 루프
+### 10.4 Combined Quality Loop
 
-여러 품질 게이트를 순차 통과:
+Sequential pass through multiple quality gates:
 
 ```bash
-/cw:loop "빌드, 테스트, 린트, 리뷰 모두 통과까지. 완료시 QUALITY_GATE_PASSED" \
+/cw:loop "Pass build, tests, lint, and review. Output QUALITY_GATE_PASSED when all pass" \
   --completion-promise "QUALITY_GATE_PASSED" \
   --max-iterations 20
 ```
 
-내부 동작:
+Internal operation:
 ```
 FOR each iteration:
-  1. npm run build     → 실패시 수정
-  2. npm test          → 실패시 수정
-  3. npm run lint      → 실패시 수정
-  4. /cw:review        → High 이상시 수정
-  5. 모두 통과 → "QUALITY_GATE_PASSED"
+  1. npm run build     → Fix on failure
+  2. npm test          → Fix on failure
+  3. npm run lint      → Fix on failure
+  4. /cw:review        → Fix on High+ issues
+  5. All pass → "QUALITY_GATE_PASSED"
 ```
 
-## 11. /cw:auto 통합 방안
+## 11. /cw:auto Integration Plan
 
-기존 `/cw:auto`의 review → fix 단계에 loop 패턴을 통합하는 방안입니다.
+Plan to integrate loop pattern into existing `/cw:auto`'s review → fix stages.
 
-> **중복 방지 원칙**: `/cw:auto --review-loop`는 `/cw:loop`의 로직을 **재사용**합니다.
-> 별도 구현이 아닌 내부 호출 방식으로 코드 중복을 피합니다.
+> **Duplication Prevention Principle**: `/cw:auto --review-loop` **reuses** `/cw:loop` logic.
+> Uses internal invocation rather than separate implementation to avoid code duplication.
 
-### 11.1 현재 /cw:auto 워크플로우
+### 11.1 Current /cw:auto Workflow
 
 ```
-[1/7] init     → 환경 초기화
-[2/7] start    → 계획 생성
-[3/7] next     → 단계 실행
-[4/7] review   → 코드 리뷰 (1회)
-[5/7] fix      → 이슈 수정 (1회)
-[6/7] check    → 컴플라이언스 체크
-[7/7] reflect  → 회고
+[1/7] init     → Environment initialization
+[2/7] start    → Plan generation
+[3/7] next     → Step execution
+[4/7] review   → Code review (once)
+[5/7] fix      → Issue fix (once)
+[6/7] check    → Compliance check
+[7/7] reflect  → Retrospective
 ```
 
-**문제점**: review-fix가 1회만 실행되어 High 이슈가 남을 수 있음
+**Problem**: review-fix runs only once, may leave High issues
 
-### 11.2 제안: --review-loop 플래그 추가
+### 11.2 Proposal: Add --review-loop Flag
 
 ```bash
-# 기존 동작 (1회 review-fix) - 하위 호환성 유지
+# Existing behavior (single review-fix) - backward compatible
 /cw:auto "task"
 
-# Review-Fix Loop 모드 활성화
+# Review-Fix Loop mode activated
 /cw:auto "task" --review-loop
 
-# 옵션 지정
+# With options
 /cw:auto "task" --review-loop --max-review-iterations 5 --review-threshold high
 ```
 
-### 11.3 새 파라미터
+### 11.3 New Parameters
 
-| 파라미터 | 기본값 | 설명 |
-|----------|--------|------|
-| `--review-loop` | false | Review-Fix를 반복 실행 |
-| `--max-review-iterations` | 5 | 최대 Review-Fix 반복 횟수 |
-| `--review-threshold` | high | 이 심각도 이상 이슈 시 반복 (critical, high, medium) |
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--review-loop` | false | Run Review-Fix in iteration mode |
+| `--max-review-iterations` | 5 | Max Review-Fix iteration count |
+| `--review-threshold` | high | Iterate on this severity and above (critical, high, medium) |
 
-### 11.4 수정된 워크플로우
+### 11.4 Modified Workflow
 
 ```
 [1/6] init
 [2/6] start
 [3/6] next
-[4/6] review-fix-loop  ← 조건부 반복
+[4/6] review-fix-loop  ← Conditional iteration
       │
       ├─► review
       │     ↓
-      │   High 이슈?
-      │     ├─ YES → fix → 다음 iteration
-      │     └─ NO  → 루프 종료
+      │   High issues?
+      │     ├─ YES → fix → next iteration
+      │     └─ NO  → exit loop
       │
-      └─► 안전장치: max-review-iterations 도달 시 종료
+      └─► Safeguard: Exit on max-review-iterations reached
 [5/6] check
 [6/6] reflect
 ```
 
-### 11.5 종료 조건
+### 11.5 Exit Conditions
 
 ```
-Review-Fix Loop 종료 조건:
-  1. review-threshold 이상 이슈가 0개
-  2. max-review-iterations 도달
-  3. 연속 2회 동일 이슈 (수정 불가 판단)
+Review-Fix Loop exit conditions:
+  1. Zero issues at review-threshold severity or above
+  2. max-review-iterations reached
+  3. 2 consecutive identical issues (unfixable determination)
 ```
 
-### 11.6 출력 예시
+### 11.6 Output Example
 
 ```
 🚀 /cw:auto "Add logout button" --review-loop
@@ -1025,9 +1025,9 @@ Review-Fix Loop 종료 조건:
   • Compliance: Pass
 ```
 
-### 11.7 에러 처리
+### 11.7 Error Handling
 
-#### 최대 반복 도달
+#### Max Iterations Reached
 
 ```
 [4/6] Review-Fix Loop...
@@ -1049,7 +1049,7 @@ Review-Fix Loop 종료 조건:
   3. Increase limit: /cw:auto --continue --max-review-iterations 10
 ```
 
-#### 수정 불가 이슈 감지
+#### Unfixable Issue Detected
 
 ```
 [4/6] Review-Fix Loop...
@@ -1069,7 +1069,7 @@ Review-Fix Loop 종료 조건:
   3. Add to tech debt: /cw:defer
 ```
 
-### 11.8 session.json 확장
+### 11.8 session.json Extension
 
 ```json
 {
@@ -1110,71 +1110,71 @@ Review-Fix Loop 종료 조건:
 }
 ```
 
-### 11.9 구현 우선순위
+### 11.9 Implementation Priority
 
 ```
 Phase 1 (MVP):
-  □ --review-loop 플래그 파싱
-  □ 기본 반복 로직 (max-review-iterations)
-  □ High 이슈 기준 종료 조건
+  □ --review-loop flag parsing
+  □ Basic iteration logic (max-review-iterations)
+  □ High issue threshold exit condition
 
 Phase 2 (Enhanced):
-  □ --review-threshold 파라미터
-  □ 수정 불가 이슈 감지
-  □ session.json 상태 저장
+  □ --review-threshold parameter
+  □ Unfixable issue detection
+  □ session.json state persistence
 
 Phase 3 (Polish):
-  □ 상세 출력 포맷
-  □ --continue 재개 지원
-  □ 테스트 작성
+  □ Detailed output format
+  □ --continue resume support
+  □ Test writing
 ```
 
-### 11.10 /cw:loop 와의 관계
+### 11.10 Relationship with /cw:loop
 
-| 명령어 | 용도 | Review-Fix | 구현 |
-|--------|------|------------|------|
-| `/cw:auto` | 전체 워크플로우 | 1회 (기본) | 기존 |
-| `/cw:auto --review-loop` | 전체 워크플로우 | N회 (loop) | **loop.md 재사용** |
-| `/cw:loop` | 범용 반복 실행 | 커스텀 가능 | 신규 (핵심) |
+| Command | Purpose | Review-Fix | Implementation |
+|---------|---------|------------|----------------|
+| `/cw:auto` | Full workflow | Once (default) | Existing |
+| `/cw:auto --review-loop` | Full workflow | N times (loop) | **Reuse loop.md** |
+| `/cw:loop` | Generic iteration | Customizable | New (core) |
 
-**아키텍처**:
+**Architecture**:
 ```
 /cw:auto --review-loop
     │
-    ├─ [1-3] init → start → next (기존 로직)
+    ├─ [1-3] init → start → next (existing logic)
     │
     └─ [4] review-fix-loop
            │
-           └─► 내부적으로 /cw:loop 로직 호출
+           └─► Internally invoke /cw:loop logic
                - completion_promise: "REVIEW_PASSED"
-               - task: "리뷰 후 High 이상 이슈 수정"
-               - max_iterations: --max-review-iterations 값
+               - task: "Review and fix High+ issues"
+               - max_iterations: --max-review-iterations value
 ```
 
-**차이점**:
-- `/cw:auto --review-loop`: 전체 워크플로우 내에서 review-fix만 반복 (loop.md 로직 재사용)
-- `/cw:loop`: 독립적인 범용 반복 실행 (review-fix 외 다양한 패턴)
+**Differences**:
+- `/cw:auto --review-loop`: Only iterate review-fix within full workflow (reuses loop.md logic)
+- `/cw:loop`: Independent generic iteration (various patterns beyond review-fix)
 
-**구현 우선순위**:
-1. `/cw:loop` 먼저 구현 (Phase 1-2)
-2. `/cw:auto --review-loop`는 loop 로직 재사용으로 구현 (Phase 5)
+**Implementation Priority**:
+1. Implement `/cw:loop` first (Phase 1-2)
+2. Implement `/cw:auto --review-loop` as loop logic reuse (Phase 5)
 
-**사용 시나리오**:
+**Usage Scenarios**:
 ```bash
-# 전체 작업 자동화 + 품질 보장
-/cw:auto "feature 구현" --review-loop
+# Full task automation + quality assurance
+/cw:auto "implement feature" --review-loop
 
-# review-fix만 별도 실행
-/cw:loop "리뷰 후 High 이상 수정. 완료시 DONE" --max-iterations 10
+# Review-fix only, separate execution
+/cw:loop "Review and fix High+ issues. Output DONE when complete" --max-iterations 10
 
-# 기존 코드 품질 개선 (전체 워크플로우 없이)
-/cw:loop "전체 코드베이스 리뷰 및 수정" --completion-promise "ALL_CLEAN"
+# Improve existing code quality (without full workflow)
+/cw:loop "Full codebase review and fix" --completion-promise "ALL_CLEAN"
 ```
 
 ---
 
-## 부록: 참고 자료
+## Appendix: References
 
 - [dingco Ralph Loop](https://github.com/dingcodingco/dingco-ralph-wiggum)
-- [기존 /cw:auto 구현](../commands/auto.md)
-- [기존 /cw:reflect 구현](../skills/reflect/SKILL.md)
+- [Existing /cw:auto implementation](../commands/auto.md)
+- [Existing /cw:reflect implementation](../skills/reflect/SKILL.md)

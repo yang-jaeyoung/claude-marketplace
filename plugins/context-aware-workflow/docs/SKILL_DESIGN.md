@@ -1,101 +1,101 @@
 # CAW Skill Ecosystem Design
 
-Agent를 강화하는 자동화 Skill 설계 문서.
+Design document for automation skills that enhance Agents.
 
-## 설계 원칙
+## Design Principles
 
-1. **Command는 명시적 워크플로우** - 사용자가 직접 호출
-2. **Skill은 Agent 강화** - Agent가 자동으로 활용
-3. **Hook과 연동** - 이벤트 기반 자동 트리거
-4. **Progressive Disclosure** - 필요 시에만 컨텍스트 로드
+1. **Commands are explicit workflows** - User invokes directly
+2. **Skills enhance Agents** - Agents utilize automatically
+3. **Hook integration** - Event-based automatic triggers
+4. **Progressive Disclosure** - Load context only when needed
 
-## Skill 현황 (16개 구현 완료)
+## Skill Status (16 implemented)
 
-| # | Skill | 설명 | 상태 |
-|---|-------|------|------|
-| 1 | plan-detector | Plan Mode 감지 및 워크플로우 시작 | ✅ 구현 |
-| 2 | insight-collector | Insight 자동 수집 및 저장 | ✅ 구현 |
-| 3 | session-persister | 세션 상태 저장 및 복구 | ✅ 구현 |
-| 4 | quality-gate | Step 완료 전 품질 검증 | ✅ 구현 |
-| 5 | progress-tracker | 작업 진행 상황 메트릭 추적 | ✅ 구현 |
-| 6 | context-helper | Agent 컨텍스트 이해 및 관리 지원 | ✅ 구현 |
-| 7 | pattern-learner | 코드베이스 패턴 학습 | ✅ 구현 |
-| 8 | decision-logger | 기술적 결정 자동 기록 (ADR) | ✅ 구현 |
-| 9 | knowledge-base | 프로젝트 지식 축적 및 검색 | ✅ 구현 |
-| 10 | review-assistant | 코드 리뷰 체크리스트 자동 생성 | ✅ 구현 |
-| 11 | **commit-discipline** | Tidy First 커밋 분리 규칙 강제 | ✅ 구현 |
-| 12 | **context-manager** | 컨텍스트 윈도우 최적화 관리 | ✅ 구현 |
-| 13 | **dependency-analyzer** | 의존성 그래프 분석 및 병렬 실행 | ✅ 구현 |
-| 14 | **quick-fix** | 간단한 리뷰 이슈 자동 수정 | ✅ 구현 |
-| 15 | **reflect** | Ralph Loop 지속적 개선 사이클 | ✅ 구현 |
-| 16 | **serena-sync** | Serena MCP 메모리 동기화 | ✅ 구현 |
+| # | Skill | Description | Status |
+|---|-------|-------------|--------|
+| 1 | plan-detector | Plan Mode detection and workflow start | ✅ Implemented |
+| 2 | insight-collector | Automatic insight collection and storage | ✅ Implemented |
+| 3 | session-persister | Session state save and restore | ✅ Implemented |
+| 4 | quality-gate | Quality verification before step completion | ✅ Implemented |
+| 5 | progress-tracker | Work progress metric tracking | ✅ Implemented |
+| 6 | context-helper | Agent context understanding and management support | ✅ Implemented |
+| 7 | pattern-learner | Codebase pattern learning | ✅ Implemented |
+| 8 | decision-logger | Technical decision auto-logging (ADR) | ✅ Implemented |
+| 9 | knowledge-base | Project knowledge accumulation and search | ✅ Implemented |
+| 10 | review-assistant | Code review checklist auto-generation | ✅ Implemented |
+| 11 | **commit-discipline** | Tidy First commit separation rules enforcement | ✅ Implemented |
+| 12 | **context-manager** | Context window optimization management | ✅ Implemented |
+| 13 | **dependency-analyzer** | Dependency graph analysis and parallel execution | ✅ Implemented |
+| 14 | **quick-fix** | Simple review issue auto-fix | ✅ Implemented |
+| 15 | **reflect** | Ralph Loop continuous improvement cycle | ✅ Implemented |
+| 16 | **serena-sync** | Serena MCP memory synchronization | ✅ Implemented |
 
 ---
 
-## Skill 카탈로그
+## Skill Catalog
 
 ---
 
 ### 1. plan-detector
-**자동 Plan Mode 감지 및 워크플로우 시작**
+**Automatic Plan Mode detection and workflow start**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | Plan Mode 완료 감지 |
-| **출력** | `/cw:start --from-plan` 자동 제안 |
-| **연동** | PostToolUse Hook (ExitPlanMode) |
+| Property | Value |
+|----------|-------|
+| **Trigger** | Plan Mode completion detected |
+| **Output** | `/cw:start --from-plan` auto-suggestion |
+| **Integration** | PostToolUse Hook (ExitPlanMode) |
 
-**동작 흐름:**
+**Workflow:**
 ```
-1. PostToolUse Hook이 ExitPlanMode 감지
-2. plan-detector Skill 활성화
-3. Plan 파일 분석 (구현 가능 여부)
-4. 사용자에게 워크플로우 시작 제안
-```
-
-**예시:**
-```
-🎯 Plan Mode 완료 감지
-
-계획 파일: .claude/plans/auth-system.md
-- 구현 단계: 5개 Phase, 12개 Step
-- 예상 파일: 8개 수정, 3개 생성
-
-자동으로 CAW 워크플로우를 시작할까요?
-[1] 예, /cw:start --from-plan 실행
-[2] 아니오, 나중에 수동으로 시작
+1. PostToolUse Hook detects ExitPlanMode
+2. plan-detector Skill activates
+3. Plan file analysis (implementation feasibility)
+4. Suggest workflow start to user
 ```
 
-**디렉토리:**
+**Example:**
+```
+🎯 Plan Mode Completion Detected
+
+Plan file: .claude/plans/auth-system.md
+- Implementation phases: 5 Phases, 12 Steps
+- Expected files: 8 modified, 3 created
+
+Would you like to start CAW workflow automatically?
+[1] Yes, run /cw:start --from-plan
+[2] No, start manually later
+```
+
+**Directory:**
 ```
 skills/plan-detector/
 ├── SKILL.md
-└── patterns.md      # Plan 파일 패턴 정의
+└── patterns.md      # Plan file pattern definitions
 ```
 
 ---
 
 ### 2. insight-collector
-**모델 응답의 Insight 자동 수집 및 저장**
+**Auto-collection and storage of model response insights**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | 응답에 `★ Insight` 패턴 감지 |
-| **출력** | `.caw/insights/` 폴더에 저장 |
-| **연동** | PostToolUse Hook (모든 응답) |
+| Property | Value |
+|----------|-------|
+| **Trigger** | `★ Insight` pattern detected in response |
+| **Output** | Save to `.caw/insights/` folder |
+| **Integration** | PostToolUse Hook (all responses) |
 
-**동작 흐름:**
+**Workflow:**
 ```
-1. 모델 응답 스캔
-2. "★ Insight" 블록 추출
-3. 메타데이터 추가 (날짜, 컨텍스트, 관련 파일)
-4. .caw/insights/{date}-{topic}.md 저장
-5. insights/index.md 업데이트
+1. Scan model response
+2. Extract "★ Insight" blocks
+3. Add metadata (date, context, related files)
+4. Save to .caw/insights/{date}-{topic}.md
+5. Update insights/index.md
 ```
 
-**저장 형식:**
+**Storage Format:**
 ```markdown
-# Insight: [추출된 제목]
+# Insight: [Extracted Title]
 
 ## Metadata
 | Field | Value |
@@ -106,85 +106,85 @@ skills/plan-detector/
 | **Phase** | Phase 2: Core Implementation |
 
 ## Content
-[원본 Insight 내용]
+[Original Insight content]
 
 ## Tags
 #authentication #security #middleware
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/insight-collector/
 ├── SKILL.md
 ├── templates/
 │   └── insight-template.md
 └── scripts/
-    └── extract_insights.py   # Insight 패턴 추출
+    └── extract_insights.py   # Insight pattern extraction
 ```
 
 ---
 
 ### 3. context-helper
-**Agent의 컨텍스트 이해 및 관리 지원**
+**Agent context understanding and management support**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | Agent가 컨텍스트 필요 시 |
-| **출력** | 관련 컨텍스트 요약 제공 |
-| **연동** | 모든 CAW Agent |
+| Property | Value |
+|----------|-------|
+| **Trigger** | When Agent needs context |
+| **Output** | Relevant context summary |
+| **Integration** | All CAW Agents |
 
-**기능:**
+**Features:**
 ```
-1. context_manifest.json 기반 파일 우선순위 제공
-2. 현재 Phase/Step에 필요한 파일만 필터링
-3. 이전 Phase 결과 요약 제공
-4. 관련 Insight 연결
+1. Provide file priority based on context_manifest.json
+2. Filter only files needed for current Phase/Step
+3. Provide previous Phase result summary
+4. Connect related Insights
 ```
 
-**Agent 사용 예시:**
+**Agent Usage Example:**
 ```markdown
-## Context Helper 호출
+## Context Helper Call
 
-현재 작업: Phase 2, Step 2.3
-필요 컨텍스트:
-  ✅ src/auth/jwt.ts (Phase 2.1에서 생성)
-  ✅ src/auth/middleware.ts (Phase 2.2에서 수정)
-  📋 관련 Insight: "JWT 토큰 갱신 패턴"
+Current work: Phase 2, Step 2.3
+Required context:
+  ✅ src/auth/jwt.ts (created in Phase 2.1)
+  ✅ src/auth/middleware.ts (modified in Phase 2.2)
+  📋 Related Insight: "JWT Token Refresh Pattern"
 
-권장 읽기 순서:
-1. .caw/task_plan.md (현재 상태)
-2. src/auth/jwt.ts (의존성)
+Recommended read order:
+1. .caw/task_plan.md (current state)
+2. src/auth/jwt.ts (dependency)
 3. .caw/insights/jwt-refresh-pattern.md
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/context-helper/
 ├── SKILL.md
-└── context-strategies.md   # 컨텍스트 전략 정의
+└── context-strategies.md   # Context strategy definitions
 ```
 
 ---
 
 ### 4. pattern-learner
-**코드베이스 패턴 학습 및 Agent에 제공**
+**Codebase pattern learning and provision to Agents**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | /cw:start 시 자동, Agent 요청 시 |
-| **출력** | `.caw/patterns/` 에 패턴 문서화 |
-| **연동** | Planner, Builder Agent |
+| Property | Value |
+|----------|-------|
+| **Trigger** | Automatic on /cw:start, on Agent request |
+| **Output** | Document patterns in `.caw/patterns/` |
+| **Integration** | Planner, Builder Agent |
 
-**학습 대상:**
+**Learning Targets:**
 ```
-1. 코딩 스타일 (naming, formatting)
-2. 아키텍처 패턴 (디렉토리 구조, 모듈화)
-3. 테스트 패턴 (테스트 파일 위치, 명명)
-4. 에러 처리 패턴
-5. API 응답 형식
+1. Coding style (naming, formatting)
+2. Architecture patterns (directory structure, modularization)
+3. Test patterns (test file location, naming)
+4. Error handling patterns
+5. API response format
 ```
 
-**출력 예시:**
+**Output Example:**
 ```markdown
 # Learned Patterns: [Project Name]
 
@@ -209,7 +209,7 @@ skills/context-helper/
 - Consistent error response format
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/pattern-learner/
 ├── SKILL.md
@@ -224,15 +224,15 @@ skills/pattern-learner/
 ---
 
 ### 5. decision-logger
-**기술적 결정 자동 기록**
+**Automatic technical decision logging**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | AskUserQuestion 응답, 아키텍처 선택 |
-| **출력** | `.caw/decisions/` ADR 형식 저장 |
-| **연동** | Architect, Planner Agent |
+| Property | Value |
+|----------|-------|
+| **Trigger** | AskUserQuestion response, architecture selection |
+| **Output** | Save in ADR format to `.caw/decisions/` |
+| **Integration** | Architect, Planner Agent |
 
-**ADR (Architecture Decision Record) 형식:**
+**ADR (Architecture Decision Record) Format:**
 ```markdown
 # ADR-001: JWT vs Session Authentication
 
@@ -240,28 +240,28 @@ skills/pattern-learner/
 Accepted
 
 ## Context
-사용자 인증 방식 선택 필요.
-RESTful API 서버로 stateless 선호.
+User authentication method selection needed.
+RESTful API server prefers stateless.
 
 ## Decision
-JWT 기반 인증 채택
+Adopt JWT-based authentication
 
 ## Rationale
-- Stateless: 서버 확장성
-- Mobile 지원 용이
-- Microservices 호환
+- Stateless: Server scalability
+- Mobile support ease
+- Microservices compatible
 
 ## Consequences
-- 토큰 갱신 로직 필요
-- 토큰 크기로 인한 헤더 증가
-- 즉시 무효화 어려움 (블랙리스트 필요)
+- Token refresh logic needed
+- Header size increase due to token size
+- Immediate invalidation difficult (blacklist needed)
 
 ## Alternatives Considered
-1. Session-based: 서버 메모리 부담
-2. OAuth only: 외부 의존성 증가
+1. Session-based: Server memory burden
+2. OAuth only: External dependency increase
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/decision-logger/
 ├── SKILL.md
@@ -274,15 +274,15 @@ skills/decision-logger/
 ---
 
 ### 6. progress-tracker
-**작업 진행 상황 메트릭 추적**
+**Work progress metric tracking**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | Step 완료, Phase 전환 |
-| **출력** | `.caw/metrics.json` 업데이트 |
-| **연동** | PostToolUse Hook, /cw:status |
+| Property | Value |
+|----------|-------|
+| **Trigger** | Step completion, Phase transition |
+| **Output** | Update `.caw/metrics.json` |
+| **Integration** | PostToolUse Hook, /cw:status |
 
-**추적 메트릭:**
+**Tracked Metrics:**
 ```json
 {
   "task_id": "auth-jwt-impl",
@@ -311,7 +311,7 @@ skills/decision-logger/
 }
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/progress-tracker/
 ├── SKILL.md
@@ -322,24 +322,24 @@ skills/progress-tracker/
 ---
 
 ### 7. quality-gate
-**Step 완료 전 품질 검증**
+**Quality verification before step completion**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | Builder가 Step 완료 선언 시 |
-| **출력** | 검증 결과, 통과/실패 |
-| **연동** | Builder, Reviewer Agent |
+| Property | Value |
+|----------|-------|
+| **Trigger** | When Builder declares step complete |
+| **Output** | Verification result, pass/fail |
+| **Integration** | Builder, Reviewer Agent |
 
-**검증 항목:**
+**Verification Items:**
 ```
-1. 코드 변경 사항 존재 확인
-2. 린트/타입체크 통과
-3. 관련 테스트 통과
-4. task_plan.md 상태 업데이트 확인
-5. 패턴 준수 확인 (pattern-learner 연동)
+1. Verify code changes exist
+2. Lint/type check pass
+3. Related tests pass
+4. task_plan.md status update confirmed
+5. Pattern compliance check (pattern-learner integration)
 ```
 
-**검증 결과:**
+**Verification Result:**
 ```
 🔍 Quality Gate: Step 2.3
 
@@ -359,7 +359,7 @@ Warnings:
 Proceed to next step? [Y/n]
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/quality-gate/
 ├── SKILL.md
@@ -374,40 +374,40 @@ skills/quality-gate/
 ---
 
 ### 8. knowledge-base
-**프로젝트 지식 축적 및 검색**
+**Project knowledge accumulation and search**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | Agent 질문, 세션 종료 |
-| **출력** | `.caw/knowledge/` 지식 저장소 |
-| **연동** | 모든 Agent |
+| Property | Value |
+|----------|-------|
+| **Trigger** | Agent question, session end |
+| **Output** | `.caw/knowledge/` knowledge repository |
+| **Integration** | All Agents |
 
-**지식 유형:**
+**Knowledge Types:**
 ```
-1. 코드베이스 구조 (자동 생성)
-2. 외부 의존성 정보
-3. 비즈니스 로직 설명
-4. 트러블슈팅 기록
-5. 성능 최적화 노트
+1. Codebase structure (auto-generated)
+2. External dependency information
+3. Business logic explanation
+4. Troubleshooting records
+5. Performance optimization notes
 ```
 
-**구조:**
+**Structure:**
 ```
 .caw/knowledge/
-├── index.md                    # 지식 인덱스
+├── index.md                    # Knowledge index
 ├── codebase/
-│   ├── structure.md            # 디렉토리 구조
-│   └── dependencies.md         # 주요 의존성
+│   ├── structure.md            # Directory structure
+│   └── dependencies.md         # Key dependencies
 ├── domain/
-│   ├── authentication.md       # 도메인 지식
+│   ├── authentication.md       # Domain knowledge
 │   └── user-management.md
 ├── troubleshooting/
-│   └── common-errors.md        # 해결된 문제들
+│   └── common-errors.md        # Resolved issues
 └── performance/
     └── optimization-notes.md
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/knowledge-base/
 ├── SKILL.md
@@ -421,15 +421,15 @@ skills/knowledge-base/
 ---
 
 ### 9. session-persister
-**세션 상태 저장 및 복구**
+**Session state save and restore**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | 세션 시작, 수동 요청 |
-| **출력** | `.caw/session.json` 세션 데이터 |
-| **연동** | `/cw:status`, `/cw:start` |
+| Property | Value |
+|----------|-------|
+| **Trigger** | Session start, manual request |
+| **Output** | `.caw/session.json` session data |
+| **Integration** | `/cw:status`, `/cw:start` |
 
-**저장 데이터:**
+**Saved Data:**
 ```json
 {
   "session_id": "sess_20260104_143000",
@@ -442,25 +442,25 @@ skills/knowledge-base/
   ],
   "pending_questions": [],
   "last_checkpoint": "2026-01-04T14:45:00Z",
-  "notes": "JWT 구현 중, 토큰 갱신 로직 작업 중"
+  "notes": "JWT implementation in progress, working on token refresh logic"
 }
 ```
 
-**세션 복구:**
+**Session Restore:**
 ```
-🔄 이전 세션 발견
+🔄 Previous Session Found
 
 Session: sess_20260104_143000
-Task: JWT 인증 시스템 구현
+Task: JWT Authentication System Implementation
 Progress: Phase 2, Step 2.3 (45%)
-Last Activity: 30분 전
+Last Activity: 30 minutes ago
 
-[1] 이전 세션 이어서 진행
-[2] 새 세션 시작 (이전 세션 아카이브)
-[3] 세션 상태만 확인
+[1] Continue from previous session
+[2] Start new session (archive previous)
+[3] View session status only
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/session-persister/
 ├── SKILL.md
@@ -474,41 +474,41 @@ skills/session-persister/
 ---
 
 ### 10. review-assistant
-**코드 리뷰 체크리스트 자동 생성**
+**Code review checklist auto-generation**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | /cw:review 실행 시 |
-| **출력** | 컨텍스트 기반 리뷰 체크리스트 |
-| **연동** | Reviewer Agent |
+| Property | Value |
+|----------|-------|
+| **Trigger** | When /cw:review executed |
+| **Output** | Context-based review checklist |
+| **Integration** | Reviewer Agent |
 
-**체크리스트 생성:**
+**Checklist Generation:**
 ```markdown
 # Review Checklist: Phase 2 Implementation
 
-## 기반 정보
-- Pattern: src/auth/ 디렉토리 패턴
-- Related Decisions: ADR-001 (JWT 선택)
-- Insights: 3개 관련 Insight
+## Foundation Information
+- Pattern: src/auth/ directory pattern
+- Related Decisions: ADR-001 (JWT selection)
+- Insights: 3 related Insights
 
-## 자동 생성 체크리스트
+## Auto-Generated Checklist
 
-### Security (JWT 관련)
-- [ ] 토큰 만료 시간 적절한가?
-- [ ] Refresh token 안전하게 저장되는가?
-- [ ] 토큰 검증 로직 완전한가?
+### Security (JWT related)
+- [ ] Is token expiry time appropriate?
+- [ ] Is refresh token stored securely?
+- [ ] Is token validation logic complete?
 
 ### Code Quality
-- [ ] 기존 auth 패턴과 일관성 있는가?
-- [ ] 에러 처리가 표준을 따르는가?
-- [ ] 테스트 커버리지 충분한가?
+- [ ] Consistent with existing auth patterns?
+- [ ] Does error handling follow standards?
+- [ ] Is test coverage sufficient?
 
 ### Performance
-- [ ] 토큰 검증이 매 요청마다 효율적인가?
-- [ ] 불필요한 DB 조회 없는가?
+- [ ] Is token validation efficient per request?
+- [ ] No unnecessary DB queries?
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/review-assistant/
 ├── SKILL.md
@@ -523,28 +523,28 @@ skills/review-assistant/
 ---
 
 ### 11. commit-discipline (NEW)
-**Tidy First 커밋 분리 규칙 강제**
+**Tidy First commit separation rules enforcement**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | git commit 전, Builder 커밋 시 |
-| **출력** | VALID / INVALID / MIXED_CHANGE_DETECTED |
-| **연동** | PreToolUse Hook (Bash), Builder |
+| Property | Value |
+|----------|-------|
+| **Trigger** | Before git commit, when Builder commits |
+| **Output** | VALID / INVALID / MIXED_CHANGE_DETECTED |
+| **Integration** | PreToolUse Hook (Bash), Builder |
 
-**핵심 원칙:**
+**Core Principle:**
 ```
 "Never mix structural and behavioral changes in the same commit.
 Always make structural changes first when both are needed."
 — Kent Beck, Tidy First
 ```
 
-**커밋 유형:**
-| 유형 | 아이콘 | 접두사 | 설명 |
-|------|--------|--------|------|
-| Tidy | 🧹 | `[tidy]` | 구조적 변경 (동작 변경 없음) |
-| Build | 🔨 | `[feat]`, `[fix]` | 동작 변경 (새 기능, 버그 수정) |
+**Commit Types:**
+| Type | Icon | Prefix | Description |
+|------|------|--------|-------------|
+| Tidy | 🧹 | `[tidy]` | Structural changes (no behavior change) |
+| Build | 🔨 | `[feat]`, `[fix]` | Behavioral changes (new features, bug fixes) |
 
-**검증 결과:**
+**Verification Result:**
 ```
 🧹 Commit Discipline Check
 
@@ -562,32 +562,32 @@ Recommendation:
    git commit -m "[feat] Add login endpoint"
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/commit-discipline/
 ├── SKILL.md
-└── change-classifier.md   # 변경 유형 분류 기준
+└── change-classifier.md   # Change type classification criteria
 ```
 
 ---
 
 ### 12. context-manager (NEW)
-**컨텍스트 윈도우 최적화 관리**
+**Context window optimization management**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | 컨텍스트 부족 시, /cw:context 명령 |
-| **출력** | 최적화된 컨텍스트, 팩킹/프루닝 결과 |
-| **연동** | 모든 Agent, /cw:context |
+| Property | Value |
+|----------|-------|
+| **Trigger** | When context insufficient, /cw:context command |
+| **Output** | Optimized context, packing/pruning results |
+| **Integration** | All Agents, /cw:context |
 
-**기능:**
+**Features:**
 ```
-1. Plan Detection - 계획 문서 분석
-2. Context Packing - 인터페이스/시그니처 추출
-3. Context Pruning - 불필요 파일 정리
+1. Plan Detection - Plan document analysis
+2. Context Packing - Interface/signature extraction
+3. Context Pruning - Unnecessary file cleanup
 ```
 
-**사용 예시:**
+**Usage Example:**
 ```
 📦 Context Manager: Packing
 
@@ -602,7 +602,7 @@ Actions:
 Result: 28,500 tokens (-36%)
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/context-manager/
 ├── SKILL.md
@@ -615,22 +615,22 @@ skills/context-manager/
 ---
 
 ### 13. dependency-analyzer (NEW)
-**의존성 그래프 분석 및 병렬 실행 기회 식별**
+**Dependency graph analysis and parallel execution opportunity identification**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | /cw:next --parallel, /cw:worktree 전 |
-| **출력** | 의존성 그래프, 병렬 실행 그룹 |
-| **연동** | Builder, /cw:next, /cw:worktree |
+| Property | Value |
+|----------|-------|
+| **Trigger** | /cw:next --parallel, before /cw:worktree |
+| **Output** | Dependency graph, parallel execution groups |
+| **Integration** | Builder, /cw:next, /cw:worktree |
 
-**분석 대상:**
+**Analysis Targets:**
 ```
-1. Phase 레벨 의존성
-2. Step 레벨 의존성
-3. 파일 레벨 의존성
+1. Phase level dependencies
+2. Step level dependencies
+3. File level dependencies
 ```
 
-**출력 예시:**
+**Output Example:**
 ```
 📊 Dependency Analysis
 
@@ -649,7 +649,7 @@ Worktree Recommendation:
      Create worktree: caw-phase-4-tests
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/dependency-analyzer/
 ├── SKILL.md
@@ -662,24 +662,24 @@ skills/dependency-analyzer/
 ---
 
 ### 14. quick-fix (NEW)
-**간단한 리뷰 이슈 자동 수정**
+**Simple review issue auto-fix**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | /cw:fix 실행, 리뷰 완료 후 |
-| **출력** | 자동 수정 결과, 남은 이슈 목록 |
-| **연동** | Reviewer, /cw:fix |
+| Property | Value |
+|----------|-------|
+| **Trigger** | /cw:fix execution, after review completion |
+| **Output** | Auto-fix results, remaining issues list |
+| **Integration** | Reviewer, /cw:fix |
 
-**자동 수정 가능 카테고리:**
+**Auto-Fixable Categories:**
 ```
-1. Magic Numbers → 상수 추출
-2. Missing Docs → JSDoc/docstring 추가
-3. Style Violations → 린트 자동 수정
-4. Import Order → 자동 정렬
-5. Unused Variables → 제거
+1. Magic Numbers → Extract constants
+2. Missing Docs → Add JSDoc/docstring
+3. Style Violations → Lint auto-fix
+4. Import Order → Auto-sort
+5. Unused Variables → Remove
 ```
 
-**수정 결과:**
+**Fix Results:**
 ```
 🔧 Quick Fix Results
 
@@ -695,9 +695,13 @@ Skipped (2):
   ⏭️ Security concern (manual review required)
 
 Summary: 5 fixed, 2 skipped, 0 failed
+
+Issues requiring deep analysis:
+- Complex refactoring candidates
+- Security-related items
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/quick-fix/
 ├── SKILL.md
@@ -711,51 +715,51 @@ skills/quick-fix/
 ---
 
 ### 15. reflect (NEW)
-**Ralph Loop 지속적 개선 사이클**
+**Ralph Loop continuous improvement cycle**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | /cw:reflect, 작업 완료 후 |
-| **출력** | `.caw/learnings.md`, Serena 메모리 |
-| **연동** | /cw:reflect, 모든 Agent |
+| Property | Value |
+|----------|-------|
+| **Trigger** | /cw:reflect, after task completion |
+| **Output** | `.caw/learnings.md`, Serena memory |
+| **Integration** | /cw:reflect, All Agents |
 
-**RALPH 사이클:**
-| 단계 | 설명 | 출력 |
-|------|------|------|
-| **R**eflect | 작업 중 발생한 일 검토 | 작업 요약, 결과 평가 |
-| **A**nalyze | 패턴 및 근본 원인 식별 | 잘된 점, 아쉬운 점, 패턴 |
-| **L**earn | 실행 가능한 교훈 추출 | 핵심 인사이트, 개선된 스킬, 격차 |
-| **P**lan | 개선 액션 생성 | 우선순위 액션 아이템 |
-| **H**abituate | 향후 작업에 적용 | 업데이트된 기본값, 체크리스트, 메모리 |
+**RALPH Cycle:**
+| Phase | Description | Output |
+|-------|-------------|--------|
+| **R**eflect | Review what happened during work | Work summary, outcome assessment |
+| **A**nalyze | Identify patterns and root causes | What worked, what didn't, patterns |
+| **L**earn | Extract actionable lessons | Key insights, improved skills, gaps |
+| **P**lan | Generate improvement actions | Prioritized action items |
+| **H**abituate | Apply to future work | Updated defaults, checklists, memories |
 
-**출력 예시:**
+**Output Example:**
 ```
 🔮 Ralph Loop: Task Reflection
 
 ## Reflect
-- Task: JWT 인증 구현
-- Duration: 2시간 15분
-- Outcome: ✅ 성공 (경미한 이슈 수정)
+- Task: JWT authentication implementation
+- Duration: 2 hours 15 minutes
+- Outcome: ✅ Success (minor issues fixed)
 
 ## Analyze
-- ✅ TDD 접근법이 효과적이었음
-- ⚠️ 초기 토큰 만료 시간 너무 짧게 설정
-- 패턴: 보안 관련 설정은 환경 변수로
+- ✅ TDD approach was effective
+- ⚠️ Initial token expiry time set too short
+- Pattern: Security-related settings should be environment variables
 
 ## Learn
-- JWT 갱신 로직에서 race condition 주의
-- 항상 토큰 만료를 환경 변수로 설정
+- Watch for race conditions in JWT refresh logic
+- Always set token expiry as environment variable
 
 ## Plan
-1. [HIGH] .env.example에 JWT 설정 추가
-2. [MED] 토큰 갱신 로직 문서화
+1. [HIGH] Add JWT settings to .env.example
+2. [MED] Document token refresh logic
 
 ## Habituate
-→ learnings.md 업데이트 완료
-→ Serena 메모리 동기화 완료
+→ learnings.md update complete
+→ Serena memory sync complete
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/reflect/
 ├── SKILL.md
@@ -766,25 +770,25 @@ skills/reflect/
 ---
 
 ### 16. serena-sync (NEW)
-**Serena MCP 메모리 동기화**
+**Serena MCP memory synchronization**
 
-| 속성 | 값 |
-|------|-----|
-| **트리거** | /cw:sync, 세션 종료 시 |
-| **출력** | Serena 메모리 업데이트 |
-| **연동** | Serena MCP, /cw:sync |
-| **MCP 서버** | serena |
+| Property | Value |
+|----------|-------|
+| **Trigger** | /cw:sync, on session end |
+| **Output** | Serena memory update |
+| **Integration** | Serena MCP, /cw:sync |
+| **MCP Server** | serena |
 
-**메모리 스키마:**
-| 메모리 이름 | 내용 | 업데이트 주체 |
-|-------------|------|--------------|
-| `project_onboarding` | 프로젝트 유형, 프레임워크, 컨벤션, 주요 파일 | Bootstrapper |
-| `domain_knowledge` | 비즈니스 규칙, 도메인 개념, 패턴 | Planner, Builder |
-| `lessons_learned` | 에러 해결, 디버깅 인사이트, 주의사항 | Builder |
-| `workflow_patterns` | 성공적인 워크플로우 접근법, 모범 사례 | Reflect skill |
-| `session_backup` | 마지막 세션 상태 (선택적 백업) | Session Persister |
+**Memory Schema:**
+| Memory Name | Content | Update Source |
+|-------------|---------|---------------|
+| `project_onboarding` | Project type, framework, conventions, key files | Bootstrapper |
+| `domain_knowledge` | Business rules, domain concepts, patterns | Planner, Builder |
+| `lessons_learned` | Error resolution, debugging insights, cautions | Builder |
+| `workflow_patterns` | Successful workflow approaches, best practices | Reflect skill |
+| `session_backup` | Last session state (optional backup) | Session Persister |
 
-**동기화 작업:**
+**Sync Operation:**
 ```
 🔄 Serena Sync
 
@@ -800,7 +804,7 @@ Result: 4 memories synced
 Last sync: 2026-01-21T10:30:00Z
 ```
 
-**디렉토리:**
+**Directory:**
 ```
 skills/serena-sync/
 ├── SKILL.md
@@ -810,7 +814,7 @@ skills/serena-sync/
 
 ---
 
-## Hook 연동 설계
+## Hook Integration Design
 
 ```json
 {
@@ -868,9 +872,9 @@ skills/serena-sync/
 
 ---
 
-## Agent-Skill 매핑
+## Agent-Skill Mapping
 
-| Agent | 사용 Skills |
+| Agent | Skills Used |
 |-------|-------------|
 | **Bootstrapper** | pattern-learner, knowledge-base |
 | **Planner** | pattern-learner, context-helper, decision-logger, dependency-analyzer |
@@ -884,7 +888,7 @@ skills/serena-sync/
 
 ---
 
-## 디렉토리 구조
+## Directory Structure
 
 ```
 context-aware-workflow/
@@ -936,23 +940,23 @@ context-aware-workflow/
 
 ---
 
-## 버전 이력
+## Version History
 
-### v1.7.0 (현재)
-- **16개 스킬 모두 구현 완료**
-- 새로운 스킬 6개 추가:
-  - `commit-discipline` - Tidy First 커밋 분리
-  - `context-manager` - 컨텍스트 윈도우 최적화
-  - `dependency-analyzer` - 의존성 분석 및 병렬 실행
-  - `quick-fix` - 자동 수정
-  - `reflect` - Ralph Loop 지속적 개선
-  - `serena-sync` - Serena MCP 동기화
+### v1.7.0 (Current)
+- **All 16 skills implemented**
+- 6 new skills added:
+  - `commit-discipline` - Tidy First commit separation
+  - `context-manager` - Context window optimization
+  - `dependency-analyzer` - Dependency analysis and parallel execution
+  - `quick-fix` - Auto-fix
+  - `reflect` - Ralph Loop continuous improvement
+  - `serena-sync` - Serena MCP sync
 
 ### v1.6.0
-- 기본 10개 스킬 설계 완료
-- Tidy First 방법론 통합
-- Git Worktree 지원
+- Basic 10 skills design complete
+- Tidy First methodology integration
+- Git Worktree support
 
 ### v1.5.0
-- Ralph Loop 설계
-- Serena MCP 연동 계획
+- Ralph Loop design
+- Serena MCP integration plan

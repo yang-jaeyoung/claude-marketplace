@@ -31,8 +31,8 @@ tools:
   - Bash
   - AskUserQuestion
 mcp_servers:
-  - serena       # 프로젝트 심볼 탐색, 시맨틱 코드 이해
-  - sequential   # 체계적 계획 수립, 의존성 분석
+  - serena       # Project symbol exploration, semantic code understanding
+  - sequential   # Systematic planning, dependency analysis
 skills: pattern-learner, context-helper, decision-logger, insight-collector
 ---
 
@@ -170,7 +170,7 @@ Create `.caw/task_plan.md` following Kent Beck's **Tidy First** methodology:
 | # | Step | Type | Status | Agent | Deps | Notes |
 |---|------|------|--------|-------|------|-------|
 | 1.1 | Review existing auth implementation | 🔨 Build | ⏳ | Planner | - | Understand current state |
-| 1.2 | Identify required dependencies | 🔨 Build | ⏳ | Planner | - | ⚡ 1.1과 병렬 가능 |
+| 1.2 | Identify required dependencies | 🔨 Build | ⏳ | Planner | - | ⚡ Parallel with 1.1 |
 
 ### Phase 2: Core Implementation
 **Phase Deps**: phase 1
@@ -180,7 +180,7 @@ Create `.caw/task_plan.md` following Kent Beck's **Tidy First** methodology:
 | 2.0 | Clean up existing auth module | 🧹 Tidy | ⏳ | Builder | - | Rename unclear vars |
 | 2.1 | Create JWT utility module | 🔨 Build | ⏳ | Builder | 2.0 | `src/auth/jwt.ts` |
 | 2.2 | Implement auth middleware | 🔨 Build | ⏳ | Builder | 2.1 | `src/middleware/auth.ts` |
-| 2.3 | Add login endpoint | 🔨 Build | ⏳ | Builder | 2.1 | ⚡ 2.2와 병렬 가능 |
+| 2.3 | Add login endpoint | 🔨 Build | ⏳ | Builder | 2.1 | ⚡ Parallel with 2.2 |
 
 ### Phase 3: API Layer
 **Phase Deps**: phase 1
@@ -189,7 +189,7 @@ Create `.caw/task_plan.md` following Kent Beck's **Tidy First** methodology:
 |---|------|------|--------|-------|------|-------|
 | 3.0 | Normalize User model structure | 🧹 Tidy | ⏳ | Builder | - | Field naming |
 | 3.1 | Extend User model | 🔨 Build | ⏳ | Builder | 3.0 | |
-| 3.2 | Add password hashing utility | 🔨 Build | ⏳ | Builder | 3.0 | ⚡ 3.1과 병렬 가능 |
+| 3.2 | Add password hashing utility | 🔨 Build | ⏳ | Builder | 3.0 | ⚡ Parallel with 3.1 |
 
 ### Phase 4: Integration & Testing
 **Phase Deps**: phase 2, phase 3
@@ -197,7 +197,7 @@ Create `.caw/task_plan.md` following Kent Beck's **Tidy First** methodology:
 | # | Step | Type | Status | Agent | Deps | Notes |
 |---|------|------|--------|-------|------|-------|
 | 4.1 | Integration tests | 🔨 Build | ⏳ | Builder | - | |
-| 4.2 | Update documentation | 🔨 Build | ⏳ | Builder | - | ⚡ 4.1과 병렬 가능 |
+| 4.2 | Update documentation | 🔨 Build | ⏳ | Builder | - | ⚡ Parallel with 4.1 |
 
 ## Validation Checklist
 - [ ] All existing tests pass
@@ -321,35 +321,35 @@ Every Phase header MUST include a `**Phase Deps**` line:
 
 | Notation | Meaning | Parallel Implication |
 |----------|---------|---------------------|
-| `-` | 독립적, 즉시 시작 가능 | 다른 독립 Phase와 병렬 가능 |
-| `phase N` | Phase N 완료 후 시작 | 동일 deps를 가진 Phase와 병렬 가능 |
-| `phase N, M` | N과 M 모두 완료 후 | N, M 완료 대기 필요 |
+| `-` | Independent, can start immediately | Parallel with other independent Phases |
+| `phase N` | Start after Phase N completes | Parallel with Phases having same deps |
+| `phase N, M` | After both N and M complete | Must wait for N, M completion |
 
-**Phase 병렬 실행 판단**:
-- Phase 2 (`phase 1`), Phase 3 (`phase 1`) → **병렬 가능** (동일 deps)
-- Phase 4 (`phase 2, 3`) → Phase 2, 3 완료 후에만 시작
+**Phase Parallel Execution Determination**:
+- Phase 2 (`phase 1`), Phase 3 (`phase 1`) → **Parallel possible** (same deps)
+- Phase 4 (`phase 2, 3`) → Starts only after Phase 2, 3 complete
 
 ### Step-Level Dependencies
 
 | Notation | Meaning | Example |
 |----------|---------|---------|
-| `-` | 독립적, Phase 시작 시 즉시 실행 | Setup tasks |
-| `N.M` | 특정 step 완료 후 | `2.1` = step 2.1 대기 |
-| `N.*` | Phase 전체 완료 후 | `1.*` = Phase 1 전체 대기 |
-| `N.M,N.K` | 여러 step 완료 후 | `2.1,2.3` = 둘 다 대기 |
-| `!N.M` | 동시 실행 불가 (mutual exclusion) | `!2.3` = 2.3과 같이 실행 불가 |
+| `-` | Independent, runs immediately on Phase start | Setup tasks |
+| `N.M` | After specific step completes | `2.1` = Wait for step 2.1 |
+| `N.*` | After entire Phase completes | `1.*` = Wait for all of Phase 1 |
+| `N.M,N.K` | After multiple steps complete | `2.1,2.3` = Wait for both |
+| `!N.M` | Cannot run simultaneously (mutual exclusion) | `!2.3` = Cannot run with 2.3 |
 
 ### Identifying Parallel Opportunities
 
-**Phase 병렬**:
-1. 동일한 Phase Deps를 가진 Phase 찾기
-2. 서로 다른 디렉토리/모듈 작업인지 확인
-3. 독립적이면 worktree로 병렬 실행 가능
+**Phase Parallel**:
+1. Find Phases with same Phase Deps
+2. Verify working on different directories/modules
+3. If independent, parallel execution via worktree is possible
 
-**Step 병렬**:
-1. **File dependencies**: 다른 파일 수정 → 병렬 가능
-2. **Data dependencies**: 출력 사용 → 순차
-3. **Shared resources**: 같은 파일 수정 → 순차 또는 worktree
+**Step Parallel**:
+1. **File dependencies**: Modifying different files → Parallel possible
+2. **Data dependencies**: Using output → Sequential
+3. **Shared resources**: Modifying same file → Sequential or worktree
 
 **Mark parallel opportunities** in Notes column with `⚡` when:
 - Steps share same dependency but modify different files
@@ -363,15 +363,15 @@ task_plan.md:
 Phase 1 (Deps: -)     ─────────────────────────┐
                                                │
 Phase 2 (Deps: phase 1) ─┬─ 2.1 ─┬─ 2.2       │
-                         │       └─ 2.3 ⚡     ├─ 동시 worktree 가능
+                         │       └─ 2.3 ⚡     ├─ Concurrent worktree possible
 Phase 3 (Deps: phase 1) ─┴─ 3.1 ─┬─ 3.2 ⚡    │
                                  └─ 3.3       │
                                                │
 Phase 4 (Deps: phase 2, 3) ────────────────────┘
 
-실행 가능:
-  터미널 1: /cw:next --worktree phase 2  # 2.2, 2.3 병렬
-  터미널 2: /cw:next --worktree phase 3  # 3.2, 3.3 병렬
+Execution possible:
+  Terminal 1: /cw:next --worktree phase 2  # 2.2, 2.3 parallel
+  Terminal 2: /cw:next --worktree phase 3  # 3.2, 3.3 parallel
 ```
 
 ## Prerequisites

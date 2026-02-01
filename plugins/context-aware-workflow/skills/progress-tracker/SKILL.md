@@ -4,10 +4,10 @@ description: Tracks workflow progress metrics including completion percentage, t
 allowed-tools: Read, Write, Bash
 forked-context: true
 forked-context-returns: |
-  progress: 진행률 %
+  progress: Progress %
   current: { phase: N, step: X.Y }
-  eta: 예상 완료 시간
-  visualization: 컴팩트 프로그레스 바
+  eta: Estimated completion time
+  visualization: Compact progress bar
 hooks:
   StepStarted:
     action: record_start
@@ -237,7 +237,7 @@ Phases:
   ⏳ Phase 3: Testing (0/3)             --
 
 Current: Step 2.3 - Auth middleware validation
-Estimated completion: 14:00 (2시간 남음)
+Estimated completion: 14:00 (2 hours remaining)
 ```
 
 ### Timeline View
@@ -483,5 +483,5 @@ See [Forked Context Pattern](../../_shared/forked-context.md).
 
 **Output Examples:**
 - `📊 [45%] Phase 2/3 | Step 5/11 | ETA: 14:00` - Status
-- `🎉 Phase 1 completed (30분)` - Milestone
-- `✅ Workflow completed in 3시간 45분` - Completion
+- `🎉 Phase 1 completed (30 min)` - Milestone
+- `✅ Workflow completed in 3h 45min` - Completion

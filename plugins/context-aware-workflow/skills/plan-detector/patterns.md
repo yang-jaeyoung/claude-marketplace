@@ -1,12 +1,12 @@
 # Plan File Patterns
 
-Plan Mode에서 생성된 계획 파일을 인식하기 위한 패턴 정의.
+Pattern definitions for recognizing plan files created in Plan Mode.
 
 ## Recognized Plan Structures
 
 ### Implementation Steps Pattern
 
-구현 단계를 나타내는 패턴:
+Patterns that indicate implementation steps:
 
 ```markdown
 # Heading Patterns
@@ -22,7 +22,7 @@ Plan Mode에서 생성된 계획 파일을 인식하기 위한 패턴 정의.
 
 ### File Change Pattern
 
-파일 변경사항을 나타내는 패턴:
+Patterns that indicate file changes:
 
 ```markdown
 # Action Keywords
@@ -39,7 +39,7 @@ Plan Mode에서 생성된 계획 파일을 인식하기 위한 패턴 정의.
 
 ### Phase/Step Pattern
 
-Phase와 Step 구조를 나타내는 패턴:
+Patterns that indicate Phase and Step structure:
 
 ```markdown
 # Phase Patterns
@@ -109,7 +109,7 @@ JWT-based authentication system implementation.
 
 ## Invalid Plan Indicators
 
-CAW 워크플로우에 적합하지 않은 계획:
+Plans that are not suitable for CAW workflow:
 
 ```markdown
 # Missing Elements
@@ -130,7 +130,7 @@ CAW 워크플로우에 적합하지 않은 계획:
 
 ## Pattern Matching Priority
 
-패턴 매칭 우선순위:
+Pattern matching priority order:
 
 | Priority | Pattern Type | Weight |
 |----------|-------------|--------|
@@ -142,7 +142,7 @@ CAW 워크플로우에 적합하지 않은 계획:
 
 ## Localization Support
 
-지원 언어:
+Supported languages:
 
 | English | Korean |
 |---------|--------|

@@ -1,31 +1,31 @@
 # 04. Plan Mode Integration Specification
 
-Claude Code의 기존 Plan Mode 출력을 워크플로우 플러그인에 통합하는 기능 명세.
+Feature specification for integrating Claude Code's existing Plan Mode output into the workflow plugin.
 
 ## 1. Overview
 
-### 1.1 목적
-- Claude Code Plan Mode에서 생성된 계획을 Discovery 단계의 입력으로 활용
-- 기존 도구와의 seamless 통합으로 사용자 경험 일관성 유지
-- 중복 계획 수립 방지 및 워크플로우 진입 장벽 최소화
+### 1.1 Purpose
+- Utilize plans generated in Claude Code Plan Mode as input for the Discovery phase
+- Maintain user experience consistency through seamless integration with existing tools
+- Prevent duplicate planning and minimize workflow entry barriers
 
-### 1.2 동작 방식
-**하이브리드 접근법**: 자동 감지 + 사용자 확인
-- SessionStart 시 기존 Plan Mode 계획 자동 감지
-- 사용자에게 import 여부 확인 (Human-in-the-Loop)
-- 승인 시 `task_plan.md` 형식으로 변환
+### 1.2 Operation Method
+**Hybrid Approach**: Auto-detection + User confirmation
+- Auto-detect existing Plan Mode plans at SessionStart
+- Confirm import with user (Human-in-the-Loop)
+- Convert to `task_plan.md` format upon approval
 
 ## 2. Detection Logic
 
-### 2.1 감지 조건
-| 조건 | 설명 | 우선순위 |
-|------|------|----------|
-| 파일 존재 | `.claude/plan.md` 존재 여부 | 필수 |
-| 최신성 | 최근 24시간 이내 수정 | 권장 |
-| 브랜치 연관 | 현재 Git 브랜치와 연관된 계획 | 선택 |
-| 완료 상태 | 체크박스 완료율 < 100% | 권장 |
+### 2.1 Detection Conditions
+| Condition | Description | Priority |
+|-----------|-------------|----------|
+| File exists | `.claude/plan.md` existence | Required |
+| Recency | Modified within last 24 hours | Recommended |
+| Branch association | Plan related to current Git branch | Optional |
+| Completion status | Checkbox completion rate < 100% | Recommended |
 
-### 2.2 감지 스크립트
+### 2.2 Detection Script
 ```python
 # skills/plan-importer/scripts/detect_plan.py
 
@@ -36,7 +36,7 @@ from pathlib import Path
 
 def resolve_plans_directory() -> str:
     """
-    plansDirectory 설정을 우선순위에 따라 해석
+    Resolve plansDirectory setting by priority
 
     Priority:
     1. .claude/settings.local.json
@@ -64,7 +64,7 @@ def resolve_plans_directory() -> str:
 
 def get_plan_paths() -> list:
     """
-    plansDirectory 설정을 기반으로 검색 경로 생성
+    Generate search paths based on plansDirectory setting
     """
     plans_dir = resolve_plans_directory()
 
@@ -85,7 +85,7 @@ DEFAULT_PLAN_PATHS = [
 
 def detect_existing_plan():
     """
-    Plan Mode에서 생성된 계획 파일을 감지
+    Detect plan files created by Plan Mode
 
     Returns:
         dict: {
@@ -105,7 +105,7 @@ def detect_existing_plan():
             stat = os.stat(plan_path)
             modified = datetime.fromtimestamp(stat.st_mtime)
 
-            # 24시간 이내 수정된 파일만
+            # Only files modified within 24 hours
             if datetime.now() - modified > timedelta(hours=24):
                 continue
 
@@ -125,7 +125,7 @@ def detect_existing_plan():
     return {"found": False, "plans_directory": plans_directory}
 
 def extract_summary(content: str) -> str:
-    """첫 번째 헤더 또는 첫 줄에서 요약 추출"""
+    """Extract summary from first header or first line"""
     lines = content.strip().split('\n')
     for line in lines:
         if line.startswith('# '):
@@ -135,7 +135,7 @@ def extract_summary(content: str) -> str:
     return lines[0][:50] if lines else "Unknown Plan"
 
 def calculate_completion(content: str) -> float:
-    """체크박스 완료율 계산"""
+    """Calculate checkbox completion rate"""
     total = content.count('- [ ]') + content.count('- [x]') + content.count('- [X]')
     if total == 0:
         return 0.0
@@ -145,37 +145,37 @@ def calculate_completion(content: str) -> float:
 
 ## 3. User Interaction Flow
 
-### 3.1 프롬프트 UI
+### 3.1 Prompt UI
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  📋 기존 Plan Mode 계획이 감지되었습니다.                  │
+│  📋 Existing Plan Mode plan detected.                   │
 │                                                         │
-│  파일: .claude/plan.md                                  │
-│  수정: 2시간 전                                          │
-│  진행: ████████░░ 80% (4/5 완료)                        │
-│  요약: "인증 시스템 리팩토링 - JWT → Session 전환"         │
+│  File: .claude/plan.md                                  │
+│  Modified: 2 hours ago                                  │
+│  Progress: ████████░░ 80% (4/5 complete)               │
+│  Summary: "Auth system refactoring - JWT → Session"     │
 │                                                         │
 │  ────────────────────────────────────────────────────   │
 │                                                         │
-│  [1] 이 계획으로 워크플로우 시작                          │
-│  [2] 계획 미리보기                                       │
-│  [3] 새로운 작업 시작 (계획 무시)                         │
-│  [4] 나중에 결정 (다음 세션까지 숨김)                      │
+│  [1] Start workflow with this plan                      │
+│  [2] Preview plan                                       │
+│  [3] Start new task (ignore plan)                       │
+│  [4] Decide later (hide until next session)             │
 │                                                         │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 3.2 선택지 동작
-| 선택 | 동작 | 후속 단계 |
-|------|------|----------|
-| **[1] 계획으로 시작** | `convert_plan.py` 실행 → `task_plan.md` 생성 | Review Phase 진입 |
-| **[2] 미리보기** | 계획 내용 표시 + 다시 선택 요청 | 프롬프트 재표시 |
-| **[3] 새로운 작업** | 계획 무시, 일반 Discovery 시작 | Planner Agent 호출 |
-| **[4] 나중에** | `.claude/plan_import_dismissed` 생성 | 일반 세션 진행 |
+### 3.2 Option Actions
+| Selection | Action | Next Step |
+|-----------|--------|-----------|
+| **[1] Start with plan** | Run `convert_plan.py` → Create `task_plan.md` | Enter Review Phase |
+| **[2] Preview** | Display plan content + re-prompt | Re-display prompt |
+| **[3] New task** | Ignore plan, start normal Discovery | Invoke Planner Agent |
+| **[4] Later** | Create `.claude/plan_import_dismissed` | Continue normal session |
 
 ## 4. Plan Conversion
 
-### 4.1 입력 형식 (Plan Mode 출력)
+### 4.1 Input Format (Plan Mode Output)
 ```markdown
 ## Implementation Plan
 
@@ -196,7 +196,7 @@ Considerations:
 - Session expiry handling
 ```
 
-### 4.2 출력 형식 (task_plan.md)
+### 4.2 Output Format (task_plan.md)
 ```markdown
 # Task Plan: Implementation Plan
 
@@ -213,9 +213,9 @@ Considerations:
 ### Active Context
 | File | Reason | Status |
 |------|--------|--------|
-| `auth/jwt.ts` | 명시적 언급 | 📖 Read |
-| `auth/middleware.ts` | 명시적 언급 | 📖 Read |
-| `lib/session.ts` | 명시적 언급 | 📝 Edit |
+| `auth/jwt.ts` | Explicitly mentioned | 📖 Read |
+| `auth/middleware.ts` | Explicitly mentioned | 📖 Read |
+| `lib/session.ts` | Explicitly mentioned | 📝 Edit |
 
 ### Project Context (Read-Only)
 - `GUIDELINES.md`
@@ -226,7 +226,7 @@ Considerations:
 ### Phase 1: Analysis
 | # | Step | Status | Agent | Notes |
 |---|------|--------|-------|-------|
-| 1.1 | Review current JWT implementation | ⏳ Pending | Planner | `auth/jwt.ts` 분석 |
+| 1.1 | Review current JWT implementation | ⏳ Pending | Planner | Analyze `auth/jwt.ts` |
 
 ### Phase 2: Implementation
 | # | Step | Status | Agent | Notes |
@@ -245,13 +245,13 @@ Considerations:
 - Session expiry handling
 
 ## Validation Checklist
-- [ ] 기존 테스트 통과
-- [ ] 새 세션 관련 테스트 추가
-- [ ] GUIDELINES.md 준수 확인
-- [ ] Reviewer Agent 검증 완료
+- [ ] Existing tests pass
+- [ ] New session-related tests added
+- [ ] GUIDELINES.md compliance verified
+- [ ] Reviewer Agent validation complete
 ```
 
-### 4.3 변환 스크립트
+### 4.3 Conversion Script
 ```python
 # skills/plan-importer/scripts/convert_plan.py
 
@@ -262,20 +262,20 @@ from typing import List, Dict
 
 def convert_plan_to_task(plan_path: str) -> str:
     """
-    Plan Mode 출력을 task_plan.md 형식으로 변환
+    Convert Plan Mode output to task_plan.md format
     """
     content = Path(plan_path).read_text()
 
-    # 파싱
+    # Parse
     title = extract_title(content)
     files = extract_files(content)
     steps = extract_steps(content)
     considerations = extract_considerations(content)
 
-    # 단계를 Phase로 그룹화
+    # Group steps into Phases
     phases = group_steps_into_phases(steps)
 
-    # task_plan.md 생성
+    # Generate task_plan.md
     return generate_task_plan(
         title=title,
         source_path=plan_path,
@@ -285,14 +285,14 @@ def convert_plan_to_task(plan_path: str) -> str:
     )
 
 def extract_files(content: str) -> List[str]:
-    """파일 경로 추출 (백틱 내 또는 Files to modify 섹션)"""
+    """Extract file paths (inside backticks or in Files to modify section)"""
     files = set()
 
-    # 백틱 내 파일 경로
+    # File paths in backticks
     backtick_pattern = r'`([^`]+\.[a-z]+)`'
     files.update(re.findall(backtick_pattern, content))
 
-    # Files to modify 섹션
+    # Files to modify section
     files_section = re.search(r'Files to modify:\n((?:- .+\n)+)', content)
     if files_section:
         for line in files_section.group(1).split('\n'):
@@ -303,7 +303,7 @@ def extract_files(content: str) -> List[str]:
     return list(files)
 
 def extract_steps(content: str) -> List[Dict]:
-    """체크박스 항목 추출"""
+    """Extract checkbox items"""
     steps = []
     pattern = r'- \[([ xX])\] (?:\d+\. )?(.+)'
 
@@ -320,10 +320,10 @@ def extract_steps(content: str) -> List[Dict]:
 
 def group_steps_into_phases(steps: List[Dict]) -> List[Dict]:
     """
-    단계를 논리적 Phase로 그룹화
-    - 분석/리뷰 키워드 → Phase 1 (Analysis)
-    - 구현/생성 키워드 → Phase 2 (Implementation)
-    - 마이그레이션/배포 키워드 → Phase 3 (Migration/Deploy)
+    Group steps into logical Phases
+    - Analysis/review keywords → Phase 1 (Analysis)
+    - Implementation/creation keywords → Phase 2 (Implementation)
+    - Migration/deploy keywords → Phase 3 (Migration/Deploy)
     """
     phases = {
         "Analysis": [],
@@ -344,20 +344,20 @@ def group_steps_into_phases(steps: List[Dict]) -> List[Dict]:
         else:
             phases["Implementation"].append(step)
 
-    # 빈 Phase 제거
+    # Remove empty Phases
     return {k: v for k, v in phases.items() if v}
 
 def generate_task_plan(title, source_path, files, phases, considerations) -> str:
-    """task_plan.md 마크다운 생성"""
+    """Generate task_plan.md markdown"""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # ... 템플릿 기반 생성 로직 ...
+    # ... template-based generation logic ...
     pass
 ```
 
 ## 5. Hook Configuration
 
-### 5.1 hooks.json 업데이트
+### 5.1 hooks.json Update
 ```json
 {
   "hooks": [
@@ -365,7 +365,7 @@ def generate_task_plan(title, source_path, files, phases, considerations) -> str
       "event": "SessionStart",
       "script": "skills/plan-importer/scripts/detect_plan.py",
       "timeout": 5000,
-      "description": "Plan Mode 계획 자동 감지",
+      "description": "Auto-detect Plan Mode plans",
       "on_result": {
         "found": "prompt_plan_import",
         "not_found": "continue"
@@ -375,15 +375,15 @@ def generate_task_plan(title, source_path, files, phases, considerations) -> str
 }
 ```
 
-### 5.2 SessionStart Hook 통합
+### 5.2 SessionStart Hook Integration
 ```
-기존 SessionStart Hook:
-  1. init_session.py (플러그인 버전 체크, GUIDELINES.md 로드)
+Existing SessionStart Hook:
+  1. init_session.py (plugin version check, GUIDELINES.md load)
 
-추가:
-  2. detect_plan.py (Plan Mode 계획 감지)
-     └─ 발견 시: prompt_plan_import 트리거
-     └─ 미발견: 일반 세션 진행
+Added:
+  2. detect_plan.py (Plan Mode plan detection)
+     └─ If found: Trigger prompt_plan_import
+     └─ If not found: Continue normal session
 ```
 
 ## 6. Skill Definition
@@ -392,17 +392,17 @@ def generate_task_plan(title, source_path, files, phases, considerations) -> str
 ```markdown
 # plan-importer
 
-Claude Code Plan Mode에서 생성된 계획을 워크플로우 시스템으로 가져옵니다.
+Import plans created in Claude Code Plan Mode into the workflow system.
 
 ## Capabilities
-- Plan Mode 출력 파일 자동 감지
-- 계획을 task_plan.md 형식으로 변환
-- 파일 참조 자동 추출 → Active Context 설정
-- 완료된 단계 상태 보존
+- Auto-detect Plan Mode output files
+- Convert plans to task_plan.md format
+- Auto-extract file references → Set Active Context
+- Preserve completed step status
 
 ## Usage
-자동으로 SessionStart 시 실행됩니다.
-수동 호출: `/workflow:start --from-plan`
+Automatically runs at SessionStart.
+Manual invocation: `/workflow:start --from-plan`
 
 ## Configuration
 ```yaml
@@ -418,14 +418,14 @@ detection:
 
 ## 7. Command Updates
 
-### 7.1 /workflow:start 확장
+### 7.1 /workflow:start Extension
 ```markdown
 | Command | Arguments | Description |
 |---------|-----------|-------------|
-| `/workflow:start` | `[task description]` | 기본: 새 작업 시작 |
-| `/workflow:start` | `--from-plan` | 감지된 Plan Mode 계획 import |
-| `/workflow:start` | `--plan-file <path>` | 특정 계획 파일 지정 |
-| `/workflow:start` | `--ignore-plan` | 기존 계획 무시하고 새로 시작 |
+| `/workflow:start` | `[task description]` | Default: Start new task |
+| `/workflow:start` | `--from-plan` | Import detected Plan Mode plan |
+| `/workflow:start` | `--plan-file <path>` | Specify plan file path |
+| `/workflow:start` | `--ignore-plan` | Ignore existing plan, start fresh |
 ```
 
 ## 8. File Structure
@@ -433,29 +433,29 @@ detection:
 ```
 skills/
 └── plan-importer/
-    ├── SKILL.md                    # Skill 정의
-    ├── config.yaml                 # 설정 (경로, 감지 조건)
+    ├── SKILL.md                    # Skill definition
+    ├── config.yaml                 # Configuration (paths, detection conditions)
     └── scripts/
-        ├── detect_plan.py          # 계획 파일 감지
-        ├── parse_plan.py           # Plan Mode 형식 파싱
-        ├── convert_plan.py         # task_plan.md 변환
+        ├── detect_plan.py          # Plan file detection
+        ├── parse_plan.py           # Plan Mode format parsing
+        ├── convert_plan.py         # task_plan.md conversion
         └── prompt_templates/
-            └── import_prompt.md    # 사용자 프롬프트 템플릿
+            └── import_prompt.md    # User prompt template
 ```
 
 ## 9. Edge Cases
 
-| 상황 | 처리 방법 |
-|------|----------|
-| 여러 계획 파일 존재 | 가장 최근 수정된 파일 우선, 선택 UI 제공 |
-| 계획 100% 완료 상태 | import 제안하되 "이미 완료됨" 표시 |
-| 파싱 실패 | 원본 내용 그대로 표시 + 수동 편집 제안 |
-| 계획 파일 삭제됨 | `.claude/plan_import_dismissed` 무시, 정상 세션 |
-| Git 브랜치 전환 | 브랜치별 계획 분리 저장 고려 (향후) |
+| Situation | Handling |
+|-----------|----------|
+| Multiple plan files exist | Prioritize most recently modified, provide selection UI |
+| Plan 100% complete | Suggest import but show "already completed" |
+| Parse failure | Display raw content + suggest manual editing |
+| Plan file deleted | Ignore `.claude/plan_import_dismissed`, normal session |
+| Git branch switch | Consider branch-specific plan separation (future) |
 
 ## 10. Future Enhancements
 
-- [ ] 브랜치별 계획 자동 연결
-- [ ] 여러 계획 파일 병합 기능
-- [ ] Plan Mode ↔ task_plan.md 양방향 동기화
-- [ ] 계획 버전 히스토리 관리
+- [ ] Branch-specific plan auto-linking
+- [ ] Multiple plan file merge capability
+- [ ] Plan Mode ↔ task_plan.md bidirectional sync
+- [ ] Plan version history management

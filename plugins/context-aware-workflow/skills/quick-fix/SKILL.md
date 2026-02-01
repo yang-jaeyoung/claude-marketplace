@@ -7,7 +7,7 @@ forked-context-returns: |
   status: SUCCESS | PARTIAL | FAILED
   summary: { fixed: N, skipped: N, failed: N }
   changes: [{ file, line, category, description }]
-  remaining: [깊은 분석이 필요한 이슈 목록]
+  remaining: [List of issues requiring deep analysis]
 hooks:
   ReviewComplete:
     action: suggest

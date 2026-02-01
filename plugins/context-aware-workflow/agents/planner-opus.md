@@ -148,7 +148,7 @@ Generate comprehensive `task_plan.md`:
 |---|------|--------|-------|------|-------|
 | 0.1 | Create migration plan | ⏳ | Planner | - | Document strategy |
 | 0.2 | Set up feature flags | ⏳ | Builder | 0.1 | Gradual rollout |
-| 0.3 | Create rollback procedures | ⏳ | Builder | 0.1 | Safety net ⚡병렬가능 |
+| 0.3 | Create rollback procedures | ⏳ | Builder | 0.1 | Safety net ⚡Parallel possible |
 
 ### Phase 1: Foundation
 | # | Step | Status | Agent | Deps | Notes |
@@ -219,7 +219,7 @@ When planning, identify:
 2. **Merge points** - steps that require all branches complete
 3. **Conflict zones** - steps modifying same files (mark with `!`)
 
-Mark parallel opportunities with `⚡병렬가능` and suggest worktree isolation for large independent branches.
+Mark parallel opportunities with `⚡Parallel possible` and suggest worktree isolation for large independent branches.
 
 ### Example Complex Dependency Graph
 ```

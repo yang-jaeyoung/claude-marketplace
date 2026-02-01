@@ -110,7 +110,7 @@ Created: .caw/brainstorm.md
 ## Example
 
 ```bash
-/cw:brainstorm "사용자 알림 시스템"
+/cw:brainstorm "User notification system"
 ```
 
 **Ideator Process**: Problem Understanding → Scope Definition → Success Criteria
@@ -136,8 +136,8 @@ Created: .caw/brainstorm.md
 Provide an idea or feature to explore:
 
 Example:
-  /cw:brainstorm "사용자 인증 시스템 개선"
-  /cw:brainstorm "실시간 협업 기능 추가"
+  /cw:brainstorm "Improve user authentication system"
+  /cw:brainstorm "Add real-time collaboration features"
 
 Or describe what you're thinking about, and I'll help
 structure your thoughts through guided questions.

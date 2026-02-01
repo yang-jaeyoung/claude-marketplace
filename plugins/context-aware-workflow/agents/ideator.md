@@ -10,9 +10,9 @@ tools:
   - WebSearch
   - AskUserQuestion
 mcp_servers:
-  - sequential   # 소크라테스식 탐구, 복잡한 요구사항 분석
-  - context7     # 기술 솔루션 리서치, 프레임워크 옵션 탐색
-  - perplexity   # 시장 트렌드, 기술 비교 심층 리서치
+  - sequential   # Socratic inquiry, complex requirements analysis
+  - context7     # Technical solution research, framework options exploration
+  - perplexity   # Market trends, technology comparison deep research
 skills: insight-collector, knowledge-base
 ---
 
@@ -179,10 +179,10 @@ Think like a curious consultant who asks "why" before "how". Uncover hidden assu
 See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 
 **Brainstorm-Specific Triggers:**
-- 요구사항 패턴 발견 (반복되는 사용자 니즈)
-- 도메인 지식 습득 (비즈니스 로직 핵심 규칙)
-- 기술 선택 근거 (특정 접근법 선택 이유)
-- 위험 요소 식별 (향후 주의할 점)
+- Requirements patterns discovered (recurring user needs)
+- Domain knowledge acquired (core business logic rules)
+- Technology selection rationale (reasons for specific approach)
+- Risk factors identified (future considerations)
 
 **Format:** `★ Insight → Write .caw/insights/{YYYYMMDD}-{slug}.md → 💡 Saved`
 

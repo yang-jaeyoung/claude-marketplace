@@ -279,49 +279,49 @@ This enables:
 
 ## Plan Mode Detection
 
-워크플로우 시작 시 **기존 Plan Mode 계획이 있는지 자동 감지**합니다.
+**Automatically detects existing Plan Mode plans** when starting a workflow.
 
-### 자동 감지 워크플로우
+### Auto-Detection Workflow
 
 ```
-/cw:start 실행 시:
-1. plansDirectory 설정 해석:
+When /cw:start executes:
+1. Resolve plansDirectory setting:
    - .claude/settings.local.json → "plansDirectory"
    - .claude/settings.json → "plansDirectory"
    - ~/.claude/settings.json → "plansDirectory"
-   - 기본값: ".claude/plans/"
+   - Default: ".claude/plans/"
 
-2. Plan Mode 파일 확인:
-   - {plansDirectory}/*.md (설정된 경로)
-   - .claude/plan.md (레거시, 항상 확인)
+2. Check for Plan Mode files:
+   - {plansDirectory}/*.md (configured path)
+   - .claude/plan.md (legacy, always checked)
 
-3. 파일이 존재하면:
-   - 계획 내용 요약 표시
-   - 변환 여부 확인 질문
+3. If file exists:
+   - Display plan content summary
+   - Ask about conversion
 
-4. 사용자 선택:
-   [1] Plan Mode 계획을 CAW task_plan.md로 변환
-   [2] 새로운 계획 작성 (Plan Mode 무시)
-   [3] Plan Mode 계획 확인 후 결정
+4. User selection:
+   [1] Convert Plan Mode plan to CAW task_plan.md
+   [2] Create new plan (ignore Plan Mode)
+   [3] Review Plan Mode plan first
 ```
 
-### 감지 대화 예시
+### Detection Dialog Example
 
 ```
-📋 Plan Mode 계획 감지됨
+📋 Plan Mode Plan Detected
 
-파일: .claude/plan.md
-제목: JWT Authentication Implementation
-단계 수: 8 steps in 3 phases
+File: .claude/plan.md
+Title: JWT Authentication Implementation
+Steps: 8 steps in 3 phases
 
-이 계획을 CAW 워크플로우로 변환하시겠습니까?
+Would you like to convert this plan to CAW workflow?
 
-[1] 변환하여 진행 (Recommended)
-[2] 새로운 계획 작성
-[3] 계획 내용 먼저 확인
+[1] Convert and proceed (Recommended)
+[2] Create new plan
+[3] Review plan first
 ```
 
-### 변환 프로세스
+### Conversion Process
 
 ```yaml
 plan_mode_to_cw:
@@ -330,24 +330,24 @@ plan_mode_to_cw:
     - ".claude/plans/*.md"
 
   extraction:
-    title: "# 또는 첫 번째 heading"
-    steps: "- [ ] 또는 numbered list"
+    title: "# or first heading"
+    steps: "- [ ] or numbered list"
     context: "File mentions, code blocks"
 
   conversion:
-    1. 제목 추출 → Task Plan title
-    2. 체크리스트 항목 → Steps
-    3. 관련 파일 언급 → Context Files
-    4. 코드 블록 → Implementation hints
+    1. Extract title → Task Plan title
+    2. Checklist items → Steps
+    3. File mentions → Context Files
+    4. Code blocks → Implementation hints
 
   output:
     file: ".caw/task_plan.md"
     format: "CAW standard template"
 ```
 
-### 변환 결과 예시
+### Conversion Result Example
 
-**Plan Mode 원본:**
+**Plan Mode Original:**
 ```markdown
 # JWT Authentication
 
@@ -357,7 +357,7 @@ plan_mode_to_cw:
 - [ ] Add login endpoint
 ```
 
-**CAW task_plan.md 변환:**
+**CAW task_plan.md Conversion:**
 ```markdown
 # Task Plan: JWT Authentication
 
@@ -373,9 +373,9 @@ plan_mode_to_cw:
 | 1.3 | Add login endpoint | ⏳ | Builder | 1.2 | |
 ```
 
-### Plan Mode 없이 시작
+### Starting Without Plan Mode
 
-Plan Mode 계획이 감지되지 않으면:
+If no Plan Mode plan is detected:
 ```
 No Plan Mode plan detected.
 Proceeding with new CAW workflow...

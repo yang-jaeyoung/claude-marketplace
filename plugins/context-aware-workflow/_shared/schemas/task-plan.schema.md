@@ -51,94 +51,94 @@ Location: `.caw/task_plan.md`
 
 ### Phase-Level Dependencies (Phase Deps)
 
-Phase 간 의존성을 명시합니다. 선행 Phase가 완료되어야 해당 Phase를 시작할 수 있습니다.
+Specifies dependencies between Phases. Predecessor Phases must complete before starting the dependent Phase.
 
 | Notation | Meaning | Example |
 |----------|---------|---------|
-| `-` | 독립적, 즉시 시작 가능 | Phase 1 (Setup) |
-| `phase N` | Phase N 완료 후 시작 | `phase 1` |
-| `phase N, M` | Phase N과 M 모두 완료 후 | `phase 2, 3` |
+| `-` | Independent, can start immediately | Phase 1 (Setup) |
+| `phase N` | Starts after Phase N completes | `phase 1` |
+| `phase N, M` | Starts after both Phase N and M complete | `phase 2, 3` |
 
-**병렬 실행 가능 판단**:
-- 동일한 Phase Deps를 가진 Phase들은 병렬 실행 가능
-- 예: Phase 2 (`phase 1`), Phase 3 (`phase 1`) → 병렬 가능
+**Determining Parallel Execution**:
+- Phases with identical Phase Deps can run in parallel
+- Example: Phase 2 (`phase 1`), Phase 3 (`phase 1`) → **Parallel possible**
 
 ### Step-Level Dependencies (Deps Column)
 
-Step 간 의존성을 명시합니다.
+Specifies dependencies between Steps.
 
 | Notation | Meaning | Example |
 |----------|---------|---------|
-| `-` | 독립적, 해당 Phase 시작 시 즉시 실행 가능 | |
-| `N.M` | 특정 Step 완료 후 실행 | `2.1` |
-| `N.M, N.K` | 여러 Step 완료 후 실행 | `2.1, 2.3` |
-| `N.*` | Phase N 전체 완료 후 실행 | `1.*` |
-| `!N.M` | Step N.M과 동시 실행 불가 (mutual exclusion) | `!2.3` |
+| `-` | Independent, can execute immediately when Phase starts | |
+| `N.M` | Execute after specific Step completes | `2.1` |
+| `N.M, N.K` | Execute after multiple Steps complete | `2.1, 2.3` |
+| `N.*` | Execute after entire Phase N completes | `1.*` |
+| `!N.M` | Cannot run concurrently with Step N.M (mutual exclusion) | `!2.3` |
 
 ## Step Type Column (Tidy First)
 
-Kent Beck의 Tidy First 방법론에 따라 모든 Step은 Type을 명시합니다.
+All Steps must specify their Type according to Kent Beck's Tidy First methodology.
 
 | Icon | Type | Description | Commit Prefix |
 |------|------|-------------|---------------|
-| 🧹 | Tidy | 구조적 변경 (동작 변화 없음) | `[tidy]` |
-| 🔨 | Build | 동작 변경 (새 기능, 버그 수정) | `[feat]`, `[fix]` |
-| 🔧 | Refactor | 혼합 변경 (가급적 피함) | `[refactor]` |
+| 🧹 | Tidy | Structural changes (no behavior change) | `[tidy]` |
+| 🔨 | Build | Behavioral changes (new features, bug fixes) | `[feat]`, `[fix]` |
+| 🔧 | Refactor | Mixed changes (avoid if possible) | `[refactor]` |
 
-### Tidy First 원칙
+### Tidy First Principles
 
-1. **구조적 변경 먼저**: 동작 변경 전에 코드 정리
-2. **커밋 분리**: Tidy와 Build 커밋을 절대 혼합하지 않음
-3. **작은 단위**: 각 변경은 최소 단위로
+1. **Structural changes first**: Clean up code before behavior changes
+2. **Separate commits**: Never mix Tidy and Build commits
+3. **Small units**: Each change should be minimal
 
-### Tidy Step 예시
+### Tidy Step Examples
 
-| 작업 | Type | 설명 |
-|------|------|------|
-| 변수/함수 이름 변경 | 🧹 Tidy | 명확한 네이밍 |
-| 메서드 추출 | 🧹 Tidy | 중복 코드 분리 |
-| 파일 재구성 | 🧹 Tidy | 디렉토리 정리 |
-| 사용하지 않는 코드 제거 | 🧹 Tidy | Dead code 삭제 |
-| 의존성 명시화 | 🧹 Tidy | 암시적 의존성 노출 |
+| Task | Type | Description |
+|------|------|-------------|
+| Rename variables/functions | 🧹 Tidy | Clearer naming |
+| Extract method | 🧹 Tidy | Separate duplicate code |
+| Reorganize files | 🧹 Tidy | Directory cleanup |
+| Remove unused code | 🧹 Tidy | Delete dead code |
+| Make dependencies explicit | 🧹 Tidy | Expose implicit dependencies |
 
-### Build Step 예시
+### Build Step Examples
 
-| 작업 | Type | 설명 |
-|------|------|------|
-| 새 함수 추가 | 🔨 Build | 새 기능 |
-| 로직 수정 | 🔨 Build | 동작 변경 |
-| 버그 수정 | 🔨 Build | 결함 수정 |
-| 테스트 추가 | 🔨 Build | 새 테스트 케이스 |
+| Task | Type | Description |
+|------|------|-------------|
+| Add new function | 🔨 Build | New feature |
+| Modify logic | 🔨 Build | Behavior change |
+| Fix bug | 🔨 Build | Defect fix |
+| Add tests | 🔨 Build | New test cases |
 
-### Step 순서 규칙
+### Step Order Rules
 
 ```
 Phase N:
-  N.0 [Tidy] 구조적 정리  ─┐
-  N.1 [Tidy] 리팩토링     ─┼─ Tidy 먼저
-  N.2 [Build] 기능 구현   ─┤
-  N.3 [Build] 테스트      ─┘ Build 나중
+  N.0 [Tidy] Structural cleanup  ─┐
+  N.1 [Tidy] Refactoring         ─┼─ Tidy first
+  N.2 [Build] Feature impl       ─┤
+  N.3 [Build] Tests              ─┘ Build later
 ```
 
 ## Status Icons
 
 | Icon | Status | Description |
 |------|--------|-------------|
-| ⏳ | Pending | 실행 대기 중 |
-| 🔄 | In Progress | 실행 중 |
-| ✅ | Complete | 완료 |
-| ❌ | Blocked | 차단됨 (의존성 미충족 또는 오류) |
-| ⏭️ | Skipped | 건너뜀 |
-| 🌳 | In Worktree | 별도 worktree에서 작업 중 |
+| ⏳ | Pending | Waiting to execute |
+| 🔄 | In Progress | Currently executing |
+| ✅ | Complete | Completed |
+| ❌ | Blocked | Blocked (dependency not met or error) |
+| ⏭️ | Skipped | Skipped |
+| 🌳 | In Worktree | Working in separate worktree |
 
 ## Agent Column
 
 | Value | Description |
 |-------|-------------|
-| Builder | 기본 구현 에이전트 |
-| Builder-Haiku | 간단한 작업용 경량 에이전트 |
-| Builder-Opus | 복잡한 작업용 고급 에이전트 |
-| Reviewer | 코드 리뷰 에이전트 |
+| Builder | Default implementation agent |
+| Builder-Haiku | Lightweight agent for simple tasks |
+| Builder-Opus | Advanced agent for complex tasks |
+| Reviewer | Code review agent |
 
 ## Example: Full Task Plan (Tidy First)
 
@@ -157,15 +157,15 @@ Phase N:
 ### Active Context
 | File | Reason | Status |
 |------|--------|--------|
-| `src/auth/jwt.ts` | JWT 유틸리티 구현 | 📝 Edit |
-| `src/middleware/auth.ts` | 인증 미들웨어 | 📝 Edit |
+| `src/auth/jwt.ts` | JWT utility implementation | 📝 Edit |
+| `src/middleware/auth.ts` | Auth middleware | 📝 Edit |
 
 ### Project Context (Read-Only)
 - `package.json`
 - `tsconfig.json`
 
 ## Task Summary
-JWT 기반 사용자 인증 시스템을 구현합니다. Tidy First 방법론에 따라 구조적 정리 후 기능을 구현합니다.
+Implement JWT-based user authentication system. Following Tidy First methodology, structural cleanup precedes feature implementation.
 
 ## Execution Phases
 
@@ -174,78 +174,78 @@ JWT 기반 사용자 인증 시스템을 구현합니다. Tidy First 방법론�
 
 | # | Step | Type | Status | Agent | Deps | Notes |
 |---|------|------|--------|-------|------|-------|
-| 1.1 | 의존성 설치 (jsonwebtoken, bcrypt) | 🔨 Build | ✅ | Builder | - | |
-| 1.2 | 타입 정의 추가 | 🔨 Build | ✅ | Builder | - | ⚡ 1.1과 병렬 |
-| 1.3 | 테스트 fixture 설정 | 🔨 Build | ✅ | Builder | - | ⚡ 병렬 가능 |
+| 1.1 | Install dependencies (jsonwebtoken, bcrypt) | 🔨 Build | ✅ | Builder | - | |
+| 1.2 | Add type definitions | 🔨 Build | ✅ | Builder | - | ⚡ Parallel with 1.1 |
+| 1.3 | Set up test fixtures | 🔨 Build | ✅ | Builder | - | ⚡ Parallel possible |
 
 ### Phase 2: Core Implementation
 **Phase Deps**: phase 1
 
 | # | Step | Type | Status | Agent | Deps | Notes |
 |---|------|------|--------|-------|------|-------|
-| 2.0 | 기존 auth 코드 정리 | 🧹 Tidy | ✅ | Builder | - | 네이밍 개선 |
-| 2.1 | JWT 유틸리티 함수 구현 | 🔨 Build | 🔄 | Builder | 2.0 | |
-| 2.2 | 토큰 생성 함수 | 🔨 Build | ⏳ | Builder | 2.1 | |
-| 2.3 | 토큰 검증 함수 | 🔨 Build | ⏳ | Builder | 2.1 | ⚡ 2.2와 병렬 |
-| 2.4 | 인증 미들웨어 | 🔨 Build | ⏳ | Builder | 2.2, 2.3 | |
+| 2.0 | Clean up existing auth code | 🧹 Tidy | ✅ | Builder | - | Naming improvements |
+| 2.1 | Implement JWT utility functions | 🔨 Build | 🔄 | Builder | 2.0 | |
+| 2.2 | Token generation function | 🔨 Build | ⏳ | Builder | 2.1 | |
+| 2.3 | Token validation function | 🔨 Build | ⏳ | Builder | 2.1 | ⚡ Parallel with 2.2 |
+| 2.4 | Auth middleware | 🔨 Build | ⏳ | Builder | 2.2, 2.3 | |
 
 ### Phase 3: API Layer
 **Phase Deps**: phase 1
 
 | # | Step | Type | Status | Agent | Deps | Notes |
 |---|------|------|--------|-------|------|-------|
-| 3.0 | User 모델 리팩토링 | 🧹 Tidy | ⏳ | Builder | - | 필드명 정규화 |
-| 3.1 | User 모델 확장 | 🔨 Build | ⏳ | Builder | 3.0 | |
-| 3.2 | 비밀번호 해싱 유틸리티 | 🔨 Build | ⏳ | Builder | 3.0 | ⚡ 3.1과 병렬 |
-| 3.3 | 회원가입 엔드포인트 | 🔨 Build | ⏳ | Builder | 3.1, 3.2 | |
+| 3.0 | User model refactoring | 🧹 Tidy | ⏳ | Builder | - | Normalize field names |
+| 3.1 | Extend User model | 🔨 Build | ⏳ | Builder | 3.0 | |
+| 3.2 | Password hashing utility | 🔨 Build | ⏳ | Builder | 3.0 | ⚡ Parallel with 3.1 |
+| 3.3 | Registration endpoint | 🔨 Build | ⏳ | Builder | 3.1, 3.2 | |
 
 ### Phase 4: Integration
 **Phase Deps**: phase 2, phase 3
 
 | # | Step | Type | Status | Agent | Deps | Notes |
 |---|------|------|--------|-------|------|-------|
-| 4.1 | 로그인 엔드포인트 | 🔨 Build | ⏳ | Builder | - | |
-| 4.2 | 인증 라우트 보호 적용 | 🔨 Build | ⏳ | Builder | 4.1 | |
-| 4.3 | 통합 테스트 | 🔨 Build | ⏳ | Builder | 4.2 | |
+| 4.1 | Login endpoint | 🔨 Build | ⏳ | Builder | - | |
+| 4.2 | Apply auth route protection | 🔨 Build | ⏳ | Builder | 4.1 | |
+| 4.3 | Integration tests | 🔨 Build | ⏳ | Builder | 4.2 | |
 
 ## Validation Checklist
-- [ ] 모든 테스트 통과
-- [ ] 프로젝트 컨벤션 준수
-- [ ] 보안 검토 완료
-- [ ] Tidy/Build 커밋 분리 확인
+- [ ] All tests pass
+- [ ] Follows project conventions
+- [ ] Security review complete
+- [ ] Tidy/Build commits separated
 
 ## Open Questions
-- 토큰 만료 시간 설정값?
+- Token expiration time setting?
 ```
 
 ## Parallel Execution Analysis
 
-위 예시에서 병렬 실행 가능한 조합:
+Parallel execution combinations in the example above:
 
-### Phase 병렬
-- Phase 2와 Phase 3: 둘 다 `phase 1`에만 의존 → **병렬 가능**
+### Phase Parallel
+- Phase 2 and Phase 3: Both only depend on `phase 1` → **Parallel possible**
 
-### Step 병렬 (Phase 1 내)
-- Step 1.1, 1.2, 1.3: 모두 `-` (독립) → **병렬 가능**
+### Step Parallel (within Phase 1)
+- Step 1.1, 1.2, 1.3: All `-` (independent) → **Parallel possible**
 
-### Step 병렬 (Phase 2 내)
-- Step 2.2, 2.3: 둘 다 `2.1`에만 의존 → **병렬 가능**
+### Step Parallel (within Phase 2)
+- Step 2.2, 2.3: Both only depend on `2.1` → **Parallel possible**
 
-### Worktree 활용 예시
+### Worktree Usage Example
 
 ```bash
-# Phase 1 완료 후
+# After Phase 1 completes
 
-# 터미널 1 (메인)
+# Terminal 1 (main)
 /cw:next --worktree phase 2
 
-# 터미널 2
+# Terminal 2
 /cw:next --worktree phase 3
 
-# 각 worktree에서
+# In each worktree
 cd .worktrees/phase-2 && claude
-/cw:next --parallel phase 2  # 2.2, 2.3 병렬 실행
+/cw:next --parallel phase 2  # Run 2.2, 2.3 in parallel
 
-# 완료 후 메인에서
+# After completion, from main
 /cw:merge --all
 ```

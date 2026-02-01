@@ -10,46 +10,46 @@ Generates context-aware review checklists by aggregating patterns, decisions, an
 
 ## Core Principle
 
-**맥락 있는 리뷰 = 효과적인 리뷰**
+**Contextual Review = Effective Review**
 
-일반적인 체크리스트가 아닌, 프로젝트의 패턴/결정/인사이트를 반영한 맞춤형 체크리스트를 생성합니다.
+Generate customized checklists reflecting project patterns/decisions/insights, not generic checklists.
 
 ## Triggers
 
-이 Skill은 다음 상황에서 활성화됩니다:
+This Skill activates in the following situations:
 
-1. **/cw:review 실행**
-   - Reviewer Agent와 함께 활성화
-   - 컨텍스트 기반 체크리스트 생성
+1. **/cw:review execution**
+   - Activated with Reviewer Agent
+   - Generate context-based checklist
 
-2. **Phase 완료 리뷰**
-   - Phase 전환 전 리뷰 시
-   - 해당 Phase 관련 체크 항목
+2. **Phase completion review**
+   - During review before Phase transition
+   - Check items related to that Phase
 
-3. **Pre-merge 리뷰**
-   - PR 생성 전 리뷰
-   - 전체적인 품질 체크
+3. **Pre-merge review**
+   - Review before PR creation
+   - Overall quality check
 
-4. **특정 파일/영역 리뷰**
-   - "auth 모듈 리뷰해줘"
-   - 해당 영역 관련 체크리스트
+4. **Specific file/area review**
+   - "Review the auth module"
+   - Checklist related to that area
 
 ## Dependencies
 
-이 Skill은 다른 Skills의 데이터를 활용합니다:
+This Skill utilizes data from other Skills:
 
 | Skill | Usage | Required |
 |-------|-------|----------|
-| **pattern-learner** | 코드 패턴 준수 확인 | Yes |
-| **decision-logger** | ADR 준수 확인 | Yes |
-| **insight-collector** | 관련 인사이트 참조 | No |
-| **knowledge-base** | 도메인 규칙 확인 | No |
+| **pattern-learner** | Code pattern compliance check | Yes |
+| **decision-logger** | ADR compliance check | Yes |
+| **insight-collector** | Related insights reference | No |
+| **knowledge-base** | Domain rule verification | No |
 
 ## Behavior
 
 ### Step 1: Identify Review Scope
 
-리뷰 대상 파악:
+Identify review scope:
 
 ```yaml
 scope_detection:
@@ -69,7 +69,7 @@ scope_detection:
 
 ### Step 2: Gather Context
 
-각 데이터 소스에서 관련 정보 수집:
+Collect relevant information from each data source:
 
 ```yaml
 context_gathering:
@@ -111,7 +111,7 @@ context_gathering:
 
 ### Step 3: Generate Checklist
 
-수집된 컨텍스트로 체크리스트 생성:
+Generate checklist from collected context:
 
 ```yaml
 checklist_structure:
@@ -127,7 +127,7 @@ checklist_structure:
 
 ### Step 4: Contextualize
 
-변경 사항에 맞게 필터링:
+Filter according to changes:
 
 ```yaml
 filtering:
@@ -279,17 +279,17 @@ gotchas:
 ## Example Flow
 
 ```
-1. 사용자: "/cw:review"
+1. User: "/cw:review"
 
-2. review-assistant 활성화
-   Scope: src/auth/*.ts (Phase 2 파일)
+2. review-assistant activated
+   Scope: src/auth/*.ts (Phase 2 files)
 
-3. 컨텍스트 수집:
-   - patterns.md: TypeScript 패턴
+3. Context collection:
+   - patterns.md: TypeScript patterns
    - ADR-001: JWT Authentication
-   - insight-20260104-jwt-refresh: 토큰 갱신 타이밍
+   - insight-20260104-jwt-refresh: Token refresh timing
 
-4. 체크리스트 생성:
+4. Checklist generation:
 
    ## Context-Aware Review Checklist
 
@@ -313,9 +313,9 @@ gotchas:
    ### Related Insights
    | Insight | Note |
    |---------|------|
-   | JWT Refresh Timing | 만료 5분 전 갱신 권장 |
+   | JWT Refresh Timing | Refresh recommended 5 min before expiry |
 
-5. Reviewer Agent에 전달
+5. Hand off to Reviewer Agent
 ```
 
 ## Integration with Reviewer Agent
@@ -323,21 +323,21 @@ gotchas:
 ```yaml
 integration:
   workflow:
-    1. /cw:review 호출
-    2. review-assistant가 체크리스트 생성
-    3. Reviewer Agent가 체크리스트 기반 리뷰
-    4. 각 항목 확인 및 피드백 제공
+    1. /cw:review called
+    2. review-assistant generates checklist
+    3. Reviewer Agent reviews based on checklist
+    4. Check each item and provide feedback
 
   handoff:
     review-assistant:
-      - 체크리스트 생성
-      - 컨텍스트 제공
-      - 관련 링크 포함
+      - Generate checklist
+      - Provide context
+      - Include related links
 
     reviewer:
-      - 실제 코드 리뷰
-      - 이슈 발견
-      - 피드백 작성
+      - Actual code review
+      - Issue discovery
+      - Feedback writing
 ```
 
 ## Checklist Priority Levels
@@ -393,37 +393,37 @@ module_rules:
 
 ## Fallback Behavior
 
-데이터 소스가 없을 때:
+When data sources are missing:
 
 ```yaml
 fallbacks:
   no_patterns:
-    message: "패턴 분석이 없습니다. 일반 체크리스트 사용"
+    message: "No pattern analysis. Using standard checklist"
     action: Use standard checklist
 
   no_decisions:
-    message: "기록된 결정이 없습니다"
+    message: "No recorded decisions"
     action: Skip ADR section
 
   no_insights:
-    message: "관련 인사이트 없음"
+    message: "No related insights"
     action: Skip insights section
 
   no_knowledge:
-    message: "도메인 지식 없음"
+    message: "No domain knowledge"
     action: Skip domain section
 ```
 
 ## Boundaries
 
 **Will:**
-- 프로젝트 컨텍스트 기반 체크리스트 생성
-- 패턴/결정/인사이트 통합
-- 변경 범위에 맞게 필터링
-- 우선순위 제시
+- Generate project context-based checklist
+- Integrate patterns/decisions/insights
+- Filter according to change scope
+- Present priorities
 
 **Will Not:**
-- 실제 코드 리뷰 수행 (Reviewer 역할)
-- 코드 수정
-- 리뷰 승인/거부 결정
-- 체크리스트 항목 자동 체크
+- Perform actual code review (Reviewer role)
+- Modify code
+- Decide review approval/rejection
+- Auto-check checklist items

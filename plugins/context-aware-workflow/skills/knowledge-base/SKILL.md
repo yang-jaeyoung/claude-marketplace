@@ -10,91 +10,91 @@ Centralized repository for capturing, organizing, and retrieving project-specifi
 
 ## Core Principle
 
-**지식 축적 = 컨텍스트 보존**
+**Knowledge Accumulation = Context Preservation**
 
-프로젝트에서 학습한 중요한 정보를 체계적으로 저장하여, 새 세션에서도 동일한 컨텍스트를 유지합니다.
+Systematically store important information learned from the project to maintain the same context across new sessions.
 
 ## Triggers
 
-이 Skill은 다음 상황에서 활성화됩니다:
+This Skill activates in the following situations:
 
-1. **Agent 질문**
-   - "이 프로젝트에서 X는 어떻게 동작하나요?"
-   - 사용자에게 묻기 전에 knowledge-base 먼저 검색
+1. **Agent Questions**
+   - "How does X work in this project?"
+   - Search knowledge-base first before asking the user
 
-2. **세션 완료**
-   - 워크플로우 종료 시 지식 정리
-   - 중요 정보 자동 캡처
+2. **Session Completion**
+   - Organize knowledge at workflow end
+   - Auto-capture important information
 
-3. **명시적 요청**
-   - "이 정보를 저장해줘"
-   - "knowledge-base에 추가"
+3. **Explicit Requests**
+   - "Save this information"
+   - "Add to knowledge-base"
 
-4. **관련 정보 발견**
-   - 도메인 규칙 발견 시
-   - 중요한 기술적 세부사항 파악 시
+4. **Relevant Information Discovery**
+   - When domain rules are discovered
+   - When important technical details are identified
 
 ## Knowledge Categories
 
 | Category | Description | Examples |
 |----------|-------------|----------|
-| **domain/** | 비즈니스 로직, 도메인 규칙 | 주문 처리 규칙, 가격 정책 |
-| **technical/** | 기술적 구현 세부사항 | API 연동 방법, 설정 값 |
-| **conventions/** | 프로젝트 규칙 | 코딩 표준, 브랜치 전략 |
-| **gotchas/** | 주의사항, 함정 | 알려진 버그, 비직관적 동작 |
-| **integrations/** | 외부 서비스 연동 | API 키 위치, 엔드포인트 |
+| **domain/** | Business logic, domain rules | Order processing rules, pricing policies |
+| **technical/** | Technical implementation details | API integration methods, configuration values |
+| **conventions/** | Project rules | Coding standards, branch strategy |
+| **gotchas/** | Cautions, pitfalls | Known bugs, non-intuitive behaviors |
+| **integrations/** | External service integrations | API key locations, endpoints |
 
 ## Behavior
 
 ### Step 1: Knowledge Detection
 
-캡처할 가치가 있는 정보 식별:
+Identify information worth capturing:
 
 ```yaml
 detection:
   high_value:
-    - Domain rules: "X일 때 Y해야 함"
-    - Configuration: "환경변수 Z 필요"
-    - Gotchas: "이렇게 하면 안 됨"
-    - Integration details: "API는 이렇게 호출"
+    - Domain rules: "When X, must do Y"
+    - Configuration: "Environment variable Z required"
+    - Gotchas: "Don't do it this way"
+    - Integration details: "API is called like this"
 
   sources:
-    - insight-collector: 캡처된 인사이트
-    - decision-logger: 기록된 결정
-    - 대화 중 발견된 정보
-    - 코드 주석/문서
+    - insight-collector: Captured insights
+    - decision-logger: Recorded decisions
+    - Information discovered during conversation
+    - Code comments/documentation
 ```
 
 ### Step 2: Categorize
 
-적절한 카테고리 할당:
+Assign appropriate category:
 
 ```yaml
 categorization:
   domain:
     keywords: ["business", "rule", "policy", "when", "must"]
-    examples: ["주문이 $100 이상이면 무료배송"]
+    examples: ["Orders $100+ get free shipping"]
 
   technical:
     keywords: ["implementation", "config", "setup", "api"]
-    examples: ["Redis 캐시 TTL은 1시간"]
+    examples: ["Redis cache TTL is 1 hour"]
 
   conventions:
     keywords: ["standard", "convention", "always", "never"]
-    examples: ["모든 API는 JSON:API 형식"]
+    examples: ["All APIs use JSON:API format"]
 
   gotchas:
     keywords: ["careful", "don't", "avoid", "bug", "issue"]
-    examples: ["Date.now()는 테스트에서 flaky"]
+    examples: ["Date.now() is flaky in tests"]
 
   integrations:
     keywords: ["external", "third-party", "api", "service"]
-    examples: ["Stripe webhook secret 위치"]
+    examples: ["Stripe webhook secret location"]
 ```
 
 ### Step 3: Create Entry
 
-지식 항목 생성:
+Create knowledge entry:
 
 ```yaml
 action: Write tool
@@ -104,7 +104,7 @@ content: See Knowledge Entry Template
 
 ### Step 4: Update Index
 
-인덱스 파일 업데이트:
+Update index file:
 
 ```yaml
 action: Write tool
@@ -120,7 +120,7 @@ content:
 
 ### Step 5: Confirm
 
-저장 완료 확인:
+Confirm save completion:
 
 ```
 📚 Knowledge saved: {title}
@@ -214,7 +214,7 @@ See [templates/knowledge-entry.md](templates/knowledge-entry.md) for the full te
 
 ## Search Behavior
 
-Agent가 지식을 검색할 때:
+When agents search for knowledge:
 
 ```yaml
 search:
@@ -248,17 +248,17 @@ search:
 ### Capturing Knowledge
 
 ```
-1. 사용자: "주문 금액이 $100 이상이면 무료배송이에요"
+1. User: "Orders $100 or more get free shipping"
 
-2. 모델: 도메인 규칙 감지
-   → 이것은 비즈니스 규칙입니다
+2. Model: Domain rule detected
+   → This is a business rule
 
-3. 모델: Knowledge entry 생성
+3. Model: Create knowledge entry
    📚 Knowledge saved: Order Free Shipping Rule
       Category: domain
       Path: .caw/knowledge/domain/order-free-shipping.md
 
-4. 저장 내용:
+4. Saved content:
    # Order Free Shipping Rule
 
    ## Summary
@@ -276,13 +276,13 @@ search:
 ### Retrieving Knowledge
 
 ```
-1. Builder: "배송비 계산 로직을 구현해야 하는데..."
+1. Builder: "I need to implement shipping cost calculation logic..."
 
-2. knowledge-base 검색:
+2. knowledge-base search:
    Query: "shipping", "order", "pricing"
    Result: kb-005 Order Free Shipping Rule
 
-3. Builder에게 컨텍스트 제공:
+3. Provide context to Builder:
    📚 Related knowledge found:
    - Order Free Shipping Rule (domain)
      "Orders $100+ get free shipping"
@@ -292,20 +292,20 @@ search:
 
 | Agent | Usage |
 |-------|-------|
-| **Planner** | 도메인 규칙 확인하여 계획 수립 |
-| **Builder** | 구현 전 관련 지식 검색 |
-| **Reviewer** | 규칙 준수 여부 확인 |
-| **Architect** | 기존 아키텍처 결정 참조 |
-| **All** | 사용자에게 묻기 전 지식 검색 |
+| **Planner** | Check domain rules for planning |
+| **Builder** | Search related knowledge before implementation |
+| **Reviewer** | Verify rule compliance |
+| **Architect** | Reference existing architecture decisions |
+| **All** | Search knowledge before asking user |
 
 ## Integration with Other Skills
 
 | Skill | Integration |
 |-------|-------------|
-| **insight-collector** | 인사이트를 지식으로 승격 |
-| **decision-logger** | ADR을 지식으로 연결 |
-| **context-helper** | 관련 지식을 컨텍스트로 제공 |
-| **session-persister** | 세션 종료 시 지식 정리 |
+| **insight-collector** | Promote insights to knowledge |
+| **decision-logger** | Link ADRs to knowledge |
+| **context-helper** | Provide related knowledge as context |
+| **session-persister** | Organize knowledge at session end |
 
 ## Knowledge Lifecycle
 
@@ -331,7 +331,7 @@ lifecycle:
 
 ## Auto-Capture Rules
 
-자동으로 캡처해야 하는 정보:
+Information that should be auto-captured:
 
 ```yaml
 auto_capture:
@@ -348,20 +348,20 @@ auto_capture:
       - "Remember that..."
       - "Important: ..."
       - "Note: ..."
-      - "기억해야 할 것: ..."
+      - "Things to remember: ..."
     action: Prompt for knowledge capture
 ```
 
 ## Boundaries
 
 **Will:**
-- 프로젝트 지식 체계적 저장
-- 카테고리별 정리 및 인덱싱
-- 키워드 기반 검색 제공
-- 관련 항목 간 링크 유지
+- Systematically store project knowledge
+- Organize and index by category
+- Provide keyword-based search
+- Maintain links between related entries
 
 **Will Not:**
-- 사용자 확인 없이 지식 삭제
-- 민감 정보 저장 (credentials, secrets)
-- 자동으로 지식 만료 처리
-- 외부 시스템과 동기화
+- Delete knowledge without user confirmation
+- Store sensitive information (credentials, secrets)
+- Automatically expire knowledge
+- Sync with external systems

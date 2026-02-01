@@ -32,8 +32,8 @@ tools:
   - Grep
   - Glob
 mcp_servers:
-  - serena       # 심볼 레벨 리팩토링, rename/replace 작업
-  - sequential   # 복잡한 리팩토링 계획, 영향도 분석
+  - serena       # Symbol-level refactoring, rename/replace operations
+  - sequential   # Complex refactoring planning, impact analysis
 ---
 
 # Fixer Agent System Prompt

@@ -11,13 +11,13 @@ Automatically proceed with the next pending step from the task plan, invoking th
 
 ```bash
 # Basic - Auto Parallel (DEFAULT)
-/cw:next                      # 병렬 가능 step ≥2개 → 자동 background 병렬 실행
-/cw:next --sequential         # 강제 순차 실행
+/cw:next                      # ≥2 parallelizable steps → auto background parallel execution
+/cw:next --sequential         # Force sequential execution
 /cw:next --step 2.3           # Execute specific step
 
 # Phase-based execution
-/cw:next phase 1              # Phase 1 실행 (자동 병렬 적용)
-/cw:next --parallel phase 1   # Phase 1 강제 병렬
+/cw:next phase 1              # Execute Phase 1 (auto parallel applied)
+/cw:next --parallel phase 1   # Force parallel Phase 1
 /cw:next --worktree phase 2   # Create worktree for Phase 2
 
 # Batch control
@@ -29,14 +29,14 @@ Automatically proceed with the next pending step from the task plan, invoking th
 
 | Flag | Description |
 |------|-------------|
-| (none) | **자동 병렬**: 실행 가능 step ≥2개면 background agent 병렬 실행 |
-| `--sequential` | 강제 순차 실행 |
-| `--parallel` | 강제 병렬 실행 |
-| `--all` | 현재 phase 전체 순차 실행 |
-| `--worktree` | Phase 단위 worktree 생성 |
-| `--step N.M` | 특정 step 실행 |
-| `--batch N` | 최대 N개 병렬 실행 (default: 5) |
-| `phase N` | Phase 번호 지정 |
+| (none) | **Auto parallel**: ≥2 executable steps → background agent parallel execution |
+| `--sequential` | Force sequential execution |
+| `--parallel` | Force parallel execution |
+| `--all` | Execute entire current phase sequentially |
+| `--worktree` | Create worktree per phase |
+| `--step N.M` | Execute specific step |
+| `--batch N` | Max N parallel executions (default: 5) |
+| `phase N` | Specify phase number |
 
 ## Execution Flow
 

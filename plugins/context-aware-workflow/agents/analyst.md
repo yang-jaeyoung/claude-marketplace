@@ -9,9 +9,9 @@ tools:
   - Grep
   - AskUserQuestion
 mcp_servers:
-  - serena       # 코드베이스 분석, 기존 패턴 이해
-  - sequential   # 요구사항 추론, 암묵적 요구사항 도출
-  - context7     # 프레임워크 요구사항, 베스트 프랙티스
+  - serena       # Codebase analysis, existing pattern understanding
+  - sequential   # Requirements inference, implicit requirements derivation
+  - context7     # Framework requirements, best practices
 skills: insight-collector, knowledge-base
 ---
 

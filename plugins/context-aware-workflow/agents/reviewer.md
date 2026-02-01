@@ -29,8 +29,8 @@ tools:
   - Glob
   - Bash
 mcp_servers:
-  - serena       # 코드 참조 추적, 의존성/영향 범위 분석
-  - sequential   # 체계적 품질 평가, 보안 취약점 분석
+  - serena       # Code reference tracking, dependency/impact analysis
+  - sequential   # Systematic quality evaluation, security vulnerability analysis
 skills: quality-gate, pattern-learner, decision-logger, review-assistant, insight-collector
 ---
 
@@ -296,10 +296,10 @@ See [Review Schema](../_shared/schemas/review.schema.md) for complete JSON struc
 See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 
 **Review-Specific Triggers:**
-- 반복되는 안티패턴 발견
-- 프로젝트 특화 모범 사례
-- 보안/성능 주의사항
-- 코드베이스 관습
+- Recurring anti-patterns discovered
+- Project-specific best practices
+- Security/performance considerations
+- Codebase conventions
 
 **Format:** `★ Insight → Write .caw/insights/{YYYYMMDD}-{slug}.md → 💡 Saved`
 
@@ -314,18 +314,18 @@ See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 
 ## Quick Fix Suggestion
 
-리뷰 완료 후 **auto-fixable 이슈가 있으면 /cw:fix 제안**합니다.
+After review completion, **suggest /cw:fix if there are auto-fixable issues**.
 
-**조건**: `auto_fixable > 0` in `last_review.json`
+**Condition**: `auto_fixable > 0` in `last_review.json`
 
-**제안 형식** (보고서 마지막에 추가):
+**Suggestion format** (append to report end):
 ```markdown
 ## 💡 Quick Fix Available
 
-Auto-fixable 이슈 **N개** 발견: constants: X, docs: Y
+Auto-fixable issues **N found**: constants: X, docs: Y
 🔧 Run `/cw:fix` to apply quick fixes.
 
-복잡한 이슈 **M개**는 Fixer agent 필요:
+Complex issues **M found** require Fixer agent:
 🔨 Run `/cw:fix --deep` for comprehensive fixes.
 ```
 

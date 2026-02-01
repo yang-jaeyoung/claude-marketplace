@@ -6,7 +6,7 @@ forked-context: true
 forked-context-returns: |
   status: restored | saved | archived | fresh_start
   session: { task_title, progress_percentage }
-  action: 수행된 작업 요약
+  action: Summary of performed actions
 hooks:
   SessionStart:
     action: restore
@@ -28,20 +28,20 @@ This skill activates:
 
 ### Session File: `.caw/session.json`
 
-세션 데이터는 `templates/session-template.json` 스키마를 따릅니다.
+Session data follows the `templates/session-template.json` schema.
 
-**주요 필드:**
+**Key fields:**
 
-| 필드 | 설명 |
-|------|------|
-| `session_id` | 고유 식별자 (sess_YYYYMMDD_HHMMSS) |
-| `workflow` | task_plan 경로, 제목, 상태 |
-| `progress` | 현재 phase/step, 완료/대기 step 목록 |
-| `context` | 활성 파일, 최근 편집, 미해결 질문 |
-| `metrics` | 인사이트/결정/품질게이트 카운트 |
-| `notes` | 자유 형식 메모 |
+| Field | Description |
+|-------|-------------|
+| `session_id` | Unique identifier (sess_YYYYMMDD_HHMMSS) |
+| `workflow` | task_plan path, title, status |
+| `progress` | Current phase/step, completed/pending step list |
+| `context` | Active files, recent edits, unresolved questions |
+| `metrics` | Insight/decision/quality gate counts |
+| `notes` | Free-form notes |
 
-**예시:**
+**Example:**
 ```json
 {
   "session_id": "sess_20260104_143000",
@@ -75,20 +75,20 @@ This skill activates:
 
 **Restore Prompt:**
 ```
-🔄 이전 세션 발견
+🔄 Previous session found
 
 Session: sess_20260104_143000
 Task: JWT Authentication Implementation
-Progress: Phase 2, Step 2.3 (45% 완료)
-Last Activity: 2시간 전
+Progress: Phase 2, Step 2.3 (45% complete)
+Last Activity: 2 hours ago
 
-최근 작업:
-  • src/auth/jwt.ts - 토큰 갱신 로직 추가
-  • src/auth/middleware.ts - 검증 미들웨어 수정
+Recent work:
+  • src/auth/jwt.ts - Added token refresh logic
+  • src/auth/middleware.ts - Modified validation middleware
 
-[1] 이전 세션 이어서 진행
-[2] 세션 상태 확인만 (/cw:status)
-[3] 새로 시작 (이전 세션 아카이브)
+[1] Continue previous session
+[2] Check session status only (/cw:status)
+[3] Start fresh (archive previous session)
 ```
 
 ### On Manual Save
@@ -104,13 +104,13 @@ Last Activity: 2시간 전
 
 **Save Confirmation:**
 ```
-💾 세션 상태 저장됨
+💾 Session state saved
 
 Progress: Phase 2, Step 2.3 (45%)
-Files tracked: 4개
-Insights captured: 3개
+Files tracked: 4
+Insights captured: 3
 
-다음 세션에서 /cw:status 또는 자동 복구로 이어서 진행할 수 있습니다.
+You can continue in the next session via /cw:status or automatic recovery.
 ```
 
 ## Directory Structure
@@ -205,19 +205,19 @@ Multiple .caw/ directories found (monorepo)
 
 ### Manual Save
 ```
-"save session" or "세션 저장"
+"save session"
 → Immediate checkpoint with confirmation
 ```
 
 ### Manual Restore
 ```
-"restore session" or "세션 복구"
+"restore session"
 → Show available sessions, offer selection
 ```
 
 ### View History
 ```
-"session history" or "세션 기록"
+"session history"
 → List recent sessions with summaries
 ```
 
@@ -242,11 +242,11 @@ errors:
 
 ### Backup to Serena
 
-세션 저장 시 Serena 메모리에도 백업하여 크로스 세션 영속성 강화:
+Backup to Serena memory when saving session for enhanced cross-session persistence:
 
 ```yaml
 backup_to_serena:
-  enabled: true  # .claude/caw.local.md에서 설정 가능
+  enabled: true  # Configurable in .claude/caw.local.md
   memory_name: "session_backup"
   trigger:
     - session_save
@@ -254,10 +254,10 @@ backup_to_serena:
     - explicit_request
 ```
 
-**저장 워크플로우**:
+**Save workflow**:
 ```
 On Session Save:
-1. Write to .caw/session.json (기존 방식)
+1. Write to .caw/session.json (existing method)
 2. If serena_backup enabled:
    write_memory("session_backup", {
      session_id: "[id]",
@@ -271,28 +271,28 @@ On Session Save:
 
 ### Restore from Serena
 
-세션 복원 시 Serena 메모리 우선 체크:
+Check Serena memory first when restoring session:
 
 ```
 On Session Restore:
-1. Check .caw/session.json (기존 방식)
+1. Check .caw/session.json (existing method)
 2. If not found or corrupted:
    - Check Serena: read_memory("session_backup")
    - If found: Offer to restore from Serena
 3. Display available recovery options
 ```
 
-**Serena 복원 프롬프트**:
+**Serena restore prompt**:
 ```
-⚠️ 로컬 세션 파일 없음
+⚠️ Local session file not found
 
-🔍 Serena 메모리에서 백업 발견:
+🔍 Backup found in Serena memory:
    Task: JWT Authentication
    Progress: Phase 2, Step 2.3 (45%)
-   Last Backup: 3일 전
+   Last Backup: 3 days ago
 
-[1] Serena 백업에서 복원
-[2] 새로 시작
+[1] Restore from Serena backup
+[2] Start fresh
 ```
 
 ### Priority Order

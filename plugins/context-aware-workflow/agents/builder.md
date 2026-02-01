@@ -31,8 +31,8 @@ tools:
   - Grep
   - Glob
 mcp_servers:
-  - serena       # 기존 코드 패턴 파악, 심볼 위치 탐색
-  - context7     # 라이브러리 공식 사용법, API 문서 참조
+  - serena       # Identify existing code patterns, symbol location search
+  - context7     # Library official usage, API documentation reference
 skills: quality-gate, context-helper, progress-tracker, pattern-learner, insight-collector
 ---
 
@@ -488,83 +488,83 @@ See [Insight Collection](../_shared/insight-collection.md) for full pattern.
 - Format: `★ Insight → Write .caw/insights/{YYYYMMDD}-{slug}.md → 💡 Saved`
 - vs Lessons Learned: Insights = code patterns (`.caw/`), Lessons = problem-solving (`CLAUDE.md`)
 
-## Lessons Learned - CLAUDE.md 업데이트
+## Lessons Learned - CLAUDE.md Update
 
-구현 중 **어려운 문제를 해결**하거나 **실수를 바로잡은 경우**, 동일한 문제 재발 방지를 위해 핵심 내용을 프로젝트의 `CLAUDE.md`에 기록합니다.
+When **resolving difficult problems** or **correcting mistakes** during implementation, record key content in the project's `CLAUDE.md` to prevent the same issues from recurring.
 
-### 기록 트리거 조건
+### Recording Trigger Conditions
 
-다음 상황 발생 시 CLAUDE.md 업데이트를 수행합니다:
+Perform CLAUDE.md update when the following situations occur:
 
-| 상황 | 예시 |
-|------|------|
-| **디버깅에 30분+ 소요** | 원인 파악이 어려웠던 버그 |
-| **3회 이상 시도 후 성공** | 반복 실패 후 해결한 구현 |
-| **예상치 못한 동작 발견** | 라이브러리/프레임워크의 quirk |
-| **환경/설정 문제 해결** | 빌드, 테스트, 배포 관련 이슈 |
-| **패턴 위반으로 인한 오류** | 프로젝트 컨벤션 미준수 문제 |
+| Situation | Example |
+|-----------|---------|
+| **Debugging took 30+ minutes** | Bug with difficult root cause identification |
+| **Success after 3+ attempts** | Implementation resolved after repeated failures |
+| **Unexpected behavior discovered** | Library/framework quirks |
+| **Environment/config issue resolved** | Build, test, deployment related issues |
+| **Error due to pattern violation** | Project convention non-compliance issues |
 
-### 기록 형식
+### Recording Format
 
-`CLAUDE.md`의 적절한 위치에 다음 형식으로 추가:
-
-```markdown
-## Lessons Learned
-
-### [카테고리]: [간결한 제목]
-- **문제**: [무엇이 잘못되었는지 1줄 설명]
-- **원인**: [근본 원인]
-- **해결**: [올바른 접근법]
-- **예방**: [향후 주의사항 또는 체크리스트]
-```
-
-### 카테고리 분류
-
-| 카테고리 | 내용 |
-|----------|------|
-| `Build` | 빌드, 컴파일, 번들링 관련 |
-| `Test` | 테스트 프레임워크, 모킹, 커버리지 |
-| `Config` | 환경변수, 설정파일, 의존성 |
-| `Pattern` | 프로젝트 컨벤션, 아키텍처 패턴 |
-| `Library` | 외부 라이브러리 사용법, 버전 이슈 |
-| `Runtime` | 실행 시 동작, 타이밍, 비동기 처리 |
-
-### 실제 예시
+Add to appropriate location in `CLAUDE.md` in the following format:
 
 ```markdown
 ## Lessons Learned
 
-### Config: TypeScript 경로 별칭 설정
-- **문제**: `@/components` 임포트가 빌드 시 실패
-- **원인**: `tsconfig.json`의 paths와 번들러 설정 불일치
-- **해결**: vite.config.ts에 `resolve.alias` 동일하게 추가
-- **예방**: 경로 별칭 추가 시 tsconfig + 번들러 설정 모두 확인
-
-### Library: React Query 캐시 무효화
-- **문제**: 데이터 업데이트 후 UI가 갱신되지 않음
-- **원인**: mutation 후 queryClient.invalidateQueries 누락
-- **해결**: useMutation의 onSuccess에서 관련 쿼리 무효화
-- **예방**: 데이터 변경 mutation 작성 시 캐시 무효화 체크리스트 확인
+### [Category]: [Concise Title]
+- **Problem**: [One line explaining what went wrong]
+- **Cause**: [Root cause]
+- **Solution**: [Correct approach]
+- **Prevention**: [Future cautions or checklist]
 ```
 
-### 업데이트 워크플로우
+### Category Classification
+
+| Category | Content |
+|----------|---------|
+| `Build` | Build, compilation, bundling related |
+| `Test` | Test framework, mocking, coverage |
+| `Config` | Environment variables, config files, dependencies |
+| `Pattern` | Project conventions, architecture patterns |
+| `Library` | External library usage, version issues |
+| `Runtime` | Runtime behavior, timing, async handling |
+
+### Practical Examples
+
+```markdown
+## Lessons Learned
+
+### Config: TypeScript Path Alias Setup
+- **Problem**: `@/components` import fails on build
+- **Cause**: Mismatch between `tsconfig.json` paths and bundler config
+- **Solution**: Add same `resolve.alias` to vite.config.ts
+- **Prevention**: Check both tsconfig + bundler config when adding path aliases
+
+### Library: React Query Cache Invalidation
+- **Problem**: UI not updating after data update
+- **Cause**: Missing queryClient.invalidateQueries after mutation
+- **Solution**: Invalidate related queries in useMutation's onSuccess
+- **Prevention**: Check cache invalidation checklist when writing data mutations
+```
+
+### Update Workflow
 
 ```
-1. 문제 해결 완료
-2. 트리거 조건 해당 여부 판단
-3. CLAUDE.md 읽기 (기존 Lessons Learned 섹션 확인)
-4. 중복 여부 확인 (이미 기록된 내용인지)
-5. 새로운 교훈이면 형식에 맞게 추가
-6. Serena 메모리에도 동기화 (NEW)
-7. 완료 보고 시 교훈 기록 사실 언급
+1. Problem resolution complete
+2. Determine if trigger condition applies
+3. Read CLAUDE.md (check existing Lessons Learned section)
+4. Check for duplicates (already recorded content)
+5. If new lesson, add in proper format
+6. Sync to Serena memory as well (NEW)
+7. Mention lesson recording in completion report
 ```
 
 ### Serena Memory Sync for Lessons (NEW)
 
-교훈을 CLAUDE.md에 기록한 후, Serena 메모리에도 저장하여 크로스 세션 영속성을 확보합니다:
+After recording lessons in CLAUDE.md, also save to Serena memory to ensure cross-session persistence:
 
 ```
-# 교훈 기록 후 Serena 메모리에 동기화
+# Sync to Serena memory after recording lessons
 write_memory("lessons_learned", """
 # Lessons Learned
 
@@ -578,12 +578,12 @@ write_memory("lessons_learned", """
 """)
 ```
 
-**동기화 시점**:
-- 새 교훈 CLAUDE.md에 추가 직후
-- `/cw:sync --to-serena` 명시적 실행 시
-- 세션 종료 전 (설정된 경우)
+**Sync Timing**:
+- Immediately after adding new lesson to CLAUDE.md
+- When explicitly running `/cw:sync --to-serena`
+- Before session end (if configured)
 
-**메모리 형식**:
+**Memory Format**:
 ```markdown
 # Lessons Learned
 
@@ -605,23 +605,23 @@ write_memory("lessons_learned", """
 - **Prevention**: Always check cache strategy for mutations
 ```
 
-### 보고 예시
+### Report Example
 
 ```
 ✅ Step 2.1 Complete
    Updated .caw/task_plan.md
 
-📚 Lesson Learned 기록됨
-   → CLAUDE.md에 "Library: React Query 캐시 무효화" 추가
-   → 향후 동일 문제 예방을 위한 체크포인트 설정
+📚 Lesson Learned recorded
+   → Added "Library: React Query Cache Invalidation" to CLAUDE.md
+   → Checkpoint set for preventing same issue in the future
 ```
 
-### 주의사항
+### Important Notes
 
-- **핵심만 기록**: 장황한 설명 대신 actionable한 내용만
-- **프로젝트 특화**: 일반적인 지식이 아닌 이 프로젝트에서 발생한 구체적 문제
-- **중복 방지**: 기존 기록과 유사한 내용이면 기존 항목 보강
-- **위치 선정**: 관련 섹션이 있으면 해당 섹션에, 없으면 "Lessons Learned" 섹션 생성
+- **Record only essentials**: Actionable content instead of verbose explanations
+- **Project-specific**: Concrete problems that occurred in this project, not general knowledge
+- **Prevent duplicates**: If similar to existing record, enhance the existing item
+- **Location selection**: Add to related section if exists, otherwise create "Lessons Learned" section
 
 ## Integrated Skills
 
@@ -629,10 +629,10 @@ Builder automatically applies these skills during execution:
 
 | Skill | Trigger | Reference |
 |-------|---------|-----------|
-| **Session Persistence** | Step/Phase 완료 시 | See `_shared/session-management.md` |
-| **Progress Tracking** | Step 시작/완료 시 | `skills/progress-tracker/SKILL.md` |
-| **Context Helper** | Step 시작 전 | `skills/context-helper/SKILL.md` |
-| **Quality Gate** | Step 완료 전 | `skills/quality-gate/SKILL.md` |
+| **Session Persistence** | On Step/Phase completion | See `_shared/session-management.md` |
+| **Progress Tracking** | On Step start/completion | `skills/progress-tracker/SKILL.md` |
+| **Context Helper** | Before Step start | `skills/context-helper/SKILL.md` |
+| **Quality Gate** | Before Step completion | `skills/quality-gate/SKILL.md` |
 
 ### Quick Reference
 

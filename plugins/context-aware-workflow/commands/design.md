@@ -223,7 +223,7 @@ Options:
 📋 Existing Design Found
 
 .caw/design/ux-ui.md exists
-  Created: 2시간 전
+  Created: 2 hours ago
   Status: Draft
 
 [1] Update existing design

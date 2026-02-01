@@ -6,8 +6,8 @@ forked-context: true
 forked-context-returns: |
   status: PASSED | FAILED | PASSED_WITH_WARNINGS
   summary: { passed: N, warnings: N, failed: N }
-  key_errors: [최대 3개 핵심 에러 메시지]
-  action_needed: [다음 단계 제안]
+  key_errors: [Max 3 key error messages]
+  action_needed: [Next step suggestions]
 triggers:
   # NOTE: These are CAW internal triggers, NOT Claude Code hooks (hooks.json)
   # Quality Gate is invoked by Builder agent, not by Claude Code hook system
@@ -230,8 +230,8 @@ Checks:
   ✅ Tests: 5 passed, 0 failed
   ✅ Tidy First: Build step, no mixed changes
 
-Step 2.3 완료로 표시됩니다.
-다음 단계로 진행하시겠습니까? [Y/n]
+Step 2.3 will be marked as complete.
+Proceed to next step? [Y/n]
 ```
 
 **Tidy Step Passed:**
@@ -244,7 +244,7 @@ Checks:
   ✅ Tests: All pass (no behavior change)
   ✅ Tidy First: Structural only, valid [tidy] commit
 
-Step 2.0 완료로 표시됩니다.
+Step 2.0 will be marked as complete.
 Commit: [tidy] Rename auth variables for clarity
 ```
 
@@ -260,9 +260,9 @@ Checks:
      └─ src/auth/jwt.ts:67 - Prefer const over let
   ✅ Tests: 5 passed, 0 failed
 
-경고가 있지만 진행 가능합니다.
-[1] 진행 (warnings 무시)
-[2] 경고 수정 후 재검증
+Warnings exist but can proceed.
+[1] Proceed (ignore warnings)
+[2] Fix warnings and revalidate
 ```
 
 **Failed:**
@@ -277,8 +277,8 @@ Checks:
      └─ auth.test.ts:23 - Expected token to be valid
      └─ auth.test.ts:45 - Timeout in async operation
 
-테스트 실패로 Step을 완료할 수 없습니다.
-실패한 테스트를 수정하시겠습니까? [Y/n]
+Cannot complete step due to test failures.
+Fix failed tests? [Y/n]
 ```
 
 **Mixed Change Failed (Tidy First Violation):**
@@ -311,7 +311,7 @@ Action Required:
 
 2. Or run: /cw:tidy --split
 
-Step을 완료할 수 없습니다.
+Cannot complete step.
 ```
 
 ## Framework Detection
@@ -436,4 +436,4 @@ See [Forked Context Pattern](../../_shared/forked-context.md).
 **Output Examples:**
 - `✅ Quality Gate PASSED` - Summary: N passed, M warnings
 - `❌ Quality Gate FAILED` - Key errors (max 3) + action needed
-- `key_errors: [핵심 에러 최대 3개]` - Focused error list
+- `key_errors: [Key errors max 3]` - Focused error list

@@ -10,45 +10,45 @@ Analyzes codebase to learn and document project-specific coding patterns for con
 
 ## Core Principle
 
-**패턴 학습 = 일관성 보장**
+**Pattern Learning = Consistency Guarantee**
 
-프로젝트의 기존 코드를 분석하여 패턴을 학습하고, 새 코드가 동일한 규칙을 따르도록 합니다.
+Analyze existing project code to learn patterns and ensure new code follows the same rules.
 
 ## Triggers
 
-이 Skill은 다음 상황에서 활성화됩니다:
+This Skill activates in the following situations:
 
-1. **/cw:start 실행**
-   - 워크플로우 시작 시 자동 분석
-   - 프로젝트 패턴 초기 학습
+1. **/cw:start execution**
+   - Auto-analyze at workflow start
+   - Initial project pattern learning
 
-2. **Agent 요청**
-   - "이 프로젝트의 패턴은?"
-   - "기존 코드 스타일 확인"
+2. **Agent request**
+   - "What are the patterns in this project?"
+   - "Check existing code style"
 
-3. **패턴 갱신 요청**
-   - "패턴 다시 분석해줘"
-   - 새로운 파일 유형 발견 시
+3. **Pattern refresh request**
+   - "Re-analyze patterns"
+   - When new file types are discovered
 
-4. **새 파일 생성 전**
-   - Builder가 파일 생성 전 패턴 확인
+4. **Before new file creation**
+   - Builder checks patterns before creating files
 
 ## Pattern Categories
 
 | Category | What to Learn | Examples |
 |----------|---------------|----------|
-| **Naming** | 명명 규칙 | camelCase functions, PascalCase classes |
-| **Architecture** | 디렉토리 구조, 모듈화 | Clean Architecture, Feature-based |
-| **Error Handling** | 에러 처리 패턴 | Result<T,E>, try-catch style |
-| **Testing** | 테스트 구조, 명명 | AAA pattern, *.test.ts |
-| **Imports** | import 정리 방식 | Grouped, path aliases |
-| **Documentation** | 주석 스타일 | JSDoc, docstrings |
+| **Naming** | Naming conventions | camelCase functions, PascalCase classes |
+| **Architecture** | Directory structure, modularization | Clean Architecture, Feature-based |
+| **Error Handling** | Error handling patterns | Result<T,E>, try-catch style |
+| **Testing** | Test structure, naming | AAA pattern, *.test.ts |
+| **Imports** | Import organization | Grouped, path aliases |
+| **Documentation** | Comment styles | JSDoc, docstrings |
 
 ## Behavior
 
 ### Step 1: File Discovery
 
-분석 대상 파일 탐색:
+Discover files to analyze:
 
 ```yaml
 discovery:
@@ -86,7 +86,7 @@ discovery:
 
 ### Step 2: Pattern Analysis
 
-각 카테고리별 패턴 추출:
+Extract patterns for each category:
 
 ```yaml
 analysis:
@@ -120,7 +120,7 @@ analysis:
 
 ### Step 3: Generate Documentation
 
-패턴을 문서화:
+Document patterns:
 
 ```yaml
 action: Write tool
@@ -130,7 +130,7 @@ content: See Pattern Template below
 
 ### Step 4: Cache for Performance
 
-분석 결과 캐싱:
+Cache analysis results:
 
 ```yaml
 cache:
@@ -147,7 +147,7 @@ cache:
 
 ### Step 5: Confirm
 
-분석 완료 확인:
+Confirm analysis completion:
 
 ```
 📊 Patterns analyzed: {N} files scanned
@@ -265,47 +265,47 @@ analyze:
 ## Example Flow
 
 ```
-1. 사용자: "/cw:start"
+1. User: "/cw:start"
 
-2. pattern-learner 활성화
-   - 설정 파일 탐색
-   - 소스 파일 샘플링
-   - 패턴 분석
+2. pattern-learner activated
+   - Discover config files
+   - Sample source files
+   - Analyze patterns
 
-3. 분석 결과:
+3. Analysis results:
    📊 Patterns analyzed: 15 files scanned
       - Language: TypeScript
       - Naming: camelCase functions, PascalCase components
       - Architecture: Feature-based structure
       - Testing: Jest with AAA pattern
 
-4. 저장:
+4. Save:
    → .caw/patterns/patterns.md
 
-5. Builder 사용 시:
-   "새 함수는 camelCase로 작성해야 합니다 (프로젝트 패턴)"
+5. When Builder uses:
+   "New functions should use camelCase (project pattern)"
 ```
 
 ## Integration with Agents
 
 | Agent | How It Uses Patterns |
 |-------|---------------------|
-| **Planner** | 아키텍처 패턴 참고하여 계획 |
-| **Builder** | 코드 작성 시 패턴 준수 |
-| **Reviewer** | 패턴 준수 여부 검토 |
-| **Architect** | 새 컴포넌트 설계 시 참고 |
+| **Planner** | Reference architecture patterns for planning |
+| **Builder** | Follow patterns when writing code |
+| **Reviewer** | Review pattern compliance |
+| **Architect** | Reference when designing new components |
 
 ## Integration with Other Skills
 
 | Skill | Integration |
 |-------|-------------|
-| **quality-gate** | conventions check에서 패턴 활용 |
-| **review-assistant** | 패턴 기반 체크리스트 생성 |
-| **context-helper** | 패턴 문서를 컨텍스트로 제공 |
+| **quality-gate** | Use patterns in conventions check |
+| **review-assistant** | Generate pattern-based checklist |
+| **context-helper** | Provide pattern docs as context |
 
 ## Incremental Analysis
 
-처음 분석 이후 점진적 업데이트:
+Incremental updates after initial analysis:
 
 ```yaml
 incremental:
@@ -323,7 +323,7 @@ incremental:
 
 ## Pattern Confidence
 
-패턴 신뢰도 표시:
+Pattern confidence indicators:
 
 | Confidence | Criteria |
 |------------|----------|
@@ -344,13 +344,13 @@ incremental:
 ## Boundaries
 
 **Will:**
-- 기존 코드 분석하여 패턴 추출
-- 패턴 문서화 및 캐싱
-- 패턴 갱신 요청 시 재분석
-- 신뢰도와 함께 패턴 제시
+- Analyze existing code to extract patterns
+- Document and cache patterns
+- Re-analyze on pattern refresh requests
+- Present patterns with confidence levels
 
 **Will Not:**
-- 패턴 강제 적용 (quality-gate 역할)
-- 코드 자동 수정
-- 설정 파일 변경
-- 외부 린터 설정 덮어쓰기
+- Enforce patterns (quality-gate role)
+- Auto-fix code
+- Modify config files
+- Override external linter settings

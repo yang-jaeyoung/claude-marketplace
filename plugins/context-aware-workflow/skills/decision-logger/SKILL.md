@@ -10,52 +10,51 @@ Captures and documents architectural and technical decisions in Architecture Dec
 
 ## Core Principle
 
-**결정 = 즉시 기록**
+**Decision = Record Immediately**
 
-기술적 결정이 내려지면 ADR 형식으로 즉시 기록합니다. 나중에 "왜 이렇게 했지?"라는 질문에 답할 수 있습니다.
+Record technical decisions in ADR format immediately when made. Answer "why did we do it this way?" later.
 
 ## Triggers
 
-이 Skill은 다음 상황에서 활성화됩니다:
+This Skill activates in the following situations:
 
-1. **AskUserQuestion 응답에 결정 포함**
-   - "X를 선택합니다", "Y로 하겠습니다"
-   - "A 대신 B를 사용"
+1. **AskUserQuestion response contains decision**
+   - "I'll choose X", "Let's go with Y"
+   - "Use B instead of A"
 
-2. **아키텍처 선택 논의**
-   - 기술 스택 선택
-   - 디자인 패턴 결정
-   - 라이브러리/프레임워크 선택
+2. **Architecture choice discussion**
+   - Technology stack selection
+   - Design pattern decisions
+   - Library/framework selection
 
-3. **Trade-off 논의 완료**
-   - 장단점 비교 후 결론
-   - 대안 검토 후 최종 선택
+3. **Trade-off discussion completed**
+   - Conclusion after pros/cons comparison
+   - Final choice after reviewing alternatives
 
-4. **명시적 요청**
-   - "이 결정을 기록해줘"
-   - "ADR로 남겨줘"
+4. **Explicit request**
+   - "Record this decision"
+   - "Log as ADR"
 
 ## Decision Detection Patterns
 
 | Pattern | Example |
 |---------|---------|
-| 선택 표현 | "chose X over Y", "decided to use X", "X를 선택" |
-| 비교 결론 | "X instead of Y because...", "X 대신 Y" |
-| 근거 제시 | "because", "due to", "the reason is", "왜냐하면" |
-| Trade-off | "trade-off", "pros/cons", "장단점" |
-| 최종 결정 | "concluded", "final choice", "결론적으로" |
+| Choice expression | "chose X over Y", "decided to use X" |
+| Comparison conclusion | "X instead of Y because..." |
+| Rationale provided | "because", "due to", "the reason is" |
+| Trade-off | "trade-off", "pros/cons" |
+| Final decision | "concluded", "final choice" |
 
 ## Behavior
 
 ### Step 1: Detect Decision
 
-대화에서 결정 패턴 감지:
+Detect decision patterns in conversation:
 
 ```yaml
 detection:
   keywords:
     - "decided", "chose", "selected", "will use"
-    - "결정", "선택", "채택", "사용하기로"
   context:
     - Technology comparison
     - Architecture discussion
@@ -65,7 +64,7 @@ detection:
 
 ### Step 2: Generate ADR ID
 
-순차적 ID 생성:
+Generate sequential ID:
 
 ```yaml
 id_format: ADR-{NNN}
@@ -83,7 +82,7 @@ process:
 
 ### Step 3: Extract Components
 
-결정에서 핵심 요소 추출:
+Extract key elements from decision:
 
 ```yaml
 components:
@@ -97,7 +96,7 @@ components:
 
 ### Step 4: Write ADR File
 
-`.caw/decisions/` 에 저장:
+Save to `.caw/decisions/`:
 
 ```yaml
 action: Write tool
@@ -107,7 +106,7 @@ content: See ADR Template below
 
 ### Step 5: Update Index
 
-인덱스 파일 업데이트 (있는 경우):
+Update index file (if exists):
 
 ```yaml
 action: Append to .caw/decisions/index.md
@@ -117,7 +116,7 @@ content: |
 
 ### Step 6: Confirm
 
-저장 완료 확인:
+Confirm save completion:
 
 ```
 📋 ADR saved: ADR-{NNN} - {Title}
@@ -174,8 +173,8 @@ See [templates/adr-template.md](templates/adr-template.md) for the full template
 
 **Pattern**: `ADR-{NNN}-{slug}.md`
 
-- NNN: 3자리 순차 번호 (001, 002, ...)
-- slug: 제목에서 3-5단어, kebab-case
+- NNN: 3-digit sequential number (001, 002, ...)
+- slug: 3-5 words from title, kebab-case
 
 **Examples**:
 - `ADR-001-jwt-over-session-auth.md`
@@ -216,18 +215,18 @@ See [templates/adr-template.md](templates/adr-template.md) for the full template
 ## Example Flow
 
 ```
-1. 사용자: "인증 방식으로 JWT와 Session 중 어떤 걸 사용할까요?"
+1. User: "Should we use JWT or Session for authentication?"
 
-2. 모델: 장단점 비교 제시
-   - JWT: Stateless, 확장성 좋음, 토큰 크기 큼
-   - Session: 서버 관리 필요, 즉시 무효화 가능
+2. Model: Present pros/cons comparison
+   - JWT: Stateless, good scalability, larger token size
+   - Session: Requires server management, instant invalidation possible
 
-3. 사용자: "JWT를 사용하겠습니다. 확장성이 중요해서요."
+3. User: "I'll use JWT. Scalability is important."
 
-4. 모델: 결정 감지 → ADR 생성
-   → .caw/decisions/ADR-001-jwt-authentication.md 저장
+4. Model: Detect decision → Create ADR
+   → Save .caw/decisions/ADR-001-jwt-authentication.md
 
-5. 모델: 확인 메시지
+5. Model: Confirmation message
    📋 ADR saved: ADR-001 - JWT Authentication Selection
 ```
 
@@ -235,7 +234,7 @@ See [templates/adr-template.md](templates/adr-template.md) for the full template
 
 ### CAW Workflow Active
 
-워크플로우가 활성화된 경우, 메타데이터에 Phase/Step 정보 포함:
+When workflow is active, include Phase/Step info in metadata:
 
 ```markdown
 ## Metadata
@@ -249,7 +248,7 @@ See [templates/adr-template.md](templates/adr-template.md) for the full template
 
 ### Without Workflow
 
-일반 대화에서도 ADR 저장 가능:
+ADRs can be saved during general conversation:
 
 ```markdown
 ## Metadata
@@ -265,17 +264,17 @@ See [templates/adr-template.md](templates/adr-template.md) for the full template
 
 | Skill | Integration |
 |-------|-------------|
-| knowledge-base | ADR을 knowledge entry로 연결 |
-| insight-collector | 관련 insight 링크 |
-| review-assistant | 결정 준수 체크리스트 생성 |
+| knowledge-base | Link ADRs to knowledge entries |
+| insight-collector | Link related insights |
+| review-assistant | Generate decision compliance checklist |
 
 ## Superseding ADRs
 
-기존 결정을 대체할 때:
+When replacing existing decisions:
 
-1. 기존 ADR 상태를 `Superseded` 로 변경
-2. 새 ADR에 대체 사유 명시
-3. 양방향 링크 추가
+1. Change existing ADR status to `Superseded`
+2. Specify replacement reason in new ADR
+3. Add bidirectional links
 
 ```markdown
 # ADR-001: JWT Authentication (SUPERSEDED)
@@ -286,12 +285,12 @@ See [templates/adr-template.md](templates/adr-template.md) for the full template
 ## Boundaries
 
 **Will:**
-- 결정 발생 시 즉시 ADR 생성
-- 순차적 ID 관리
-- 관련 ADR 간 링크 유지
-- 상태 변경 추적
+- Create ADR immediately when decision occurs
+- Manage sequential IDs
+- Maintain links between related ADRs
+- Track status changes
 
 **Will Not:**
-- 결정 자체를 내리는 것 (기록만 함)
-- 사용자 확인 없이 기존 ADR 수정
-- 자동으로 ADR 삭제 또는 만료
+- Make decisions (only record)
+- Modify existing ADRs without user confirmation
+- Auto-delete or expire ADRs
