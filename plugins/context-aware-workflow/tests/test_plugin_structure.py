@@ -517,7 +517,7 @@ class TestModelRoutingSchema(unittest.TestCase):
 
     def test_model_routing_schema_exists(self):
         """Model routing schema must exist."""
-        schema = PLUGIN_ROOT / "_shared" / "schemas" / "model-routing.schema.json"
+        schema = PLUGIN_ROOT / "schemas" / "model-routing.schema.json"
         self.assertTrue(schema.exists(), "model-routing.schema.json not found")
 
 

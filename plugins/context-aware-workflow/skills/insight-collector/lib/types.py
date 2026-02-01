@@ -1,7 +1,6 @@
 """Type definitions for Insight Collector."""
 
-from typing import List, Optional
-from typing_extensions import TypedDict, NotRequired
+from typing import List, Optional, TypedDict, NotRequired
 
 
 class Observation(TypedDict):
