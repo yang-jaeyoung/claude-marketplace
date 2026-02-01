@@ -1,1 +1,0 @@
-/Users/urd/.claude/plugins/rails8-hotwire/knowledge/LOADING-PROTOCOL.md
