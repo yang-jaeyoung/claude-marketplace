@@ -95,17 +95,17 @@ argument-hint: "<arg>"
 
 ## Gemini CLI Usage
 
-All commands invoke external `gemini` CLI with appropriate flags:
+All commands invoke external `gemini` CLI with the `-p` (prompt) flag for non-interactive execution:
 
 ```bash
-# Headless question
-gemini --headless "question"
+# Direct question
+gemini -p "question"
 
 # Code review with context
-git diff --staged | gemini --headless "Review this code..."
+git diff --staged | gemini -p "Review this code..."
 
 # Commit message generation
-git diff --staged | gemini --headless "Generate commit message..."
+git diff --staged | gemini -p "Generate commit message..."
 ```
 
 ---
@@ -116,7 +116,7 @@ git diff --staged | gemini --headless "Generate commit message..."
 
 - **DO** verify Gemini CLI is installed before running commands.
 - **DO** ensure `git add` is run before `/gemini:commit`.
-- **DO** use `--headless` flag for non-interactive execution.
+- **DO** use `-p` flag for non-interactive prompt execution.
 - **DO** handle Gemini CLI errors gracefully with troubleshooting hints.
 
 ## Don'ts
@@ -124,4 +124,4 @@ git diff --staged | gemini --headless "Generate commit message..."
 - **DON'T** assume Gemini CLI is available without checking.
 - **DON'T** run `/gemini:commit` without staged changes.
 - **DON'T** expose API keys or tokens in command output.
-- **DON'T** use interactive Gemini CLI modes (require `--headless`).
+- **DON'T** use interactive Gemini CLI modes (always use `-p` flag).

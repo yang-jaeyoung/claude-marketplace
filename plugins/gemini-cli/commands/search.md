@@ -1,32 +1,32 @@
 ---
-description: Google Search Grounding을 사용한 웹 검색
+description: Web search using Google Search Grounding
 argument-hint: "<query>"
 allowed-tools: ["Bash"]
 ---
 
 # Gemini Search
 
-Google Search Grounding을 사용하여 웹 검색을 수행합니다.
+Perform web search using Google Search Grounding.
 
 ## Instructions
 
-1. 사용자 쿼리를 arguments에서 가져옵니다
-2. Gemini CLI에 웹 검색 프롬프트를 전달합니다:
+1. Get the user query from arguments
+2. Run Gemini CLI with web search prompt:
 
 ```bash
-gemini -p "다음 질문에 대해 웹 검색을 수행하고, 검색 결과를 기반으로 답변해주세요.
-출처 URL을 반드시 포함하세요.
+gemini -p "Perform a web search for the following question and answer based on the search results.
+Always include source URLs.
 
-질문: <user_query>"
+Question: <user_query>"
 ```
 
-3. 검색 결과를 사용자에게 표시합니다
+3. Display the search results to the user
 
-## 출력 형식
+## Output Format
 
-- 검색 결과 요약
-- 핵심 정보
-- 출처 URL 목록
+- Search results summary
+- Key information
+- Source URLs list
 
 ## Usage Examples
 
@@ -38,7 +38,7 @@ gemini -p "다음 질문에 대해 웹 검색을 수행하고, 검색 결과를 
 
 ## Notes
 
-- Gemini는 프롬프트에 웹 검색 요청 시 자동으로 Search Grounding 실행
-- 무료 티어 1,500 쿼리/일 한도
-- 실시간 정보 + LLM 분석이 동시에 필요한 경우 적합
-- 복잡한 연구는 `/research` 명령과 함께 사용 권장
+- Gemini automatically activates Search Grounding when web search is requested in prompt
+- Free tier limit: 1,500 queries/day
+- Suitable when real-time information and LLM analysis are both needed
+- For complex research, consider combining with `/research` command
