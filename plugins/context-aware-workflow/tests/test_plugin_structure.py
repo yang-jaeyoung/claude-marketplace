@@ -65,13 +65,15 @@ class TestPluginStructure(unittest.TestCase):
         self.assertIn("hooks", data, "hooks.json must have 'hooks' key at root")
         self.assertIsInstance(data["hooks"], dict, "'hooks' must be an object")
 
-        # Valid hook event names
+        # Valid hook event names (Claude Code supported events)
         valid_events = {
             "SessionStart",
+            "SessionEnd",
             "PreToolUse",
             "PostToolUse",
             "Notification",
             "Stop",
+            "SubagentStop",
         }
 
         for event_name in data["hooks"].keys():
@@ -96,7 +98,8 @@ class TestPluginStructure(unittest.TestCase):
     def test_required_directories_exist(self):
         """Required plugin directories must exist."""
         # commands/ contains the slash commands (e.g., /cw:start)
-        required_dirs = ["agents", "hooks", "commands", "docs"]
+        # _shared/ contains shared documentation and schemas
+        required_dirs = ["agents", "hooks", "commands", "_shared", "skills"]
 
         for dir_name in required_dirs:
             dir_path = PLUGIN_ROOT / dir_name
