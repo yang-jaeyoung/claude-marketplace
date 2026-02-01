@@ -14,7 +14,7 @@ Execute general (non-code) queries using Codex CLI.
 2. Run Codex CLI with the following command:
 
 ```bash
-codex exec -m gpt-5.2 -s read-only --skip-git-repo-check "<user_question>"
+codex exec -m gpt-5.2 -s read-only --reasoning medium --skip-git-repo-check "<user_question>"
 ```
 
 3. Display the result to the user
@@ -23,6 +23,7 @@ codex exec -m gpt-5.2 -s read-only --skip-git-repo-check "<user_question>"
 
 - Model: `gpt-5.2` (general purpose)
 - Sandbox: `read-only` (safe mode)
+- Reasoning: `medium` (balanced speed/quality)
 - Working directory: Current directory
 
 ## Usage Examples

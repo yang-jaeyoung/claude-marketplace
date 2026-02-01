@@ -27,9 +27,10 @@ claude plugins reload
 
 ## Core Commands
 
-- **ask** (`commands/ask.md`): General queries using gpt-5.2
-- **code** (`commands/code.md`): Code-related queries using gpt-5.2-codex
-- **review** (`commands/review.md`): Code review using gpt-5.2-codex
+- **ask** (`commands/ask.md`): General queries using gpt-5.2 (reasoning: medium)
+- **code** (`commands/code.md`): Code-related queries using gpt-5.2-codex (reasoning: medium)
+- **review** (`commands/review.md`): Code review using gpt-5.2-codex (reasoning: high)
+- **exec** (`commands/exec.md`): Advanced execution with full options control
 
 ## Session and Automation
 
@@ -45,6 +46,7 @@ claude plugins reload
 
 ## MCP Integration (Experimental)
 
+- **mcp-server** (`commands/mcp-server.md`): Start Codex as MCP server
 - **mcp-list** (`commands/mcp-list.md`): List MCP servers
 - **mcp-add** (`commands/mcp-add.md`): Add MCP server
 
@@ -62,17 +64,19 @@ claude plugins reload
 codex-cli/
   .claude-plugin/plugin.json
   README.md
-  AGENTS.md
+  CLAUDE.md
   commands/
     ask.md
     code.md
     review.md
+    exec.md
     resume.md
     auto.md
     vision.md
     search.md
     cloud.md
     apply.md
+    mcp-server.md
     mcp-list.md
     mcp-add.md
     status.md
@@ -93,6 +97,19 @@ allowed-tools: ["Bash"]
 
 - `gpt-5.2`: General purpose, vision, search queries
 - `gpt-5.2-codex`: Code-related tasks, auto mode
+
+## Reasoning Effort
+
+- `low`: Quick fixes, simple experiments
+- `medium`: General code generation (default)
+- `high`: Complex architecture, thorough review
+
+## Approval Policy
+
+- `untrusted`: Require approval for all actions
+- `on-request`: Approve on request (default)
+- `on-failure`: Only approve on failure
+- `never`: Autonomous execution
 
 ## Safety Defaults
 

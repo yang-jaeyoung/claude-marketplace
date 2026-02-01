@@ -14,7 +14,7 @@ Execute Codex CLI in full-auto mode for autonomous task completion.
 2. Run Codex CLI in full-auto mode:
 
 ```bash
-codex exec --full-auto -m gpt-5.2-codex -s read-only --skip-git-repo-check "<task>"
+codex exec --full-auto -m gpt-5.2-codex -s read-only --reasoning medium --skip-git-repo-check "<task>"
 ```
 
 3. Display the result to the user
@@ -24,6 +24,8 @@ codex exec --full-auto -m gpt-5.2-codex -s read-only --skip-git-repo-check "<tas
 - Model: `gpt-5.2-codex` (optimized for coding tasks)
 - Sandbox: `read-only` (safe mode by default)
 - Mode: `--full-auto` (autonomous execution)
+- Reasoning: `medium` (balanced speed/quality)
+- Approval Policy: `never` (full autonomous mode)
 
 ## Usage Examples
 

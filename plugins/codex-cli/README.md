@@ -7,29 +7,34 @@ Codex CLI를 Claude Code에서 직접 사용할 수 있는 플러그인입니다
 - **모델 분리**: 용도에 따라 최적화된 모델 사용
   - 일반 질의: `gpt-5.2`
   - 코드 관련: `gpt-5.2-codex`
+- **Reasoning Effort**: 작업 복잡도에 따른 추론 수준 조절
+  - `low`: 빠른 실험, 간단한 수정
+  - `medium`: 일반 코드 생성 (기본값)
+  - `high`: 복잡한 아키텍처, 코드 리뷰
 - **안전한 실행**: 기본적으로 `read-only` 샌드박스 모드 사용
 - **세션 관리**: 이전 세션 이어가기 지원
 - **클라우드 통합**: Codex Cloud 태스크 지원
-- **MCP 통합**: MCP 서버 관리 지원
+- **MCP 통합**: MCP 서버 관리 및 MCP Server 모드 지원
 
 ## Commands
 
 ### Core Commands
 
-| Command | Description | Model |
-|---------|-------------|-------|
-| `/codex:ask` | 일반 질의 실행 | gpt-5.2 |
-| `/codex:code` | 코드 관련 질의 | gpt-5.2-codex |
-| `/codex:review` | 코드 리뷰 실행 | gpt-5.2-codex |
+| Command | Description | Model | Reasoning |
+|---------|-------------|-------|-----------|
+| `/codex:ask` | 일반 질의 실행 | gpt-5.2 | medium |
+| `/codex:code` | 코드 관련 질의 | gpt-5.2-codex | medium |
+| `/codex:review` | 코드 리뷰 실행 | gpt-5.2-codex | high |
+| `/codex:exec` | 고급 옵션 실행 | 선택 가능 | 선택 가능 |
 
 ### Session & Automation
 
-| Command | Description | Model |
-|---------|-------------|-------|
-| `/codex:resume` | 이전 세션 이어가기 | - |
-| `/codex:auto` | Full-auto 모드 실행 | gpt-5.2-codex |
-| `/codex:vision` | 이미지 컨텍스트 질의 | gpt-5.2 |
-| `/codex:search` | 웹 검색 포함 질의 | gpt-5.2 |
+| Command | Description | Model | Reasoning |
+|---------|-------------|-------|-----------|
+| `/codex:resume` | 이전 세션 이어가기 | - | - |
+| `/codex:auto` | Full-auto 모드 실행 | gpt-5.2-codex | medium |
+| `/codex:vision` | 이미지 컨텍스트 질의 | gpt-5.2 | - |
+| `/codex:search` | 웹 검색 포함 질의 | gpt-5.2 | - |
 
 ### Cloud Integration
 
@@ -42,6 +47,7 @@ Codex CLI를 Claude Code에서 직접 사용할 수 있는 플러그인입니다
 
 | Command | Description |
 |---------|-------------|
+| `/codex:mcp-server` | Codex를 MCP 서버로 시작 |
 | `/codex:mcp-list` | 설정된 MCP 서버 목록 |
 | `/codex:mcp-add` | MCP 서버 추가 |
 
@@ -117,11 +123,30 @@ Codex CLI를 Claude Code에서 직접 사용할 수 있는 플러그인입니다
 ### MCP 서버 관리 (실험적)
 
 ```bash
+# Codex를 MCP 서버로 실행
+/codex:mcp-server
+
+# MCP Inspector와 함께 실행
+/codex:mcp-server --inspector
+
 # 서버 목록
 /codex:mcp-list
 
 # 서버 추가
 /codex:mcp-add myserver --url https://mcp.example.com
+```
+
+### 고급 실행 옵션
+
+```bash
+# 높은 추론 수준으로 아키텍처 분석
+/codex:exec -r high "Review the architecture of this project"
+
+# 자동 승인 + 작업 공간 쓰기 권한
+/codex:exec -p never -s workspace-write "Refactor the utils module"
+
+# 커스텀 작업 디렉토리
+/codex:exec --cwd ./backend "List all API endpoints"
 ```
 
 ## Prerequisites

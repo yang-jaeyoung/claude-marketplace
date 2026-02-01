@@ -15,12 +15,12 @@ Run code review on the current repository using Codex CLI.
 
 If no arguments provided:
 ```bash
-codex review -m gpt-5.2-codex -s read-only
+codex review -m gpt-5.2-codex -s read-only --reasoning high
 ```
 
 If specific focus area or files provided:
 ```bash
-codex exec -m gpt-5.2-codex -s read-only "Review the code: <user_args>"
+codex exec -m gpt-5.2-codex -s read-only --reasoning high "Review the code: <user_args>"
 ```
 
 3. Display the review results to the user
@@ -29,6 +29,7 @@ codex exec -m gpt-5.2-codex -s read-only "Review the code: <user_args>"
 
 - Model: `gpt-5.2-codex` (optimized for code analysis)
 - Sandbox: `read-only` (safe mode)
+- Reasoning: `high` (thorough analysis for complex reviews)
 - Working directory: Current directory (should be a git repository)
 
 ## Usage Examples
