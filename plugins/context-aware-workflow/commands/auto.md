@@ -41,7 +41,7 @@ Execute the complete CW workflow in a single command with enhanced features:
 
 ## Signal-Based Phase Transitions
 
-Each phase outputs a completion signal. See [Signal Detection](_shared/signal-detection.md).
+Each phase outputs a completion signal. See [Signal Detection](../_shared/signal-detection.md).
 
 | Phase | Signal |
 |-------|--------|
@@ -103,7 +103,7 @@ State saved in `.caw/auto-state.json`:
   "signals": { "detected_signals": [...] }
 }
 ```
-Full schema: `_shared/schemas/auto-state.schema.json`
+Full schema: `../_shared/schemas/auto-state.schema.json`
 
 Stop hook (`hooks/scripts/auto_enforcer.py`) ensures persistence and auto-resume.
 
@@ -163,6 +163,6 @@ On error, state is saved to `.caw/auto-state.json`.
 
 ## References
 
-- [Signal Detection](_shared/signal-detection.md)
-- [Parallel Validation](_shared/parallel-validation.md)
-- [Auto State Schema](_shared/schemas/auto-state.schema.json)
+- [Signal Detection](../_shared/signal-detection.md)
+- [Parallel Validation](../_shared/parallel-validation.md)
+- [Auto State Schema](../_shared/schemas/auto-state.schema.json)
