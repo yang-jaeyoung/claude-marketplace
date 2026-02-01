@@ -91,8 +91,8 @@ Plans and structures tasks into executable steps.
 ### Builder
 Implements code following TDD approach.
 - **Haiku** (`builder-haiku.md`): Boilerplate, simple CRUD, formatting (complexity <= 0.3)
-- **Sonnet** (`builder-sonnet.md`): Standard implementation, pattern-following (0.3-0.7)
-- **Opus** (`builder.md`): Complex algorithms, security-critical code (> 0.7)
+- **Sonnet** (`builder.md`): Standard implementation, pattern-following (0.3-0.7)
+- **Opus** (`builder-opus.md`): Complex algorithms, security-critical code (> 0.7)
 
 ### Reviewer
 Reviews code for quality, bugs, and best practices.
@@ -103,17 +103,17 @@ Reviews code for quality, bugs, and best practices.
 ### Fixer
 Applies fixes based on review feedback.
 - **Haiku** (`fixer-haiku.md`): Auto-fix lint, imports, formatting (complexity <= 0.3)
-- **Sonnet** (`fixer-sonnet.md`): Multi-file refactoring, pattern extraction (0.3-0.7)
-- **Opus** (`fixer.md`): Security fixes, architectural refactoring (> 0.7)
+- **Sonnet** (`fixer.md`): Multi-file refactoring, pattern extraction (0.3-0.7)
+- **Opus** (`fixer-opus.md`): Security fixes, architectural refactoring (> 0.7)
 
 ## Specialized Agents (Single Tier)
 
 - **Analyst** (`analyst.md`, Sonnet): Requirements extraction, task specification for auto workflow
 - **Bootstrapper** (`bootstrapper.md`, Haiku): Environment initialization, project detection
-- **Architect** (`architect.md`, Opus): System design, component architecture
+- **Architect** (`architect.md`, Sonnet): System design, component architecture
 - **Designer** (`designer.md`, Sonnet): UX/UI design, wireframes, user flows
 - **Ideator** (`ideator.md`, Sonnet): Requirements discovery, Socratic dialogue
-- **ComplianceChecker** (`compliance-checker.md`, Sonnet): Guideline validation
+- **ComplianceChecker** (`compliance-checker.md`, Haiku): Guideline validation
 
 ---
 
@@ -157,28 +157,46 @@ Applies fixes based on review feedback.
 
 ```yaml
 ---
-name: "AgentName"
-description: "What the agent does"
-model: sonnet           # haiku, sonnet, or opus
-tier: sonnet            # Optional: complexity tier indicator
-whenToUse: |
-  Usage guidance with examples
-tools:
+name: agent-name                 # REQUIRED: lowercase-with-hyphens only (Claude Code spec)
+description: "What the agent does"  # REQUIRED: when to delegate to this agent
+model: sonnet                    # haiku, sonnet, opus, or inherit (default: inherit)
+tools:                           # Optional: tools available to the agent
   - Read
   - Write
   - Glob
-mcp_servers:
+mcp_servers:                     # Optional: MCP servers (omit for haiku tier)
   - serena
+skills: skill1, skill2           # Optional: skills to preload at startup
+# Plugin Extensions (not in official Claude Code spec):
+tier: sonnet                     # Extension: explicit complexity tier indicator
+whenToUse: |                     # Extension: usage guidance with examples
+  When to use this agent...
+color: blue                      # Extension: UI display color
 ---
 # Agent system prompt here
 ```
 
+### Official vs Extension Fields
+
+| Field | Official | Required | Notes |
+|-------|:--------:|:--------:|-------|
+| `name` | ✅ | **Yes** | lowercase-with-hyphens only |
+| `description` | ✅ | **Yes** | Guides delegation decisions |
+| `model` | ✅ | No | sonnet/opus/haiku/inherit |
+| `tools` | ✅ | No | Inherits all if omitted |
+| `mcp_servers` | ❌ | No | Plugin extension, optional for haiku |
+| `skills` | ✅ | No | Preloaded at agent startup |
+| `tier` | ❌ | No | Plugin extension for complexity indicator |
+| `whenToUse` | ❌ | No | Plugin extension for selection guidance |
+| `color` | ❌ | No | Plugin extension for UI |
+
 ## Tiered Agent Naming Convention
 
-- Base tier (Sonnet): `<agent>.md` (e.g., `planner.md`, `reviewer.md`)
-- Lower tier (Haiku): `<agent>-haiku.md`
-- Higher tier (Opus): `<agent>-opus.md`
-- Exception: Builder uses Opus as base (`builder.md`)
+- **Base tier (Sonnet)**: `<agent>.md` (e.g., `planner.md`, `builder.md`, `fixer.md`)
+- **Fast tier (Haiku)**: `<agent>-haiku.md` (e.g., `planner-haiku.md`)
+- **Complex tier (Opus)**: `<agent>-opus.md` (e.g., `planner-opus.md`, `builder-opus.md`)
+
+All base agents use Sonnet model for balanced cost/capability.
 
 ## Skill Definition (skills/*/SKILL.md)
 
