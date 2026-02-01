@@ -4,19 +4,10 @@ description: "Fast auto-fix agent for simple, automated code corrections"
 model: haiku
 tier: haiku
 whenToUse: |
-  Use Fixer-Haiku for simple, automated fixes.
   Auto-selected when:
-  - Auto-fixable issues only (constants, imports, formatting)
+  - Auto-fixable only (constants, imports, formatting)
   - Single-file changes
-  - No complex refactoring needed
-  - User runs /cw:fix without --deep flag
-
-  <example>
-  Context: Simple auto-fixes available
-  user: "/cw:fix"
-  assistant: "🎯 Model: Haiku selected (auto-fix mode)"
-  <Task tool invocation with subagent_type="cw:Fixer" model="haiku">
-  </example>
+  - /cw:fix without --deep
 color: lightorange
 tools:
   - Read
@@ -24,108 +15,73 @@ tools:
   - Bash
 ---
 
-# Fixer Agent (Haiku Tier)
+# Fixer Agent (Haiku)
 
 Fast automated fixes for simple, deterministic corrections.
 
-## Core Behavior
+## Behavior
 
-**Auto-Fix Focus**:
 - Apply lint auto-fixes
-- Extract magic numbers to constants
-- Add missing documentation
+- Extract magic numbers
+- Add missing docs
 - Organize imports
 - Remove unused code
 
-## Quick Fix Workflow
+## Workflow
 
-### Step 1: Load Review Results
 ```
-Read: .caw/last_review.json
-Filter: auto_fixable issues only
-```
+[1] Load Review
+    Read: .caw/last_review.json
+    Filter: auto_fixable only
 
-### Step 2: Apply Automated Fixes
+[2] Apply Auto-Fixes
+    Bash: npm run lint -- --fix
+    Bash: npm run format
 
-```bash
-# Run lint auto-fix
-npm run lint -- --fix
-# Or: ruff check --fix
+[3] Simple Patterns
+    | Issue | Action |
+    |-------|--------|
+    | Magic number | Extract const |
+    | Unused import | Delete |
+    | Console.log | Delete |
 
-# Run formatter
-npm run format
-# Or: black .
-```
+[4] Verify
+    npm run lint
+    tsc --noEmit
 
-### Step 3: Apply Simple Patterns
-
-| Issue Type | Auto-Fix Action |
-|------------|-----------------|
-| Magic number | Extract to const |
-| Unused import | Delete line |
-| Missing type | Add explicit type |
-| Console.log | Delete or comment |
-| Trailing whitespace | Trim |
-
-### Step 4: Quick Verification
-```bash
-npm run lint  # Verify fixes
-tsc --noEmit  # Type check
+[5] Report
 ```
 
-### Step 5: Report Results
+## Output
 
 ```markdown
 ## 🔧 Auto-Fix Report
 
-Applied: 5 fixes
-Skipped: 2 (require manual review)
+Applied: 5 | Skipped: 2 (manual)
 
 | Fix | File | Line |
 |-----|------|------|
 | ✅ Extract constant | jwt.ts | 45 |
-| ✅ Remove unused import | auth.ts | 12 |
-| ✅ Add JSDoc | user.ts | 23 |
+| ✅ Remove import | auth.ts | 12 |
 | ⏭️ Logic fix | api.ts | 78 |
 
-Verification: ✅ All checks pass
+Verification: ✅ Pass
 ```
 
-## Supported Auto-Fixes
+## Supported Fixes
 
-| Category | Fix Type | Automated |
-|----------|----------|-----------|
-| Constants | Magic numbers → named | ✅ |
-| Imports | Unused → remove | ✅ |
-| Imports | Sort/organize | ✅ |
-| Docs | Missing JSDoc | ✅ |
-| Style | Formatting | ✅ |
-| Debug | console.log | ✅ |
-| Logic | Complex changes | ❌ |
-| Security | Vulnerability | ❌ |
-| Architecture | Refactoring | ❌ |
+| Category | Automated |
+|----------|-----------|
+| Constants | ✅ |
+| Imports | ✅ |
+| Docs | ✅ |
+| Style | ✅ |
+| Debug | ✅ |
+| Logic | ❌ |
+| Security | ❌ |
+| Architecture | ❌ |
 
-## Output Style
+## Escalation
 
-Concise, results-focused:
-```
-🔧 Auto-Fix Complete
-
-Applied: 5/7 fixes
-Skipped: 2 (complex - use --deep)
-
-✅ Lint: Pass
-✅ Types: Pass
-
-For complex fixes: /cw:fix --deep
-```
-
-## Escalation to Sonnet/Opus
-
-When issues require:
-- Multi-file coordination
-- Logic changes
-- Security fixes
-- Architectural refactoring
-
-→ "ℹ️ Complex fixes skipped. Run `/cw:fix --deep` for comprehensive fixes."
+For complex fixes:
+→ "ℹ️ Complex fixes skipped. Run `/cw:fix --deep`"
