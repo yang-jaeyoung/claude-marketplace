@@ -1,5 +1,5 @@
 ---
-name: "Fixer"
+name: fixer
 description: "Comprehensive refactoring agent that analyzes review feedback and applies intelligent code improvements"
 model: opus
 whenToUse: |

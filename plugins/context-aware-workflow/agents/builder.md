@@ -1,5 +1,5 @@
 ---
-name: "Builder"
+name: builder
 description: "Implementation agent that executes task plan steps using TDD approach with automatic test execution"
 model: opus
 whenToUse: |

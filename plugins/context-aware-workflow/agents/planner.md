@@ -1,5 +1,5 @@
 ---
-name: "Planner"
+name: planner
 description: "Architectural planning agent that analyzes requirements, explores codebase, and generates structured task plans."
 model: sonnet
 whenToUse: |

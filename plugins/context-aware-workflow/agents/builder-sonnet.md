@@ -1,5 +1,5 @@
 ---
-name: "Builder"
+name: builder
 description: "Balanced implementation agent for standard development tasks with TDD approach"
 model: sonnet
 tier: sonnet

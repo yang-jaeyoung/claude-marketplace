@@ -1,5 +1,5 @@
 ---
-name: "Reviewer"
+name: reviewer
 description: "Deep code review agent for security audits, architecture review, and comprehensive analysis"
 model: opus
 tier: opus

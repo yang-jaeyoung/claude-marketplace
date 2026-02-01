@@ -1,5 +1,5 @@
 ---
-name: "Fixer"
+name: fixer
 description: "Balanced refactoring agent for standard code improvements and multi-file fixes"
 model: sonnet
 tier: sonnet

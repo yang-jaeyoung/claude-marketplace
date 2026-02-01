@@ -1,5 +1,5 @@
 ---
-name: "Bootstrapper"
+name: bootstrapper
 description: "Environment initialization agent that sets up the .caw/ workspace, detects project context, and prepares the workflow environment. Must run before Planner on new projects."
 model: haiku
 whenToUse: |
