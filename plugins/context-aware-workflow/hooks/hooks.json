@@ -6,6 +6,12 @@
           {
             "type": "command",
             "command": "echo \"CAW (Context-Aware Workflow) plugin is active. Use /cw:status to check workflow state or /cw:start to begin a new task.\""
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/scripts/rate_limit_handler.py\"",
+            "async": true,
+            "timeout": 5
           }
         ]
       }
@@ -70,6 +76,12 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/insight-collector/hooks/observe.py\" post"
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/skills/hud/update_hud.py\"",
+            "async": true,
+            "timeout": 5
           }
         ]
       }

@@ -12,6 +12,14 @@
 - Ralph Loop continuous improvement cycles
 - QA loops (qaloop/ultraqa) for automated quality assurance
 - Parallel execution via git worktrees
+- HUD (Heads-Up Display) for real-time workflow metrics
+- Eco mode for cost-optimized execution (30-50% savings)
+- Background task heuristics for automatic async decisions
+- Analytics system for token/cost analysis
+- Delegation categories for improved agent routing
+- Rate limit handling with automatic resume
+- Swarm mode for parallel multi-agent execution
+- Pipeline mode for explicit sequential stages
 
 ---
 
@@ -32,6 +40,15 @@ python tests/test_plugin_structure.py
 /cw:reflect    # Run Ralph Loop
 /cw:qaloop     # Review-Fix cycles
 /cw:ultraqa    # Auto QA with diagnosis
+/cw:analytics  # Token/cost analysis
+/cw:swarm      # Parallel agent execution
+/cw:pipeline   # Sequential stage execution
+
+# Magic keywords
+# eco/ecomode   - Cost-optimized execution
+# deepwork      - Complete all tasks mode
+# quickfix      - Minimal changes only
+# async         - Force background execution
 ```
 
 ---
@@ -135,7 +152,49 @@ context: fork           # Runs in isolated context
 
 ---
 
+# New Features (v2.1.0)
+
+## HUD (Heads-Up Display)
+Real-time workflow metrics during execution.
+- Enable: `CAW_HUD=enabled`
+- Location: `skills/hud/SKILL.md`
+
+## Eco Mode
+Cost-optimized execution (30-50% savings).
+- Activation: Use `eco` or `ecomode` keyword
+- Effects: Forces Haiku, skips optional phases
+
+## Background Heuristics
+Automatic async/foreground decision based on task patterns.
+- Location: `_shared/background-heuristics.md`
+- Patterns: lint, format, gemini → async; security, critical → foreground
+
+## Analytics
+Token/cost analysis and optimization insights.
+- Command: `/cw:analytics`
+- Schema: `schemas/metrics.schema.json`
+
+## Swarm Mode
+Parallel multi-agent execution.
+- Command: `/cw:swarm "task1" "task2"`
+- Location: `commands/swarm.md`
+
+## Pipeline Mode
+Explicit sequential stages with checkpoints.
+- Command: `/cw:pipeline --stages "plan,build,review"`
+- Location: `commands/pipeline.md`
+
+## Delegation Categories
+Category-based agent routing (research, implementation, review, design, maintenance).
+- Location: `_shared/agent-resolver.md`
+
+## Rate Limit Handling
+Automatic wait-and-resume for rate limit errors.
+- Location: `hooks/scripts/rate_limit_handler.py`
+
+---
+
 # Context Map
 
-- **[Shared Resources](./_shared/)** — Model routing, agent registry, templates.
+- **[Shared Resources](./_shared/)** — Model routing, agent registry, templates, skill composition, background heuristics.
 - **[Tests](./tests/)** — Plugin structure validation, unit tests.

@@ -1,0 +1,413 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://caw.plugin/schemas/metrics.schema.json",
+  "title": "CAW Metrics Schema",
+  "description": "Schema for workflow analytics and metrics tracking",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "Unique identifier for the workflow session"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when session started"
+    },
+    "ended_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when session ended (null if ongoing)"
+    },
+    "duration_seconds": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total session duration in seconds"
+    },
+    "token_usage": {
+      "type": "object",
+      "description": "Token consumption metrics",
+      "properties": {
+        "input": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total input tokens consumed"
+        },
+        "output": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total output tokens generated"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Sum of input and output tokens"
+        },
+        "cached": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tokens served from cache"
+        }
+      },
+      "required": ["input", "output", "total"]
+    },
+    "cost_breakdown": {
+      "type": "object",
+      "description": "Cost breakdown by model tier",
+      "properties": {
+        "haiku": {
+          "$ref": "#/definitions/tierCost"
+        },
+        "sonnet": {
+          "$ref": "#/definitions/tierCost"
+        },
+        "opus": {
+          "$ref": "#/definitions/tierCost"
+        },
+        "total": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Total cost in USD"
+        }
+      },
+      "required": ["total"]
+    },
+    "model_distribution": {
+      "type": "object",
+      "description": "Percentage of tokens per model tier",
+      "properties": {
+        "haiku": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of tokens using Haiku"
+        },
+        "sonnet": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of tokens using Sonnet"
+        },
+        "opus": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Fraction of tokens using Opus"
+        }
+      }
+    },
+    "phase_metrics": {
+      "type": "object",
+      "description": "Metrics broken down by workflow phase",
+      "additionalProperties": {
+        "$ref": "#/definitions/phaseMetric"
+      }
+    },
+    "step_metrics": {
+      "type": "array",
+      "description": "Metrics for individual steps",
+      "items": {
+        "$ref": "#/definitions/stepMetric"
+      }
+    },
+    "background_tasks": {
+      "type": "object",
+      "description": "Background task execution statistics",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total background tasks executed"
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Successfully completed tasks"
+        },
+        "timed_out": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tasks that exceeded timeout"
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tasks that failed with errors"
+        },
+        "average_duration_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Average task duration in milliseconds"
+        },
+        "by_pattern": {
+          "type": "object",
+          "description": "Task counts and timing by pattern",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "avg_ms": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "eco_mode": {
+      "type": "object",
+      "description": "Eco mode usage and savings",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether eco mode was active"
+        },
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Time spent in eco mode"
+        },
+        "estimated_savings": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated cost savings from eco mode in USD"
+        },
+        "tokens_saved": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Estimated tokens saved by skipping optional phases"
+        }
+      }
+    },
+    "rate_limits": {
+      "type": "object",
+      "description": "Rate limit encounters and handling",
+      "properties": {
+        "encounters": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of rate limit errors encountered"
+        },
+        "total_wait_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total time spent waiting for rate limits"
+        },
+        "auto_resumed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of automatic resumes after rate limit"
+        }
+      }
+    },
+    "agent_usage": {
+      "type": "object",
+      "description": "Agent invocation statistics",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "invocations": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of times agent was invoked"
+          },
+          "tokens": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total tokens used by agent"
+          },
+          "cost": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Total cost for agent invocations"
+          },
+          "avg_duration_seconds": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Average invocation duration"
+          }
+        }
+      }
+    },
+    "tool_usage": {
+      "type": "object",
+      "description": "Tool invocation statistics",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of times tool was used"
+          },
+          "success_rate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Fraction of successful invocations"
+          }
+        }
+      }
+    },
+    "optimization_insights": {
+      "type": "array",
+      "description": "Generated optimization recommendations",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["cost", "performance", "model", "workflow"],
+            "description": "Type of insight"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable recommendation"
+          },
+          "potential_savings": {
+            "type": "number",
+            "description": "Estimated cost savings if implemented"
+          },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high"],
+            "description": "Priority of the recommendation"
+          }
+        },
+        "required": ["type", "message"]
+      }
+    }
+  },
+  "required": ["session_id", "started_at", "token_usage"],
+  "definitions": {
+    "tierCost": {
+      "type": "object",
+      "description": "Cost metrics for a model tier",
+      "properties": {
+        "tokens_in": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Input tokens for this tier"
+        },
+        "tokens_out": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Output tokens for this tier"
+        },
+        "tokens_total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total tokens for this tier"
+        },
+        "cost": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Cost in USD for this tier"
+        },
+        "invocations": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of API calls using this tier"
+        }
+      },
+      "required": ["tokens_total", "cost"]
+    },
+    "phaseMetric": {
+      "type": "object",
+      "description": "Metrics for a workflow phase",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Phase name"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ended_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tokens": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tokens used in this phase"
+        },
+        "cost": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Cost for this phase"
+        },
+        "steps_completed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "steps_total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "model_tier": {
+          "type": "string",
+          "enum": ["haiku", "sonnet", "opus"],
+          "description": "Primary model used in this phase"
+        }
+      },
+      "required": ["tokens", "duration_seconds"]
+    },
+    "stepMetric": {
+      "type": "object",
+      "description": "Metrics for an individual step",
+      "properties": {
+        "step_id": {
+          "type": "string",
+          "description": "Step identifier (e.g., '1.2')"
+        },
+        "phase": {
+          "type": "string",
+          "description": "Parent phase name"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ended_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "duration_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cost": {
+          "type": "number",
+          "minimum": 0
+        },
+        "model_tier": {
+          "type": "string",
+          "enum": ["haiku", "sonnet", "opus"]
+        },
+        "agent": {
+          "type": "string",
+          "description": "Agent that executed this step"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed", "failed", "skipped"]
+        }
+      },
+      "required": ["step_id", "tokens", "status"]
+    }
+  }
+}

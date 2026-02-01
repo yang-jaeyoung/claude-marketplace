@@ -47,6 +47,113 @@ FUNCTION resolve_agent(requested_agent: string, complexity: float):
       RETURN requested_agent
 ```
 
+## Delegation Categories
+
+Category-based routing selects agents based on task type, improving selection accuracy beyond complexity alone.
+
+### Category Definitions
+
+```yaml
+delegation_categories:
+  research:
+    description: "Information gathering, exploration, analysis"
+    agents:
+      - analyst
+      - ideator
+      - Planner (research phase)
+    keywords:
+      - research, investigate, explore, analyze
+      - understand, discover, learn, study
+      - what, why, how, where
+
+  implementation:
+    description: "Code writing, feature building"
+    agents:
+      - Builder (all tiers)
+      - Fixer (all tiers)
+      - architect
+    keywords:
+      - implement, build, create, add
+      - write, code, develop, construct
+      - feature, function, component
+
+  review:
+    description: "Code review, validation, compliance"
+    agents:
+      - Reviewer (all tiers)
+      - ComplianceChecker
+    keywords:
+      - review, check, validate, verify
+      - audit, inspect, assess, evaluate
+      - compliance, quality, security
+
+  design:
+    description: "UX/UI design, architecture planning"
+    agents:
+      - designer
+      - architect
+      - ideator
+    keywords:
+      - design, plan, architect, structure
+      - layout, interface, UX, UI
+      - mockup, wireframe, prototype
+
+  maintenance:
+    description: "Fixes, refactoring, cleanup"
+    agents:
+      - Fixer (all tiers)
+      - Bootstrapper
+    keywords:
+      - fix, repair, correct, patch
+      - refactor, clean, tidy, optimize
+      - update, upgrade, migrate
+```
+
+### Category Resolution Algorithm
+
+```
+FUNCTION resolve_by_category(task_description: string) -> string:
+
+  # [1] Extract keywords from task
+  keywords = extract_keywords(task_description)
+
+  # [2] Score each category
+  category_scores = {}
+  FOR category, config IN delegation_categories:
+    score = count_matching_keywords(keywords, config.keywords)
+    category_scores[category] = score
+
+  # [3] Select highest scoring category
+  best_category = max(category_scores, key=score)
+
+  # [4] Return primary agent for category
+  RETURN delegation_categories[best_category].agents[0]
+```
+
+### Category + Complexity Combined
+
+The resolver combines category and complexity for optimal selection:
+
+```
+FUNCTION resolve_agent_full(task: string, complexity: float) -> string:
+
+  # [1] Determine category
+  category = resolve_by_category(task)
+
+  # [2] Get category agents
+  agents = delegation_categories[category].agents
+
+  # [3] Select agent by complexity within category
+  IF category == "implementation":
+    RETURN select_builder_tier(complexity)
+  ELIF category == "review":
+    RETURN select_reviewer_tier(complexity)
+  ELIF category == "research":
+    RETURN "analyst"  # No tiering for research
+  ELSE:
+    RETURN agents[0]  # Primary agent
+```
+
 ## Tiered Agent Mapping
 
 ### Complexity Thresholds
@@ -141,9 +248,39 @@ Task(subagent_type=agent, prompt=...)
 2. **Override sparingly**: Only force tiers when you have specific needs
 3. **Use keywords naturally**: "Quick fix" or "deep review" work intuitively
 4. **Monitor costs**: Higher tiers cost more, use when needed
+5. **Trust categories**: Category detection improves agent selection accuracy
+6. **Combine signals**: Use both category keywords and complexity indicators
+
+## Category Detection Examples
+
+```markdown
+# Research task → analyst
+"Investigate how the payment system handles refunds"
+→ Category: research (keywords: investigate)
+→ Agent: analyst
+
+# Implementation task → builder-sonnet (medium complexity)
+"Implement user profile page with avatar upload"
+→ Category: implementation (keywords: implement)
+→ Complexity: 0.55 (medium)
+→ Agent: builder-sonnet
+
+# Review task → reviewer-opus (security-related)
+"Security audit of the authentication module"
+→ Category: review (keywords: audit)
+→ Complexity: 0.85 (high, security keyword)
+→ Agent: reviewer-opus
+
+# Maintenance task → fixer-haiku (simple fix)
+"Fix typo in the login form"
+→ Category: maintenance (keywords: fix)
+→ Complexity: 0.15 (low)
+→ Agent: fixer-haiku
+```
 
 ## Related Documentation
 
 - [Agent Registry](./agent-registry.md) - Complete agent catalog
 - [Model Routing](./model-routing.md) - Tier selection logic
 - [Parallel Execution](./parallel-execution.md) - Background task management
+- [Background Heuristics](./background-heuristics.md) - Async task management
