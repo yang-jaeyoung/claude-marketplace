@@ -125,6 +125,6 @@ When rules diverge from actual code patterns, propose an update immediately. Ens
 ## Active Plugins (3)
 
 - **[Context-Aware Workflow](./plugins/context-aware-workflow/AGENTS.md)** — Full-featured plugin with agents, skills, hooks, Plan Mode integration, Ralph Loop, and Gemini CLI async reviews.
-- **[Codex CLI](./plugins/codex-cli/AGENTS.md)** — Markdown-only plugin for Codex CLI integration (12 commands).
+- **[Codex CLI](./plugins/codex-cli/CLAUDE.md)** — Markdown-only plugin for Codex CLI integration (14 commands).
 - **[Gemini CLI](./plugins/gemini-cli/AGENTS.md)** — Markdown-only plugin for Gemini CLI integration (6 commands).
 

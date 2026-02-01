@@ -159,7 +159,7 @@ Codex CLI를 Claude Code에서 직접 사용할 수 있는 플러그인입니다
 ### From Marketplace
 
 ```bash
-claude plugins add github:jyyang/claude-marketplace
+claude plugins add github:jaebit/context-aware-workflow
 claude plugins install codex-cli
 ```
 
