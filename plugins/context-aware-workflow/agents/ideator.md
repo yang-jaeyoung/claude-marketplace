@@ -1,7 +1,7 @@
 ---
 name: ideator
 description: Interactive requirements discovery through Socratic dialogue and systematic brainstorming
-model: opus
+model: sonnet
 tools:
   - Read
   - Write
