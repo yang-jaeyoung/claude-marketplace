@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "agent-registry.schema.json",
   "title": "Agent Registry Schema",
-  "description": "Schema for CAW + OMC unified agent registry",
+  "description": "Schema for CAW agent registry",
   "type": "object",
   "properties": {
     "schema_version": {
@@ -16,9 +16,6 @@
       "properties": {
         "cw": {
           "$ref": "#/definitions/namespace"
-        },
-        "omc": {
-          "$ref": "#/definitions/namespace"
         }
       },
       "additionalProperties": {
@@ -30,13 +27,6 @@
       "description": "List of all registered agents",
       "items": {
         "$ref": "#/definitions/agent"
-      }
-    },
-    "fallback_map": {
-      "type": "object",
-      "description": "OMC agent to CAW fallback mapping",
-      "additionalProperties": {
-        "$ref": "#/definitions/fallback_entry"
       }
     },
     "tier_rules": {
@@ -81,7 +71,7 @@
         },
         "namespace": {
           "type": "string",
-          "enum": ["cw", "omc"],
+          "enum": ["cw"],
           "description": "Agent namespace"
         },
         "name": {
@@ -139,10 +129,6 @@
             "type": "string"
           }
         },
-        "fallback_for": {
-          "type": "string",
-          "description": "OMC agent this serves as fallback for"
-        },
         "flags": {
           "type": "array",
           "description": "Supported command-line flags",
@@ -171,39 +157,6 @@
         }
       },
       "required": ["name", "description"]
-    },
-    "fallback_entry": {
-      "type": "object",
-      "properties": {
-        "omc_agent": {
-          "type": "string",
-          "description": "OMC agent identifier"
-        },
-        "caw_fallback": {
-          "type": "string",
-          "description": "CAW fallback agent identifier"
-        },
-        "fallback_model": {
-          "type": "string",
-          "enum": ["haiku", "sonnet", "opus"],
-          "description": "Model tier for fallback"
-        },
-        "capability_diff": {
-          "type": "array",
-          "description": "Capabilities lost in fallback",
-          "items": {
-            "type": "string"
-          }
-        },
-        "additional_tools": {
-          "type": "array",
-          "description": "Additional tools needed for fallback",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": ["omc_agent", "caw_fallback"]
     },
     "tier_rule": {
       "type": "object",

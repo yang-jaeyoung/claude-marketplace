@@ -1,7 +1,7 @@
 # Module Context
 
 **Module:** Context-Aware Workflow (cw)
-**Version:** 1.8.0
+**Version:** 2.0.0
 **Role:** Advanced agentic workflow orchestration with intelligent model routing.
 **Tech Stack:** Python 3.x, Pytest, Markdown/YAML.
 
@@ -11,7 +11,6 @@
 - Tiered agent variants (Haiku/Sonnet/Opus) with complexity-based routing
 - Ralph Loop continuous improvement cycles
 - QA loops (qaloop/ultraqa) for automated quality assurance
-- OMC (oh-my-claudecode) integration with graceful degradation
 - Parallel execution via git worktrees
 
 ---
@@ -75,35 +74,6 @@ Applies fixes based on review feedback.
 
 ---
 
-# OMC Integration
-
-When oh-my-claudecode plugin is available, additional specialized agents become accessible.
-
-## Agent Mapping (OMC -> CAW Fallback)
-
-- `omc:architect` -> `cw:architect`
-- `omc:researcher` -> `cw:Planner` + WebSearch
-- `omc:scientist` -> `cw:Builder` + Bash
-- `omc:explore` -> Task(Explore)
-- `omc:executor` -> `cw:Builder`
-- `omc:qa-tester` -> `cw:Reviewer` + Bash
-- `omc:critic` -> `cw:reviewer-opus`
-- `omc:build-fixer` -> `cw:Fixer`
-- `omc:security-reviewer` -> `cw:reviewer-opus`
-- `omc:code-reviewer` -> `cw:reviewer-opus`
-
-## Graceful Degradation
-
-CAW functions fully without OMC. When OMC agents are unavailable:
-1. Agent Resolver checks OMC availability
-2. Falls back to equivalent CAW agent
-3. Displays warning about reduced capability
-4. Continues operation with fallback
-
-See `_shared/agent-resolver.md` for implementation details.
-
----
-
 # Implementation Patterns
 
 ## Agent Definition (agents/*.md)
@@ -162,12 +132,10 @@ context: fork           # Runs in isolated context
 - **DON'T** rely on global state across agent executions.
 - **DON'T** use complex logic in Markdown; delegate to Python scripts.
 - **DON'T** hardcode model selection; use the routing system.
-- **DON'T** skip graceful degradation when integrating external agents.
 
 ---
 
 # Context Map
 
-- **[Shared Resources](./_shared/)** — Model routing, agent resolver, templates.
-- **[Documentation](./docs/)** — Architecture, workflows, integration guides.
+- **[Shared Resources](./_shared/)** — Model routing, agent registry, templates.
 - **[Tests](./tests/)** — Plugin structure validation, unit tests.

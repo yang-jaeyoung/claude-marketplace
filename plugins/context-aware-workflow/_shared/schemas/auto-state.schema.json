@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Auto State Schema",
-  "description": "State tracking for /cw:auto enhanced workflow with expansion, signal detection, and parallel validation (OMC Autopilot integration)",
+  "description": "State tracking for /cw:auto enhanced workflow with expansion, signal detection, and parallel validation",
   "type": "object",
   "required": ["schema_version", "active", "phase", "iteration", "started_at", "config"],
   "properties": {
@@ -211,11 +211,6 @@
           "type": "array",
           "items": { "type": "string" },
           "description": "Files modified during execution"
-        },
-        "use_omc_ralph": {
-          "type": "boolean",
-          "default": false,
-          "description": "Use OMC Ralph+Ultrawork if available"
         },
         "signal_detected": {
           "type": "boolean",

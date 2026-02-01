@@ -5,7 +5,7 @@ argument-hint: "<topic> [--internal] [--external] [--depth shallow|normal|deep]"
 
 # /cw:research - Integrated Research Mode
 
-Comprehensive research combining internal codebase exploration (via Serena) and external documentation research (via web tools). Uses specialized agents when OMC is available.
+Comprehensive research combining internal codebase exploration (via Serena) and external documentation research (via web tools).
 
 ## Usage
 
@@ -54,9 +54,7 @@ Explores the existing codebase using Serena and symbolic tools:
 │    • Serena: find_referencing_symbols                            │
 │    • Serena: search_for_pattern                                  │
 │    • Grep/Glob: Pattern matching                                 │
-│                                                                  │
-│  OMC Enhancement (when available):                               │
-│    • omc:explore - Fast codebase navigation                      │
+│    • Task(Explore): Fast codebase navigation                     │
 │                                                                  │
 │  Output:                                                         │
 │    • Relevant files and symbols                                  │
@@ -80,10 +78,6 @@ Searches external documentation and resources:
 │    • WebSearch: General web search                               │
 │    • WebFetch: Documentation retrieval                           │
 │    • Context7: Library documentation                             │
-│                                                                  │
-│  OMC Enhancement (when available):                               │
-│    • omc:researcher - Specialized documentation research         │
-│    • omc:scientist - Data analysis and experimentation           │
 │                                                                  │
 │  Output:                                                         │
 │    • Best practices                                              │
@@ -121,44 +115,38 @@ Searches external documentation and resources:
 
 ## Agent Selection
 
-### OMC Available
+### Standard Mode
 
 ```
 Internal Research:
-  Agent: omc:explore (Haiku)
+  Agent: Task(Explore) (Haiku)
   Purpose: Fast codebase navigation
-  
-  Agent: omc:analyst (Opus) [for --depth deep]
-  Purpose: Deep pattern analysis
-
-External Research:
-  Agent: omc:researcher (Sonnet)
-  Purpose: Documentation research
-  
-  Agent: omc:scientist (Sonnet) [for data topics]
-  Purpose: Data analysis, experiments
-
-Synthesis:
-  Agent: omc:analyst (Opus)
-  Purpose: Combine findings, recommend
-```
-
-### OMC NOT Available (Fallback)
-
-```
-⚠️ Running Research in Basic Mode
-
-Internal Research:
-  Tools: Serena (direct), Grep, Glob
-  Limitation: Manual navigation required
+  Tools: Serena, Grep, Glob
 
 External Research:
   Tools: WebSearch, WebFetch, Context7
-  Limitation: No specialized prompt
+  Purpose: Documentation research
 
 Synthesis:
-  Agent: cw:planner-opus
-  Limitation: Less focused synthesis
+  Agent: cw:Planner (Sonnet)
+  Purpose: Combine findings, recommend
+```
+
+### Deep Mode (--depth deep)
+
+```
+Internal Research:
+  Agent: cw:planner-opus (Opus)
+  Purpose: Deep pattern analysis
+  Tools: Serena, Grep, Glob
+
+External Research:
+  Tools: WebSearch, WebFetch, Context7
+  Purpose: Documentation research
+
+Synthesis:
+  Agent: cw:planner-opus (Opus)
+  Purpose: Comprehensive analysis
 ```
 
 ## Research Depth Levels
@@ -471,6 +459,6 @@ Recommendations: 3
 
 ## Related Documentation
 
-- [Agent Resolver](../_shared/agent-resolver.md) - Agent selection
+- [Model Routing](../_shared/model-routing.md) - Agent selection
 - [Agent Registry](../_shared/agent-registry.md) - Available agents
 - [Serena Integration](../_shared/serena-integration.md) - Code analysis

@@ -5,7 +5,7 @@ argument-hint: "[--target build|test|lint|all] [--max-cycles N] [--deep]"
 
 # /cw:ultraqa - Ultra Quality Assurance
 
-Advanced QA automation that intelligently diagnoses build/test/lint failures and applies targeted fixes. Uses specialized agents for root cause analysis when OMC is available.
+Advanced QA automation that intelligently diagnoses build/test/lint failures and applies targeted fixes. Uses tiered agents for root cause analysis based on complexity.
 
 ## Usage
 
@@ -35,7 +35,6 @@ Advanced QA automation that intelligently diagnoses build/test/lint failures and
 | `--max-cycles` | 5 | Maximum fix attempts |
 | `--deep` | false | Enable deep diagnosis (uses Opus) |
 | `--continue` | false | Resume from saved state |
-| `--no-fallback` | false | Fail if OMC not available |
 | `--verbose` | false | Show detailed diagnosis |
 
 ## Architecture
@@ -67,11 +66,29 @@ Advanced QA automation that intelligently diagnoses build/test/lint failures and
 
 ## Agent Selection Strategy
 
-### OMC Available (Full Power)
+### Standard Mode
 
 ```
 Diagnose Phase:
-  Agent: omc:architect (Opus)
+  Agent: cw:reviewer-opus (Opus)
+  Capabilities:
+    ✅ Root cause analysis
+    ✅ Error pattern matching
+    ✅ Fix suggestions
+
+Fix Phase:
+  Agent: cw:Fixer (Opus)
+  Capabilities:
+    ✅ Targeted fixes
+    ✅ Multi-file refactoring
+    ✅ Test-aware modifications
+```
+
+### Deep Mode (--deep)
+
+```
+Diagnose Phase:
+  Agent: cw:architect (Opus)
   Capabilities:
     ✅ Deep root cause analysis
     ✅ Cross-file dependency tracking
@@ -79,32 +96,11 @@ Diagnose Phase:
     ✅ Intelligent fix suggestions
 
 Fix Phase:
-  Agent: omc:executor (Sonnet)
+  Agent: cw:Fixer (Opus)
   Capabilities:
-    ✅ Focused implementation
-    ✅ Minimal collateral changes
-    ✅ Test-aware modifications
-```
-
-### OMC NOT Available (Fallback Mode)
-
-```
-⚠️ Running UltraQA in Basic Mode
-
-Diagnose Phase:
-  Agent: cw:reviewer-opus
-  Method: Error log parsing + review
-  Limitations:
-    ⚠️ Basic error pattern matching
-    ⚠️ Single-file analysis
-    ⚠️ Generic fix suggestions
-
-Fix Phase:
-  Agent: cw:Fixer
-  Method: Standard fixing
-  Limitations:
-    ⚠️ May cause side effects
-    ⚠️ Less targeted fixes
+    ✅ Comprehensive fixes
+    ✅ Architectural improvements
+    ✅ Security-aware modifications
 ```
 
 ## Detection Phase
@@ -147,10 +143,10 @@ issues = parse_lint_issues(output)
 
 ## Diagnosis Phase
 
-### With omc:architect
+### Diagnosis Prompt
 
 ```markdown
-## Diagnosis Prompt (OMC)
+## Root Cause Analysis
 
 Analyze the following errors and provide root cause analysis:
 
@@ -170,24 +166,6 @@ Analyze the following errors and provide root cause analysis:
 5. Recommended fix approach
 
 Output structured diagnosis report.
-```
-
-### Without OMC (Fallback)
-
-```markdown
-## Diagnosis Prompt (CAW Fallback)
-
-Review the following errors:
-
-**Errors:**
-[error_list]
-
-**Analyze:**
-1. What is the direct cause?
-2. What file(s) need changes?
-3. What is the suggested fix?
-
-Note: Running in basic mode. Analysis may be limited.
 ```
 
 ## Fix Phase
@@ -242,7 +220,7 @@ Detecting issues...
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Cycle 1/5 ━━━━━━━━━━━━━━━━━━━━
-  🔍 Diagnosing with omc:architect...
+  🔍 Diagnosing with cw:reviewer-opus...
 
   📋 Root Cause Analysis:
   ┌────────────────────────────────────────────────
@@ -307,51 +285,6 @@ Cycle 3/5 ━━━━━━━━━━━━━━━━━━━━
 💡 Next: /cw:review to verify changes
 ```
 
-### Fallback Mode Output
-
-```
-🔬 /cw:ultraqa --target build
-
-⚠️ Running in Basic Mode (OMC not available)
-   Diagnosis depth: Standard
-   For advanced analysis, install oh-my-claudecode
-
-Detecting issues...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📦 Build:  ❌ 2 errors
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Cycle 1/5 ━━━━━━━━━━━━━━━━━━━━
-  🔍 Basic diagnosis (cw:reviewer-opus)...
-
-  📋 Error Analysis:
-  ┌────────────────────────────────────────────────
-  │ Error 1: TS2305 - Module has no exported member
-  │   File: src/auth.ts:5
-  │   Likely fix: Check export in source module
-  │
-  │ Error 2: TS2339 - Property does not exist
-  │   File: src/user.ts:23
-  │   Likely fix: Add property to type definition
-  └────────────────────────────────────────────────
-
-  🔧 Applying fixes...
-      ✅ types.ts: Added export
-      ✅ user.ts: Added property
-
-  🔄 Verifying...
-      📦 Build: ✅ Success
-
-✅ UltraQA Complete (Basic Mode)
-
-📊 Summary:
-  • Build errors: 2 → 0 ✅
-
-💡 Note: For more thorough QA, consider:
-   • Installing OMC for advanced diagnosis
-   • Running /cw:review --deep manually
-```
-
 ## State File
 
 ### `.caw/ultraqa_state.json`
@@ -368,8 +301,6 @@ Cycle 1/5 ━━━━━━━━━━━━━━━━━━━━
     "deep_mode": true
   },
   "environment": {
-    "omc_available": true,
-    "fallback_mode": false,
     "project_type": "typescript",
     "build_command": "npm run build",
     "test_command": "npm test",
@@ -415,7 +346,6 @@ Cycle 1/5 ━━━━━━━━━━━━━━━━━━━━
 | Targets | Build/Test/Lint | Any review issue |
 | Diagnosis | Deep root cause | Standard review |
 | Best for | CI failures | Quality gates |
-| OMC Benefit | High | Medium |
 
 ## Integration
 
@@ -455,11 +385,11 @@ Cycle 1/5 ━━━━━━━━━━━━━━━━━━━━
    - For architectural problems
 
 4. **Check fallback warnings**
-   - Install OMC for full power
+   - Use --deep for thorough analysis
    - Understand limitations
 
 ## Related Documentation
 
-- [Agent Resolver](../_shared/agent-resolver.md) - Agent selection
+- [Model Routing](../_shared/model-routing.md) - Agent selection
 - [QA Loop](./qaloop.md) - Quality assurance loop
 - [Review Command](./review.md) - Manual review

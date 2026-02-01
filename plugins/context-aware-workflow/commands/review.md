@@ -157,13 +157,8 @@ Overall: 🟢 Approved with suggestions
 
 **Agent Selection for Deep Review:**
 
-When OMC is available:
-- Agent: `omc:critic` (Opus) - Deep code critique specialist
-- Agent: `omc:code-reviewer` (Opus) - Comprehensive review
-
-When OMC is NOT available:
-- Agent: `cw:reviewer-opus` - CAW's Opus-tier reviewer
-- Fallback provides equivalent depth with less specialized prompting
+- Agent: `cw:reviewer-opus` (Opus) - Deep code critique
+- Provides thorough analysis with security and architecture focus
 
 ### Focused Review
 

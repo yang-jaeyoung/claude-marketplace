@@ -8,26 +8,20 @@
     {
       "name": "codex-cli",
       "description": "Codex CLI integration for Claude Code - Execute Codex commands directly",
-      "source": "./plugins/codex-cli"
+      "source": "./plugins/codex-cli",
+      "version": "1.0.0"
     },
     {
       "name": "gemini-cli",
       "description": "Google Gemini CLI integration for code review, commit messages, and documentation",
-      "source": "./plugins/gemini-cli"
-    },
-    {
-      "name": "mssql",
-      "description": "MS SQL Server integration for Claude Code - Execute queries, explore schemas, and manage databases with Windows Authentication",
-      "source": "./plugins/mssql"
+      "source": "./plugins/gemini-cli",
+      "version": "1.0.0"
     },
     {
       "name": "cw",
       "description": "Context-aware workflow orchestration plugin with Plan Mode integration, intelligent context management, and structured task planning",
       "source": "./plugins/context-aware-workflow",
-      "version": "1.0.0",
-      "author": {
-        "name": "urd"
-      },
+      "version": "2.0.0",
       "keywords": [
         "workflow",
         "context",
@@ -36,80 +30,6 @@
         "task-management"
       ],
       "category": "productivity"
-    },
-    {
-      "name": "az",
-      "description": "Collection of specialized skills for brainstorming, code conventions, security audits, documentation generation, and project analysis",
-      "source": "./plugins/az-skill-pack",
-      "version": "1.0.0",
-      "author": {
-        "name": "urd"
-      },
-      "keywords": [
-        "brainstorming",
-        "csharp",
-        "security",
-        "documentation",
-        "vue",
-        "audit"
-      ],
-      "category": "productivity"
-    },
-    {
-      "name": "intent-based-skills",
-      "description": "Intent-based skill framework plugin for consistent and verifiable complex task execution with feedback loop system",
-      "source": "./plugins/intent-based-skills",
-      "version": "1.0.0",
-      "author": {
-        "name": "urd"
-      },
-      "keywords": [
-        "skills",
-        "intent",
-        "framework",
-        "analyzer",
-        "react",
-        "vue",
-        "dotnet",
-        "feedback"
-      ],
-      "category": "productivity"
-    },
-    {
-      "name": "rails8-hotwire",
-      "description": "Rails 8 + Hotwire full-stack development plugin with specialized agents, hooks, and skills for modern Rails development",
-      "source": "./plugins/rails8-hotwire",
-      "version": "1.0.0",
-      "author": {
-        "name": "urd"
-      },
-      "keywords": [
-        "rails",
-        "ruby",
-        "hotwire",
-        "turbo",
-        "stimulus",
-        "kamal",
-        "full-stack"
-      ],
-      "category": "web-development"
-    },
-    {
-      "name": "quant-k",
-      "description": "KRX 퀀트 분석 종목 발굴 플러그인",
-      "source": "./plugins/quant-k",
-      "version": "0.1.0",
-      "author": {
-        "name": "urd"
-      },
-      "keywords": [
-        "krx",
-        "quant",
-        "stock",
-        "finance",
-        "analysis"
-      ],
-      "category": "finance"
     }
   ]
 }

@@ -54,24 +54,22 @@ Exit Conditions:
 ❌ Build failure persists
 ```
 
-## Agent Selection (with OMC Integration)
+## Agent Selection
 
-### When OMC is Available
-
-```
-Build Phase:    omc:executor (Sonnet) - Focused execution
-Diagnose:       omc:architect (Opus) - Deep root cause analysis
-Fix:            omc:executor (Sonnet) - Precise fixes
-```
-
-### When OMC is NOT Available (Fallback)
+### Standard Mode
 
 ```
 Build Phase:    cw:Builder (Sonnet) - Standard build
-Diagnose:       cw:reviewer-opus - Review with diagnosis
-Fix:            cw:Fixer (Sonnet) - Generic fixing
+Diagnose:       cw:Reviewer (Sonnet) - Review with diagnosis
+Fix:            cw:Fixer (Sonnet) - Targeted fixing
+```
 
-⚠️ Note: Diagnosis depth may be reduced without OMC
+### Deep Mode (--deep)
+
+```
+Build Phase:    cw:Builder (Sonnet) - Standard build
+Diagnose:       cw:reviewer-opus (Opus) - Deep root cause analysis
+Fix:            cw:Fixer (Opus) - Comprehensive fixing
 ```
 
 ## Execution Flow
@@ -95,10 +93,10 @@ Fix:            cw:Fixer (Sonnet) - Generic fixing
       }
     }
 
-[3] Resolve agents
-    build_agent = resolve_agent("omc:executor")
-    diagnose_agent = resolve_agent("omc:architect")
-    fix_agent = resolve_agent("omc:executor")
+[3] Select agents based on mode
+    build_agent = "cw:Builder"
+    diagnose_agent = "cw:Reviewer" or "cw:reviewer-opus" (--deep)
+    fix_agent = "cw:Fixer"
 ```
 
 ### Phase 2: QA Cycle
@@ -295,11 +293,10 @@ This may require manual intervention or architectural change.
     "exit_severity": "major"
   },
   "environment": {
-    "omc_available": true,
     "agents_used": {
-      "build": "omc:executor",
-      "diagnose": "omc:architect",
-      "fix": "omc:executor"
+      "build": "cw:Builder",
+      "diagnose": "cw:Reviewer",
+      "fix": "cw:Fixer"
     }
   },
   "current_cycle": 2,
@@ -395,7 +392,6 @@ This may require manual intervention or architectural change.
 
 ## Related Documentation
 
-- [Agent Resolver](../_shared/agent-resolver.md) - Agent selection
-- [Model Routing](../_shared/model-routing.md) - Tier selection
+- [Model Routing](../_shared/model-routing.md) - Agent tier selection
 - [Loop Command](./loop.md) - Autonomous execution
 - [Review Command](./review.md) - Manual review

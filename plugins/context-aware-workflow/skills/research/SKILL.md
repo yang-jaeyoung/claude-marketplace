@@ -121,47 +121,45 @@ Combine findings:
 
 ## Agent Integration
 
-### With OMC Available
+### Standard Mode
 
-When OMC plugin is detected, delegate to specialized agents:
-
-```markdown
-## OMC Agent Delegation
-
-Internal Research:
-  Agent: omc:explore
-  Task: "Explore codebase for: {topic}"
-  Output: File list, symbol map, patterns
-
-External Research:
-  Agent: omc:researcher
-  Task: "Research documentation for: {topic}"
-  Output: Best practices, official recommendations
-
-Synthesis:
-  Agent: omc:analyst
-  Task: "Synthesize research findings"
-  Output: Comparative analysis, recommendations
-```
-
-### Without OMC (Fallback)
-
-Use direct tools:
+Use direct tools and built-in agents:
 
 ```markdown
-## Fallback Research
+## Research Execution
 
 Internal:
-  - Direct Serena tool calls
+  - Task(Explore) for fast codebase navigation
+  - Direct Serena tool calls for symbols
   - Grep/Glob for pattern matching
 
 External:
-  - WebSearch + WebFetch
+  - WebSearch + WebFetch for documentation
   - Context7 for libraries
 
 Synthesis:
+  - cw:Planner for combining findings
   - Direct LLM analysis
-  - Manual comparison
+```
+
+### Deep Mode (--depth deep)
+
+Use Opus-tier agents for comprehensive analysis:
+
+```markdown
+## Deep Research Execution
+
+Internal:
+  - cw:planner-opus for deep pattern analysis
+  - Comprehensive Serena symbol exploration
+
+External:
+  - Thorough documentation research
+  - Multiple source verification
+
+Synthesis:
+  - cw:planner-opus for comprehensive analysis
+  - Detailed comparative recommendations
 ```
 
 ## Output Format

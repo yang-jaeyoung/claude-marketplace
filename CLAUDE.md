@@ -128,7 +128,3 @@ When rules diverge from actual code patterns, propose an update immediately. Ens
 - **[Codex CLI](./plugins/codex-cli/AGENTS.md)** — Markdown-only plugin for Codex CLI integration (12 commands).
 - **[Gemini CLI](./plugins/gemini-cli/AGENTS.md)** — Markdown-only plugin for Gemini CLI integration (6 commands).
 
-## Registered but Not Present (5)
-
-These plugins are declared in `marketplace.json` but do not exist in the filesystem:
-- mssql, az, intent-based-skills, rails8-hotwire, quant-k

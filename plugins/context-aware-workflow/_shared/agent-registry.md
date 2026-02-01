@@ -1,19 +1,12 @@
-# Unified Agent Registry
+# Agent Registry
 
-Comprehensive catalog of all available agents for CAW and OMC integration.
+Comprehensive catalog of all available agents for CAW workflows.
 
 ## Overview
 
-This registry documents all agents available in the CAW ecosystem, including native CAW agents and OMC agents when the oh-my-claudecode plugin is installed.
+This registry documents all agents available in the CAW ecosystem with their tiers, capabilities, and use cases.
 
-## Agent Namespaces
-
-| Namespace | Source | Always Available |
-|-----------|--------|------------------|
-| `cw:` | CAW Plugin | ✅ Yes |
-| `omc:` | OMC Plugin | ❌ Requires OMC |
-
-## CAW Native Agents
+## CAW Agents
 
 ### Core Agents (Tiered)
 
@@ -167,262 +160,20 @@ Applies fixes based on review feedback.
 
 ---
 
-## OMC Agents (When Available)
-
-These agents are available when the oh-my-claudecode plugin is installed.
-
-### Research & Analysis
-
-#### omc:researcher
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | `cw:Planner` + WebSearch |
-
-**Purpose**: External documentation research, API exploration
-
-**Capabilities**:
-- Documentation research
-- API exploration
-- Library comparison
-- Best practice research
-
----
-
-#### omc:scientist
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | `cw:Builder` + Bash |
-
-**Purpose**: Data analysis, hypothesis testing, experimentation
-
-**Capabilities**:
-- Data analysis
-- Hypothesis testing
-- Experiment design
-- Results interpretation
-
----
-
-#### omc:analyst
-| Model | CAW Fallback |
-|-------|--------------|
-| Opus | `cw:planner-opus` |
-
-**Purpose**: Deep analysis, pattern recognition, insights
-
-**Capabilities**:
-- Pattern recognition
-- Trend analysis
-- Insight generation
-- Strategic recommendations
-
----
-
-### Exploration & Navigation
-
-#### omc:explore
-| Model | CAW Fallback |
-|-------|--------------|
-| Haiku | Task(Explore) |
-
-**Purpose**: Codebase exploration, file discovery, pattern finding
-
-**Capabilities**:
-- Fast codebase search
-- Pattern matching
-- File discovery
-- Structure mapping
-
----
-
-### Execution & Building
-
-#### omc:executor
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | `cw:Builder` |
-
-**Purpose**: Focused code implementation, build execution
-
-**Capabilities**:
-- Code implementation
-- Build execution
-- Test running
-- Deployment tasks
-
----
-
-#### omc:build-fixer
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | `cw:Fixer` |
-
-**Purpose**: Build error fixing, compilation issues
-
-**Capabilities**:
-- Build error diagnosis
-- Compilation fixes
-- Dependency resolution
-- Configuration repair
-
----
-
-### Quality Assurance
-
-#### omc:qa-tester
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | `cw:Reviewer` + Bash |
-
-**Purpose**: Test execution, quality verification
-
-**Capabilities**:
-- Test execution
-- Coverage analysis
-- Regression testing
-- Quality gates
-
----
-
-#### omc:critic
-| Model | CAW Fallback |
-|-------|--------------|
-| Opus | `cw:reviewer-opus` |
-
-**Purpose**: Deep code critique, architectural review
-
-**Capabilities**:
-- Code critique
-- Design review
-- Quality assessment
-- Improvement suggestions
-
----
-
-#### omc:code-reviewer
-| Model | CAW Fallback |
-|-------|--------------|
-| Opus | `cw:reviewer-opus --deep` |
-
-**Purpose**: Comprehensive code review
-
-**Capabilities**:
-- Deep code review
-- Logic analysis
-- Pattern validation
-- Best practice enforcement
-
----
-
-#### omc:security-reviewer
-| Model | CAW Fallback |
-|-------|--------------|
-| Opus | `cw:reviewer-opus --security` |
-
-**Purpose**: Security-focused code analysis
-
-**Capabilities**:
-- Vulnerability scanning
-- OWASP checks
-- Security patterns
-- Threat modeling
-
----
-
-### Design & Architecture
-
-#### omc:architect
-| Model | CAW Fallback |
-|-------|--------------|
-| Opus | `cw:architect` |
-
-**Purpose**: System architecture, design decisions
-
-**Capabilities**:
-- System design
-- Component architecture
-- Technical decisions
-- Integration planning
-
----
-
-#### omc:designer
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | `cw:designer` |
-
-**Purpose**: UI/UX design, visual specifications
-
-**Capabilities**:
-- Visual design
-- UX patterns
-- Interface specs
-- Design systems
-
----
-
-### Content & Documentation
-
-#### omc:writer
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | Direct LLM |
-
-**Purpose**: Documentation, content writing
-
-**Capabilities**:
-- Documentation writing
-- README creation
-- API docs
-- User guides
-
----
-
-#### omc:vision
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | Direct LLM |
-
-**Purpose**: Image analysis, visual understanding
-
-**Capabilities**:
-- Image analysis
-- Screenshot interpretation
-- Visual debugging
-- UI inspection
-
----
-
-#### omc:tdd-guide
-| Model | CAW Fallback |
-|-------|--------------|
-| Sonnet | `cw:Builder` |
-
-**Purpose**: TDD methodology guidance
-
-**Capabilities**:
-- TDD workflow
-- Test-first guidance
-- Red-green-refactor
-- Testing patterns
-
----
-
 ## Agent Selection Matrix
 
 ### By Task Type
 
-| Task Type | Recommended Agent | Fallback |
-|-----------|-------------------|----------|
-| Planning | `cw:Planner` | - |
-| Implementation | `cw:Builder` | - |
-| Code Review | `cw:Reviewer` | - |
-| Bug Fixing | `cw:Fixer` | - |
-| Architecture | `omc:architect` | `cw:architect` |
-| Research | `omc:researcher` | WebSearch |
-| Testing | `omc:qa-tester` | `cw:Reviewer` + Bash |
-| Security | `omc:security-reviewer` | `cw:reviewer-opus --security` |
-| Data Analysis | `omc:scientist` | Bash + Python |
+| Task Type | Recommended Agent |
+|-----------|-------------------|
+| Planning | `cw:Planner` |
+| Implementation | `cw:Builder` |
+| Code Review | `cw:Reviewer` |
+| Bug Fixing | `cw:Fixer` |
+| Architecture | `cw:architect` |
+| Research | `cw:Planner` + WebSearch |
+| Testing | `cw:Reviewer` + Bash |
+| Security | `cw:reviewer-opus` |
 
 ### By Complexity
 
@@ -442,12 +193,6 @@ Task tool:
   subagent_type: "cw:Builder"
   model: "sonnet"
   prompt: "Implement the login feature..."
-
-## Using OMC Agent (with fallback)
-resolved_agent = resolve_agent("omc:architect")
-Task tool:
-  subagent_type: resolved_agent
-  prompt: "Design the authentication system..."
 ```
 
 ### Tiered Agent Selection
@@ -464,27 +209,7 @@ ELSE:
   agent = "cw:Builder"  # Opus default
 ```
 
-### Conditional OMC Usage
-
-```markdown
-## Prefer OMC when available
-IF omc_available():
-  researcher = "omc:researcher"
-ELSE:
-  researcher = "cw:Planner"
-  # Will need to manually use WebSearch/WebFetch
-```
-
 ## Integration Points
-
-### With Agent Resolver
-
-All agent requests should go through the resolver:
-
-```markdown
-agent = resolve_agent(requested_agent)
-Task(subagent_type=agent, prompt=...)
-```
 
 ### With Model Routing
 
@@ -505,9 +230,9 @@ Commands use registry for agent selection:
 | `/cw:next` | `cw:Builder` | Tier-based |
 | `/cw:review` | `cw:Reviewer` | Tier-based |
 | `/cw:fix` | `cw:Fixer` | Tier-based |
-| `/cw:qaloop` | Multiple | Resolver |
-| `/cw:ultraqa` | OMC preferred | Resolver |
-| `/cw:research` | OMC preferred | Resolver |
+| `/cw:qaloop` | Multiple | Tier-based |
+| `/cw:ultraqa` | `cw:reviewer-opus` | Deep analysis |
+| `/cw:research` | `cw:Planner` | WebSearch tools |
 
 ## Schema Reference
 
@@ -515,6 +240,5 @@ See [agent-registry.schema.json](./schemas/agent-registry.schema.json) for the c
 
 ## Related Documentation
 
-- [Agent Resolver](./agent-resolver.md) - Resolution and fallback logic
 - [Model Routing](./model-routing.md) - Tier selection
 - [Parallel Execution](./parallel-execution.md) - Concurrent agent execution

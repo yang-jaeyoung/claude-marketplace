@@ -246,19 +246,3 @@ Signal detection updates `.caw/auto-state.json`:
 }
 ```
 
-## OMC Integration
-
-When oh-my-claudecode is detected:
-
-1. Use OMC's transcript detection paths
-2. Synchronize signal state between `.caw/auto-state.json` and `.omc/autopilot-state.json`
-3. Prefer OMC's Ralph+Ultrawork for execution phase
-4. Map signals bidirectionally:
-
-| CAW Signal | OMC Signal |
-|------------|------------|
-| EXPANSION_COMPLETE | EXPANSION_COMPLETE |
-| PLANNING_COMPLETE | PLANNING_COMPLETE |
-| EXECUTION_COMPLETE | EXECUTION_COMPLETE |
-| QA_COMPLETE | QA_COMPLETE |
-| AUTO_COMPLETE | AUTOPILOT_COMPLETE |

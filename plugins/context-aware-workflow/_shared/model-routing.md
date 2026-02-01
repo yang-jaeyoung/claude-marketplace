@@ -127,53 +127,6 @@ Model tier can be influenced by magic keywords from `mode.json`:
 | DEEP_ANALYSIS | Opus (thorough reasoning) |
 | DEEP_WORK | Sonnet (efficient completion) |
 
-## OMC Agent Tier Mapping
-
-When OMC (oh-my-claudecode) plugin is available, the following agents can be used with their default tiers:
-
-### OMC Agent Tiers
-
-| OMC Agent | Default Tier | Override Available |
-|-----------|--------------|-------------------|
-| `omc:architect` | Opus | Yes |
-| `omc:researcher` | Sonnet | Yes |
-| `omc:scientist` | Sonnet | Yes |
-| `omc:explore` | Haiku | No |
-| `omc:executor` | Sonnet | Yes |
-| `omc:qa-tester` | Sonnet | Yes |
-| `omc:critic` | Opus | No (always deep) |
-| `omc:analyst` | Opus | Yes |
-| `omc:build-fixer` | Sonnet | Yes |
-| `omc:security-reviewer` | Opus | No (always thorough) |
-| `omc:code-reviewer` | Opus | Yes |
-| `omc:designer` | Sonnet | Yes |
-| `omc:writer` | Sonnet | Yes |
-| `omc:vision` | Sonnet | Yes |
-| `omc:tdd-guide` | Sonnet | Yes |
-
-### OMC Tier Override Syntax
-
-```bash
-# Use haiku tier for executor
-Task(subagent_type: "omc:executor", model: "haiku")
-
-# Use opus tier for researcher (upgrade)
-Task(subagent_type: "omc:researcher", model: "opus")
-```
-
-### Graceful Degradation
-
-When OMC is not available, requested OMC agents fall back to CAW equivalents:
-
-| Requested | Fallback | Notes |
-|-----------|----------|-------|
-| `omc:architect` | `cw:architect` | Equivalent capability |
-| `omc:researcher` | `cw:Planner` + WebSearch | Manual integration |
-| `omc:critic` | `cw:reviewer-opus` | Less specialized |
-| `omc:security-reviewer` | `cw:reviewer-opus --security` | Flag mode |
-
-See [agent-resolver.md](./agent-resolver.md) for complete fallback logic.
-
 ## Schema Reference
 
 See [model-routing.schema.json](../schemas/model-routing.schema.json) for complete schema definition.

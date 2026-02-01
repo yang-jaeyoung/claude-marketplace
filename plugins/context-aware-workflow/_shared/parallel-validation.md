@@ -1,6 +1,6 @@
 # Parallel Validation System
 
-Enhanced review phase with 3-architect parallel validation (inspired by OMC Autopilot).
+Enhanced review phase with 3-architect parallel validation.
 
 ## Overview
 

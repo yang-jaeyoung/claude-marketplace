@@ -91,13 +91,9 @@
       "type": "object",
       "description": "Runtime environment information",
       "properties": {
-        "omc_available": {
-          "type": "boolean",
-          "description": "Whether OMC plugin is available"
-        },
         "agents_used": {
           "type": "object",
-          "description": "Resolved agents for each role",
+          "description": "Agents used for each role",
           "properties": {
             "build": {
               "type": "string",
@@ -112,10 +108,6 @@
               "description": "Agent used for fixing"
             }
           }
-        },
-        "fallback_mode": {
-          "type": "boolean",
-          "description": "Whether running in fallback mode"
         }
       }
     },
