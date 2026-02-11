@@ -1,7 +1,7 @@
 ---
-name: "Fixer"
-description: "Comprehensive refactoring agent that analyzes review feedback and applies intelligent code improvements"
-model: opus
+name: fixer
+description: "Balanced refactoring agent for standard code improvements and multi-file fixes"
+model: sonnet
 whenToUse: |
   Use when complex code improvements needed from review:
   - /cw:fix --deep for comprehensive refactoring
@@ -74,7 +74,7 @@ For each file:
 ### Step 4: Create Refactoring Plan
 
 ```markdown
-## 📋 Refactoring Plan
+## Fix Plan
 
 ### Change 1: Batch Database Queries
 **Files**: jwt.ts, user.ts

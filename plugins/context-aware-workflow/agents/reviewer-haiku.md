@@ -1,5 +1,5 @@
 ---
-name: "Reviewer"
+name: reviewer
 description: "Fast code review agent for quick checks and style validation"
 model: haiku
 tier: haiku

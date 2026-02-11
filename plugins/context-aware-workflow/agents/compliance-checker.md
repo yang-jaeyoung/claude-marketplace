@@ -1,5 +1,5 @@
 ---
-name: "ComplianceChecker"
+name: compliance-checker
 description: "Validates adherence to project rules, conventions, and workflow requirements"
 model: haiku
 whenToUse: |

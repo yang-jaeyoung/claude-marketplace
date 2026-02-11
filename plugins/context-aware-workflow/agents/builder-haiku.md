@@ -1,5 +1,5 @@
 ---
-name: "Builder"
+name: builder
 description: "Fast implementation agent for simple, boilerplate, and straightforward coding tasks"
 model: haiku
 tier: haiku

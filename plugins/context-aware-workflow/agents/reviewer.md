@@ -1,5 +1,5 @@
 ---
-name: "Reviewer"
+name: reviewer
 description: "Code review agent that analyzes implementations for quality, best practices, and potential issues"
 model: sonnet
 whenToUse: |

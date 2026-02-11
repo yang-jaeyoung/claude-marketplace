@@ -1,5 +1,5 @@
 ---
-name: "Fixer"
+name: fixer
 description: "Fast auto-fix agent for simple, automated code corrections"
 model: haiku
 tier: haiku

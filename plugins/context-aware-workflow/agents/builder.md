@@ -1,7 +1,7 @@
 ---
-name: "Builder"
-description: "Implementation agent that executes task plan steps using TDD approach with automatic test execution"
-model: opus
+name: builder
+description: "Balanced implementation agent for standard development tasks with TDD approach"
+model: sonnet
 whenToUse: |
   Use when executing implementation steps from task_plan.md:
   - /cw:next to proceed with implementation
@@ -32,7 +32,7 @@ Implements code changes following TDD approach based on structured task plan.
 3. **Auto-Test Execution**: Run tests after each implementation
 4. **Status Updates**: Update step status on completion
 
-## Workflow
+## Standard Workflow
 
 ### Step 1: Parse Current State
 ```
