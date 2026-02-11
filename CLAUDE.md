@@ -93,15 +93,53 @@ plugins/<name>/
 | Type | Location | Key Fields |
 |------|----------|------------|
 | Commands | `commands/*.md` | description, allowed-tools, context, agent, model, hooks |
-| Agents | `agents/*.md` | name, description, model(sonnet/opus/haiku), tools, mcp_servers |
+| Agents | `agents/*.md` | name, description, model, tools, mcp_servers, whenToUse, color, tier, skills |
 | Skills | `skills/*/SKILL.md` | name, description, allowed-tools, context:fork |
 | Hooks | `hooks/hooks.json` | PreToolUse, PostToolUse, Stop, Setup, SessionStart, etc |
 
+## Agents Schema
+
+### Required Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Agent identifier (lowercase or PascalCase) |
+| `description` | string | Brief description of agent purpose |
+| `model` | enum | `sonnet`, `opus`, or `haiku` |
+| `tools` | array | List of allowed tools |
+
+### Optional Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `mcp_servers` | array | MCP servers to enable (serena, sequential, context7, perplexity) |
+| `whenToUse` | string | Multi-line guidance for when to invoke this agent |
+| `color` | string | Display color hint for UI (green, blue, orange, purple, etc.) |
+| `tier` | string | Explicit tier label for tiered variants (haiku, sonnet, opus) |
+| `skills` | string | Comma-separated list of integrated skills |
+
 ## Agents Tiering
 
-- **Base:** `<name>.md` (Sonnet)
-- **Fast:** `<name>-haiku.md`
-- **Complex:** `<name>-opus.md`
+### Naming Convention
+
+- **Base:** `<name>.md` — Default tier, typically Sonnet (but may use Opus for complex-by-default agents)
+- **Fast:** `<name>-haiku.md` — Lightweight, speed-optimized
+- **Complex:** `<name>-opus.md` — Deep analysis, comprehensive
+
+### Model Selection by Complexity
+
+| Complexity | Tier | Model | Use Case |
+|------------|------|-------|----------|
+| ≤ 0.3 | Haiku | haiku | Boilerplate, simple CRUD, formatting |
+| 0.3 - 0.7 | Sonnet | sonnet | Standard features, typical tasks |
+| > 0.7 | Opus | opus | Architecture, security, large refactoring |
+
+### Escalation Pattern
+
+Agents should include escalation guidance when task complexity exceeds their tier:
+- Haiku → "⚠️ Task more complex. Sonnet recommended."
+- Sonnet → "⚠️ Higher complexity. Opus recommended."
+- Opus → "ℹ️ Task simpler than expected. Sonnet tier would be efficient."
 
 ## Hooks
 
